@@ -1,6 +1,3 @@
-
-
-
 import { useMemo, useState } from "react";
 import "./App.css";
 import {
@@ -35,11 +32,43 @@ const usuarios = {
 },
   ],
   innovacion: [
-    { id: "go", iniciales: "GO", nombre: "Glen Orillo Starke", cargo: "Director Innovación Digital", tag: "Todas las nacionales", acceso: "todo" },
-    { id: "jp", iniciales: "JP", nombre: "Juan Pablo Godoy", cargo: "Encargado de N1 y N3", tag: "Todas las nacionales", acceso: "todo" },
-    { id: "jv", iniciales: "JV", nombre: "Jonathan Velásquez", cargo: "Encargado de N2 y N4", tag: "Todas las nacionales", acceso: "todo" },
-    { id: "sb", iniciales: "SB", nombre: "Sthefanie Botello", cargo: "Encargada de N5", tag: "Todas las nacionales", acceso: "todo" },
-  ],
+  {
+    id: "go",
+    iniciales: "GO",
+    nombre: "Glen Orillo Starke",
+    cargo: "Director Innovación Digital",
+    tag: "Todas las nacionales",
+    acceso: "todo",
+    foto: "/images/GlenHD.png",
+  },
+  {
+    id: "jp",
+    iniciales: "JP",
+    nombre: "Juan Pablo Godoy",
+    cargo: "Encargado de N1 y N3",
+    tag: "Todas las nacionales",
+    acceso: "todo",
+    foto: "/images/Juan_PabloHD.png",
+  },
+  {
+    id: "jv",
+    iniciales: "JV",
+    nombre: "Jonathan Velásquez",
+    cargo: "Encargado de N2 y N4",
+    tag: "Todas las nacionales",
+    acceso: "todo",
+    foto: "/images/JonathanHD.png",
+  },
+  {
+    id: "sb",
+    iniciales: "SB",
+    nombre: "Sthefanie Botello",
+    cargo: "Encargada de N5",
+    tag: "Todas las nacionales",
+    acceso: "todo",
+    foto: "/images/SthefHD.png",
+  },
+],
   nacionales: [
     { id: "dm", iniciales: "DM", nombre: "Diana Milena Contreras Rodriguez", cargo: "Lider Nacional 1", tag: "Nacional 1", acceso: "N1" },
     { id: "js", iniciales: "JS", nombre: "Juan Sebastian Abella Quintero", cargo: "Lider Nacional 2", tag: "Nacional 2", acceso: "N2" },
@@ -80,7 +109,14 @@ function UserCard({ usuario, seleccionado, onSelect, colorClass }) {
       className={`user-card ${colorClass} ${seleccionado ? "selected" : ""}`}
       onClick={() => onSelect(usuario.id)}
     >
-      <div className="avatar">{usuario.iniciales}</div>
+      <div className={`avatar ${usuario.foto ? "avatar-photo" : ""}`}>
+       {usuario.foto ? (
+     <img src={usuario.foto} alt={usuario.nombre} />
+      ) : (
+         usuario.iniciales
+     )}
+</div>
+
       <h3>{usuario.nombre}</h3>
       <p className="cargo">{usuario.cargo}</p>
       <span className="tag">{usuario.tag}</span>
@@ -156,11 +192,27 @@ function App() {
 
   const resumen = useMemo(() => {
     const venta = datosFiltrados.reduce((s, r) => s + (Number(r["VENTA ESTIMADA"]) || 0), 0);
-    const propuesta = datosFiltrados.reduce((s, r) => s + (Number(r["VALOR DE LA PROPUESTA"]) || 0), 0);
+
+    const propuestaCerrada = datosFiltrados
+      .filter((r) => r.ESTADO === "Cerrada")
+      .reduce((s, r) => s + (Number(r["VALOR DE LA PROPUESTA"]) || 0), 0);
+
+    const propuestaSeguimiento = datosFiltrados
+      .filter((r) => r.ESTADO === "En seguimiento")
+      .reduce((s, r) => s + (Number(r["VALOR DE LA PROPUESTA"]) || 0), 0);
+
     const cerradas = datosFiltrados.filter((r) => r.ESTADO === "Cerrada").length;
     const seguimiento = datosFiltrados.filter((r) => r.ESTADO === "En seguimiento").length;
     const porMejorar = datosFiltrados.filter((r) => r.ESTADO === "Por Mejorar").length;
-    return { venta, propuesta, cerradas, seguimiento, porMejorar };
+
+    return {
+      venta,
+      propuestaCerrada,
+      propuestaSeguimiento,
+      cerradas,
+      seguimiento,
+      porMejorar,
+    };
   }, [datosFiltrados]);
 
   const estadosData = useMemo(() => {
@@ -246,7 +298,7 @@ function App() {
           ))}
         </div>
 
-        <h2 className="section-label">NACIONALES</h2>
+        <h2 className="section-label">EQUIPOS NACIONALES</h2>
         <div className="row row-nacionales">
           {usuarios.nacionales.map((u) => (
             <UserCard key={u.id} usuario={u} colorClass="nacionales" seleccionado={seleccionadoId === u.id} onSelect={setSeleccionadoId} />
@@ -304,8 +356,8 @@ function App() {
         <section className="kpi-grid">
           <KPI label="Registros" value={number(datosFiltrados.length)} detail="Con los filtros actuales" />
           <KPI label="Venta estimada" value={money(resumen.venta)} detail="Oportunidad comercial" accent="blue" />
-          <KPI label="Valor propuestas" value={money(resumen.propuesta)} detail="Propuestas registradas" accent="purple" />
-          <KPI label="Cerradas" value={number(resumen.cerradas)} detail={`${number(resumen.seguimiento)} en seguimiento`} accent="green" />
+          <KPI label="Valor propuestas cerradas" value={money(resumen.propuestaCerrada)} detail={`${number(resumen.cerradas)} propuestas cerradas`} accent="green" />
+          <KPI label="Valor propuestas en seguimiento" value={money(resumen.propuestaSeguimiento)} detail={`${number(resumen.seguimiento)} propuestas en seguimiento`} accent="purple" />
           <KPI label="Por mejorar" value={number(resumen.porMejorar)} detail="Requieren gestión" accent="orange" />
         </section>
 
@@ -427,7 +479,71 @@ function App() {
           </div>
         </section>
 
-        <section className="table-card">
+        
+        <section className="innovation-team">
+          <div className="innovation-team-header">
+            <h2>Área de Innovación Digital</h2>
+            <span>Somos el equipo detrás de cada propuesta</span>
+          </div>
+
+          <div className="innovation-lead">
+            <div className="innovation-photo innovation-photo-lead">
+              <img src="/images/GlenHD.png" alt="Glen Orillo Starke" />
+              <span className="innovation-badge">JEFE</span>
+            </div>
+
+            <div className="innovation-lead-text">
+              <h3>Glen Orillo Starke</h3>
+              <strong>Director Innovación Digital</strong>
+              <p>
+                Lidera la estrategia y visión del Área de Innovación Digital de Prisa Media.
+              </p>
+            </div>
+          </div>
+
+          <div className="innovation-members">
+            <div className="innovation-member">
+              <div className="innovation-photo">
+                <img src="/images/Juan_PabloHD.png" alt="Juan Pablo Godoy"/>
+              </div>
+              <div className="innovation-member-text">
+                <h3>Juan Pablo Godoy</h3>
+                <span>Encargado de N1 y N3</span>
+                <p>
+                  Lidera la creación y desarrollo de propuestas digitales para las Nacionales N1 y N3.
+                </p>
+              </div>
+            </div>
+
+            <div className="innovation-member">
+              <div className="innovation-photo">
+                <img src="/images/JonathanHD.png" alt="Jonathan Velásquez" />
+              </div>
+              <div className="innovation-member-text">
+                <h3>Jonathan Velásquez</h3>
+                <span>Encargado de N2 y N4</span>
+                <p>
+                  Responsable del diseño y ejecución de propuestas digitales para las Nacionales N2 y N4.
+                </p>
+              </div>
+            </div>
+
+            <div className="innovation-member">
+              <div className="innovation-photo">
+                <img src="/images/SthefHD.png" alt="Sthefanie Botello" />
+              </div>
+              <div className="innovation-member-text">
+                <h3>Sthefanie Botello</h3>
+                <span>Encargada de N5</span>
+                <p>
+                  Encargada de desarrollar y optimizar propuestas digitales para la Nacional N5.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+<section className="table-card">
           <div className="table-heading">
             <div>
               <h3>Detalle de oportunidades</h3>
@@ -473,7 +589,7 @@ function App() {
             </table>
           </div>
         </section>
-      </main>
+</main>
 
       {registroSeleccionado && (
         <div className="modal-backdrop" onClick={() => setRegistroSeleccionado(null)}>
