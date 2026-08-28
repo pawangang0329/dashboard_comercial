@@ -98,7 +98,7 @@ const USERS = [
     canViewAll: true,
 
     image:
-      `${IMAGE_PATH}TatianaGarciaCalderon.png`,
+  `${IMAGE_PATH}TatianaGarciaHD.png`,
   },
 
 
@@ -178,7 +178,7 @@ const USERS = [
     canViewAll: true,
 
     image:
-      `${IMAGE_PATH}SthefHD.png`,
+      `${IMAGE_PATH}sthef1HD.png`,
   },
 
 
@@ -356,7 +356,7 @@ const INNOVATION_TEAM = [
     initials: "SB",
 
     image:
-      `${IMAGE_PATH}SthefHD.png`,
+      `${IMAGE_PATH}sthef1HD.png`,
 
     desc:
       "Encargada de desarrollar y optimizar propuestas digitales para la Nacional N5.",
@@ -1288,7 +1288,7 @@ function getUserImage(name) {
     normalized.includes("stefanie")
   ) {
 
-    return `${IMAGE_PATH}SthefHD.png`;
+    return `${IMAGE_PATH}sthef1HD.png`;
 
   }
 
@@ -1342,7 +1342,7 @@ function getUserImage(name) {
     normalized.includes("tatiana garcia")
   ) {
 
-    return `${IMAGE_PATH}TatianaGarciaCalderon.png`;
+    return `${IMAGE_PATH}TatianaGarciaHD.png`;
 
   }
 
