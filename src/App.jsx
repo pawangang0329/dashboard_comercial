@@ -1,6115 +1,7668 @@
-import { useMemo, useState } from "react";
-import "./App.css";
+/* =========================================================
+   APP.JSX
+   DASHBOARD COMERCIAL - PRISA MEDIA
+   ========================================================= */
+
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import * as XLSX from "xlsx";
+
 import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
+  Search,
+  Bell,
+  HelpCircle,
+  ChevronDown,
+  ChevronRight,
+  ChevronLeft,
+  Landmark,
+  Shirt,
+  UtensilsCrossed,
+  GraduationCap,
+  ShoppingCart,
+  Car,
+  Briefcase,
+  HeartPulse,
+  ShieldCheck,
+  Cpu,
+  Building2,
+  Clapperboard,
+  Plane,
+  LayoutGrid,
+  FileText,
+  CheckCircle2,
+  Lightbulb,
+  DollarSign,
+  Users,
+  Tag,
+  Download,
+  Eye,
+  Home as HomeIcon,
+  Building,
+  Menu,
+  X,
+  TrendingUp,
+} from "lucide-react";
+
+import {
   PieChart,
   Pie,
   Cell,
+  ResponsiveContainer,
   LineChart,
   Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ComposedChart,
+  Bar,
+  CartesianGrid,
 } from "recharts";
 
+
 /* =========================================================
-   USUARIOS Y RESTRICCIONES
+   CONFIGURACIÓN GENERAL
    ========================================================= */
 
-const usuarios = {
-  direccion: [
-    {
-      id: "tg",
-      iniciales: "TG",
-      nombre: "Tatiana Garcia Calderon",
-      cargo: "Gerente comercial nacional",
-      tag: "Todas las nacionales",
-      acceso: "todo",
-    },
-  ],
+const EXCEL_FILE = "/BS_PRISA.xlsx";
 
-  innovacion: [
-    {
-      id: "go",
-      iniciales: "GO",
-      nombre: "Glen Orillo Starke",
-      cargo: "Director Innovación Digital",
-      tag: "Todas las nacionales",
-      acceso: "todo",
-      foto: "/images/GlenHD.png",
-    },
-    {
-      id: "jp",
-      iniciales: "JP",
-      nombre: "Juan Pablo Godoy",
-      cargo: "Encargado de N1 y N3",
-      tag: "Todas las nacionales",
-      acceso: "todo",
-      foto: "/images/JuanPabloHD.png",
-    },
-    {
-      id: "jv",
-      iniciales: "JV",
-      nombre: "Jonathan Velásquez",
-      cargo: "Encargado de N2 y N4",
-      tag: "Todas las nacionales",
-      acceso: "todo",
-      foto: "/images/JonathanHD.png",
-    },
-    {
-      id: "sb",
-      iniciales: "SB",
-      nombre: "Sthefanie Botello",
-      cargo: "Encargada de N5",
-      tag: "Todas las nacionales",
-      acceso: "todo",
-      foto: "/images/SthefHD.png",
-    },
-  ],
+const IMAGE_PATH = "/images/";
 
-  nacionales: [
-    {
-      id: "dm",
-      iniciales: "DM",
-      nombre: "Diana Milena Contreras Rodriguez",
-      cargo: "Lider Nacional 1",
-      tag: "Nacional 1",
-      acceso: "N1",
-    },
-    {
-      id: "js",
-      iniciales: "JS",
-      nombre: "Juan Sebastian Abella Quintero",
-      cargo: "Lider Nacional 2",
-      tag: "Nacional 2",
-      acceso: "N2",
-    },
-    {
-      id: "tp",
-      iniciales: "TP",
-      nombre: "Tatiana Pelaez Copete",
-      cargo: "Lider Nacional 3",
-      tag: "Nacional 3",
-      acceso: "N3",
-    },
-    {
-      id: "ia",
-      iniciales: "IA",
-      nombre: "Ivonne Adriana Moriones Alvarez",
-      cargo: "Lider Nacional 4",
-      tag: "Nacional 4",
-      acceso: "N4",
-    },
-    {
-      id: "wo",
-      iniciales: "WO",
-      nombre: "William Ocampo Arguello",
-      cargo: "Lider Nacional 5",
-      tag: "Nacional 5",
-      acceso: "N5",
-    },
-  ],
+
+/* =========================================================
+   USUARIOS
+   ========================================================= */
+
+const USERS = [
+
+  /* =======================================================
+     USUARIOS CON ACCESO TOTAL
+     ======================================================= */
+
+  {
+    id: "tatiana-garcia",
+
+    name: "Tatiana García Calderón",
+
+    shortName: "Tatiana García",
+
+    initials: "TG",
+
+    role: "Gerente comercial nacional",
+
+    filterTeam: "",
+
+    canViewAll: true,
+
+    image:
+      `${IMAGE_PATH}TatianaGarciaCalderon.png`,
+  },
+
+
+  {
+    id: "glen-orillo",
+
+    name: "Glen Orillo Starke",
+
+    shortName: "Glen",
+
+    initials: "GO",
+
+    role: "Director Innovación Digital",
+
+    filterTeam: "",
+
+    canViewAll: true,
+
+    image:
+      `${IMAGE_PATH}GlenHD.png`,
+  },
+
+
+  {
+    id: "juan-pablo",
+
+    name: "Juan Pablo Godoy",
+
+    shortName: "Juan Pablo",
+
+    initials: "JG",
+
+    role: "Encargado de N1 y N3",
+
+    filterTeam: "",
+
+    canViewAll: true,
+
+    image:
+      `${IMAGE_PATH}JuanPabloHD.png`,
+  },
+
+
+  {
+    id: "jonathan",
+
+    name: "Jonathan Velásquez",
+
+    shortName: "Jonathan",
+
+    initials: "JV",
+
+    role: "Encargado de N2 y N4",
+
+    filterTeam: "",
+
+    canViewAll: true,
+
+    image:
+      `${IMAGE_PATH}JonathanHD.png`,
+  },
+
+
+  {
+    id: "sthefanie",
+
+    name: "Sthefanie Botello",
+
+    shortName: "Sthefanie",
+
+    initials: "SB",
+
+    role: "Encargada de N5",
+
+    filterTeam: "",
+
+    canViewAll: true,
+
+    image:
+      `${IMAGE_PATH}SthefHD.png`,
+  },
+
+
+  /* =======================================================
+     USUARIOS DE EQUIPOS NACIONALES
+     ======================================================= */
+
+  {
+    id: "diana",
+
+    name:
+      "Diana Milena Contreras Rodriguez",
+
+    shortName: "Diana Milena",
+
+    initials: "DM",
+
+    role: "Líder Nacional 1",
+
+    filterTeam: "Nacional 1",
+
+    canViewAll: false,
+
+    image:
+      `${IMAGE_PATH}DianaMilenaContreras.png`,
+  },
+
+
+  {
+    id: "juan-sebastian",
+
+    name:
+      "Juan Sebastian Abella Quintero",
+
+    shortName: "Juan Sebastian",
+
+    initials: "JS",
+
+    role: "Líder Nacional 2",
+
+    filterTeam: "Nacional 2",
+
+    canViewAll: false,
+
+    image:
+      `${IMAGE_PATH}JuanSebastianAbellaQuintero.png`,
+  },
+
+
+  {
+    id: "tatiana-pelaez",
+
+    name:
+      "Tatiana Pelaez Copete",
+
+    shortName: "Tatiana Pelaez",
+
+    initials: "TP",
+
+    role: "Líder Nacional 3",
+
+    filterTeam: "Nacional 3",
+
+    canViewAll: false,
+
+    image:
+      `${IMAGE_PATH}TatianaPelaezCopete.png`,
+  },
+
+
+  {
+    id: "ivonne",
+
+    name:
+      "Ivonne Adriana Moriones Alvarez",
+
+    shortName: "Ivonne Adriana",
+
+    initials: "IA",
+
+    role: "Líder Nacional 4",
+
+    filterTeam: "Nacional 4",
+
+    canViewAll: false,
+
+    image:
+      `${IMAGE_PATH}IvonneAdrianaMorionesAlvarez.png`,
+  },
+
+
+  {
+    id: "william",
+
+    name:
+      "William Ocampo Arguello",
+
+    shortName: "William",
+
+    initials: "WO",
+
+    role: "Líder Nacional 5",
+
+    filterTeam: "Nacional 5",
+
+    canViewAll: false,
+
+    image:
+      `${IMAGE_PATH}WilliamOcampoArguello.png`,
+  },
+
+];
+
+
+/* =========================================================
+   EQUIPO DE INNOVACIÓN DIGITAL
+   ========================================================= */
+
+const INNOVATION_TEAM = [
+
+  {
+    name: "Glen Orillo Starke",
+
+    role:
+      "Director Innovación Digital",
+
+    initials: "GO",
+
+    image:
+      `${IMAGE_PATH}GlenHD.png`,
+
+    desc:
+      "Lidera la estrategia y visión del Área de Innovación Digital de Prisa Media.",
+  },
+
+
+  {
+    name: "Juan Pablo Godoy",
+
+    role:
+      "Encargado de N1 y N3",
+
+    initials: "JG",
+
+    image:
+      `${IMAGE_PATH}JuanPabloHD.png`,
+
+    desc:
+      "Lidera la creación y desarrollo de propuestas digitales para las Nacionales N1 y N3.",
+  },
+
+
+  {
+    name: "Jonathan Velásquez",
+
+    role:
+      "Encargado de N2 y N4",
+
+    initials: "JV",
+
+    image:
+      `${IMAGE_PATH}JonathanHD.png`,
+
+    desc:
+      "Responsable del diseño y ejecución de propuestas digitales para las Nacionales N2 y N4.",
+  },
+
+
+  {
+    name: "Sthefanie Botello",
+
+    role:
+      "Encargada de N5",
+
+    initials: "SB",
+
+    image:
+      `${IMAGE_PATH}SthefHD.png`,
+
+    desc:
+      "Encargada de desarrollar y optimizar propuestas digitales para la Nacional N5.",
+  },
+
+];
+
+
+/* =========================================================
+   EQUIPOS NACIONALES
+   ========================================================= */
+
+const NATIONAL_TEAMS = [
+
+  {
+    name:
+      "Diana Milena Contreras Rodriguez",
+
+    role:
+      "Líder Nacional 1",
+
+    national:
+      "Nacional 1",
+
+    initials: "DM",
+
+    image:
+      `${IMAGE_PATH}DianaMilenaContreras.png`,
+  },
+
+
+  {
+    name:
+      "Juan Sebastian Abella Quintero",
+
+    role:
+      "Líder Nacional 2",
+
+    national:
+      "Nacional 2",
+
+    initials: "JS",
+
+    image:
+      `${IMAGE_PATH}JuanSebastianAbellaQuintero.png`,
+  },
+
+
+  {
+    name:
+      "Tatiana Pelaez Copete",
+
+    role:
+      "Líder Nacional 3",
+
+    national:
+      "Nacional 3",
+
+    initials: "TP",
+
+    image:
+      `${IMAGE_PATH}TatianaPelaezCopete.png`,
+  },
+
+
+  {
+    name:
+      "Ivonne Adriana Moriones Alvarez",
+
+    role:
+      "Líder Nacional 4",
+
+    national:
+      "Nacional 4",
+
+    initials: "IA",
+
+    image:
+      `${IMAGE_PATH}IvonneAdrianaMorionesAlvarez.png`,
+  },
+
+
+  {
+    name:
+      "William Ocampo Arguello",
+
+    role:
+      "Líder Nacional 5",
+
+    national:
+      "Nacional 5",
+
+    initials: "WO",
+
+    image:
+      `${IMAGE_PATH}WilliamOcampoArguello.png`,
+  },
+
+];
+
+
+/* =========================================================
+   COLORES DEL DASHBOARD
+   ========================================================= */
+
+const COLORS = {
+
+  bg: "#0a0b10",
+
+  panel: "#12141c",
+
+  panel2: "#171a24",
+
+  border: "#242836",
+
+  text: "#e9eaf0",
+
+  sub: "#8b8fa3",
+
+  pink: "#e6197a",
+
+  pinkSoft:
+    "rgba(230,25,122,0.14)",
+
+  green: "#2fbf6e",
+
+  greenSoft:
+    "rgba(47,191,110,0.14)",
+
+  amber: "#e0a52c",
+
+  amberSoft:
+    "rgba(224,165,44,0.14)",
+
+  blue: "#3b8ef0",
+
+  blueSoft:
+    "rgba(59,142,240,0.14)",
+
+  purple: "#8b6ff0",
+
 };
 
-const todosLosUsuarios = [
-  ...usuarios.direccion,
-  ...usuarios.innovacion,
-  ...usuarios.nacionales,
-];
 
 /* =========================================================
-   DATOS DEL EXCEL
+   COLORES DE LAS NACIONALES
    ========================================================= */
 
-const datosComerciales = [
-  {
-    EQUIPO: "ALIANZAS",
-    "NOMBRE EJECUTIVO": "ALIANZAS",
-    CUENTA: "DISQUERAS - TIQUETERAS",
-    "VENTA ESTIMADA": 10000000,
-    "NECESIDAD 1":
-      "PROPUESTA DIGITAL PARA DISQUERAS, EVENTOS Y TIQUETERAS - FRANQUICIAS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "ALIANZAS|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "ALIANZAS",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-03",
-    "FECHA DE ENTREGA": "2026-06-03",
-    "LINK DE PRESENTACION":
-      "PRODUCTO DIGITAL-FRANQUICIAS-MÚSICA EN MOVIMIENTO.pptx",
-    "VALOR DE LA PROPUESTA": 10000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 1,
-  },
+const NACIONAL_COLORS = {
 
-  {
-    EQUIPO: "ALIANZAS",
-    "NOMBRE EJECUTIVO": "ALIANZAS",
-    CUENTA: "FRANQUICIAS",
-    "VENTA ESTIMADA": 10000000,
-    "NECESIDAD 1": "PROPUESTA DE FRANQUICIAS PARA EVENTOS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "ALIANZAS|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "ALIANZAS",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-03",
-    "FECHA DE ENTREGA": "2026-06-03",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL-DEL PLAY AL SHOW.pptx",
-    "VALOR DE LA PROPUESTA": 10000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 2,
-  },
+  "Nacional 1":
+    COLORS.pink,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "FRANQUICIAS",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA DE FRANQUICIAS POR RUBROS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION": "FRANQUICIAS PRISA.pptx",
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 3,
-  },
+  "Nacional 2":
+    COLORS.blue,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "FRANQUICIAS",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA DE FRANQUICIAS POR PAQUETES",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION": "Producto_Digital_FRANQUICIAS PRISA 2026.pptx",
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 4,
-  },
+  "Nacional 3":
+    COLORS.amber,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "ELECCIONES 2026",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA ELECCIONES 2026",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL-ELECCIONES 2026.pptx",
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 5,
-  },
+  "Nacional 4":
+    COLORS.green,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "PRODUCTOS GENERALES",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA DIGITAL LA RUTA DEL GOL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL-LA RUTA DEL GOL.pptx",
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 6,
-  },
+  "Nacional 5":
+    COLORS.purple,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "PRODUCTOS GENERALES",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA DE FRANQUICIAS MUNDIAL 2026",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION":
-      "Producto_Digital_FRANQUICIA MUNDIALISTA.pptx",
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 7,
-  },
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "PRODUCTOS GENERALES",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA DIGITAL BEAUTY",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION": "Producto_Digital_Universo Beauty.pptx",
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 8,
-  },
+  N1:
+    COLORS.pink,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "PRODUCTOS GENERALES",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA DIGITAL CONSTRUCTORAS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION": "Producto_Digital_LIVING EXPERIENCE.pptx",
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 9,
-  },
+  N2:
+    COLORS.blue,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "PRODUCTOS GENERALES",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA DIGITAL SHOPPABLE",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 10,
-  },
+  N3:
+    COLORS.amber,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "PRODUCTOS GENERALES",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA DIGITAL TECNOLOGIA DNS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION":
-      "Producto_Digital_RADIO INTERACTIVO.pptx",
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 11,
-  },
+  N4:
+    COLORS.green,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "PRODUCTOS GENERALES",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "DESARROLO DE AGENTE DE IA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 12,
-  },
+  N5:
+    COLORS.purple,
 
-  {
-    EQUIPO: "PRODUCTOS GENERALES",
-    "NOMBRE EJECUTIVO": "PRODUCTOS GENERALES",
-    CUENTA: "CONEXIÓN PRISA",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1":
-      "CONEXIÓN PRISA. UNA DINÁMICA COMERCIAL QUE PRESENTA PRODUCTOS DIGITALES EXCLUSIVOS PARA CADA RUBRO, IMPULSANDO OPORTUNIDADES DE NEGOCIO EN TIEMPO REAL.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital al area comercial",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "Seguimiento – Evento 22 de julio",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "PRODUCTOS GENERALES|En seguimiento",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "PRODUCTOS GENERALES",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-06",
-    "FECHA DE ENTREGA": "2026-07-06",
-    "LINK DE PRESENTACION":
-      "Producto_Digital-CONEXIÓN PRISA.pptx",
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Equipo Innovación Digital",
-    id: 13,
-  },
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Andrea Morales",
-    CUENTA: "MANTEQUILLA LA BUENA",
-    "VENTA ESTIMADA": 40000000,
-    "NECESIDAD 1":
-      "PROPUESTA CAPSULAS FRANQUICIAS - PROBANDO PROBANDO Y CHICAS EN SU SALSA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Andrea Morales",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-22",
-    "FECHA DE ENTREGA": "2026-07-22",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL - LA BUENA.pptx",
-    "VALOR DE LA PROPUESTA": 42014863,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 14,
-  },
+  ALIANZAS:
+    "#6dd3c7",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Diana Contreras Rodriguez",
-    CUENTA: "YALE",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Diana Contreras Rodriguez",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 15,
-  },
+  GENERAL:
+    "#6dd3c7",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Rosa Diaz",
-    CUENTA: "CAFAM",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Rosa Diaz",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 16,
-  },
+};
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Rosa Diaz",
-    CUENTA: "KOALA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Rosa Diaz",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 17,
-  },
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Rosa Diaz",
-    CUENTA: "NISSAN",
-    "VENTA ESTIMADA": 50000000,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Rosa Diaz",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-21",
-    "FECHA DE ENTREGA": "2026-07-30",
-    "LINK DE PRESENTACION":
-      "https://grupoprisa-my.sharepoint.com/:p:/g/personal/juangodoy_est_caracol_com_co/IQCYkmJrdbInS4u8M93JA0qcAZGDL-39y8dP9-zxG8YRQ3k",
-    "VALOR DE LA PROPUESTA": 58000000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 18,
-  },
+/* =========================================================
+   ORDEN DE RUBROS
+   ========================================================= */
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Rosa Diaz",
-    CUENTA: "CHANGAN",
-    "VENTA ESTIMADA": 50000000,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Rosa Diaz",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-21",
-    "FECHA DE ENTREGA": "2026-07-30",
-    "LINK DE PRESENTACION":
-      "https://grupoprisa-my.sharepoint.com/:p:/g/personal/juangodoy_est_caracol_com_co/IQCHxe3NSSkMSpsZDwFQ5LU5Ac7jtZiYMDl8eyyLQMcBTDw",
-    "VALOR DE LA PROPUESTA": 58000000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 19,
-  },
+const RUBRO_ORDER = [
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Rosa Diaz",
-    CUENTA: "PORCHE",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Rosa Diaz",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 20,
-  },
+  "Banca",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Felipe Guillen",
-    CUENTA: "SAMSUNG",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Felipe Guillen",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 21,
-  },
+  "Moda",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Diana Contreras Rodriguez",
-    CUENTA: "PLEXI",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Diana Contreras Rodriguez",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 22,
-  },
+  "Gastronomía",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Felipe Guillen",
-    CUENTA: "PRIMAX",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Felipe Guillen",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 23,
-  },
+  "Educación",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Carolina Diaz",
-    CUENTA: "COLSANITAS",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2":
-      "SE DESARROLLO UNA PROPUESTA PARA MUNDO COLSANITAS (PODCAST, CHAT IA)",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "REALIZAR SEGUIMIENTO A LA PROPUESTA PARA CONOCER SU ESTADO, CONFIRMAR SI SE CONCRETÓ EL CIERRE E IDENTIFICAR OPORTUNIDADES DE MEJORA.",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Carolina Diaz",
-    MES: "AGOSTO",
-    "FECHA SOLICITUD": "2026-08-13",
-    "FECHA DE ENTREGA": "2026-08-20",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 24,
-  },
+  "Consumo Masivo",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Carolina Diaz",
-    CUENTA: "PROSEGURO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Carolina Diaz",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 25,
-  },
+  "Automotriz",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Carolina Diaz",
-    CUENTA: "KELLOGS",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Carolina Diaz",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 26,
-  },
+  "Servicios",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Carolina Diaz",
-    CUENTA: "AJINOMOTO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Carolina Diaz",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 27,
-  },
+  "Salud",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Diana Contreras Rodriguez",
-    CUENTA: "KNORR",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Diana Contreras Rodriguez",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 28,
-  },
+  "Seguros",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Carolina Diaz",
-    CUENTA: "SUPERMERCADO MAKRO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Carolina Diaz",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 29,
-  },
+  "Tecnología",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Andrea Morales",
-    CUENTA: "CASA LUKER",
-    "VENTA ESTIMADA": 28500000,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Andrea Morales",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-08",
-    "FECHA DE ENTREGA": "2026-07-08",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 28500000,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 30,
-  },
+  "Inmobiliario",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Andrea Morales",
-    CUENTA: "ALQUERIA",
-    "VENTA ESTIMADA": 34000000,
-    "NECESIDAD 1":
-      "FRANQUICIA - LA MIL OFICIOS Y SE LO EXPLICO CON EXPERTOS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Andrea Morales",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-08-04",
-    "FECHA DE ENTREGA": "2026-08-05",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 34000000,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 31,
-  },
-    {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Andrea Morales",
-    CUENTA: "VOLVO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Andrea Morales",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 32,
-  },
+  "Entretenimiento",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Andrea Morales",
-    CUENTA: "CAJA SOCIAL",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Andrea Morales",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 33,
-  },
+  "Viajes",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Natalia Zambrano",
-    CUENTA: "RAMO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Natalia Zambrano",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 34,
-  },
+  "Otros",
 
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Natalia Zambrano",
-    CUENTA: "SPOTIFY",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N1|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Natalia Zambrano",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 35,
-  },
-
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Felipe Guillen",
-    CUENTA: "DON JULIO",
-    "VENTA ESTIMADA": 15000000,
-    "NECESIDAD 1": "Ruta del gol",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "se paso la propuesta ruta del gol",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "acaptaron la propuesta",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "La propuesta fue aprobada por el cliente. Actualmente nos encontramos a la espera de su ejecución.",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "Cerrada",
-    CLAVE: "N1|Cerrada",
-    PRIORIDAD: null,
-    RESPONSABLE: "Felipe Guillen",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-25",
-    "FECHA DE ENTREGA": "2026-06-25",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL-LA RUTA DEL GOL.pptx",
-    "VALOR DE LA PROPUESTA": 32000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 36,
-  },
-
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Andrea Morales",
-    CUENTA: "ARTURO CALLE",
-    "VENTA ESTIMADA": 50000000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL - FRANQUICIA PLAZA ALVIRA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "no aprobado por el cliente",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "en seguimiento",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Andrea Morales",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-02",
-    "FECHA DE ENTREGA": "2026-07-02",
-    "LINK DE PRESENTACION": "EL TOUR DEL ESTILO.pptx",
-    "VALOR DE LA PROPUESTA": 76000000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 37,
-  },
-
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Carolina Diaz",
-    CUENTA: "ADIDAS",
-    "VENTA ESTIMADA": 35000000,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Carolina Diaz",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-09",
-    "FECHA DE ENTREGA": "2026-07-09",
-    "LINK DE PRESENTACION": "PROPUESTA ADIDAS.pptx",
-    "VALOR DE LA PROPUESTA": 39000000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 38,
-  },
-
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Carolina Diaz",
-    CUENTA: "HONOR",
-    "VENTA ESTIMADA": 40000000,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "no aprobada por el cliente",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "no aprobada",
-    CLAVE: "N1|no aprobada",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Carolina Diaz",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-09",
-    "FECHA DE ENTREGA": "2026-07-09",
-    "LINK DE PRESENTACION": "PROPUESTA COMERCIAL HONOR.pptx",
-    "VALOR DE LA PROPUESTA": 39420000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 39,
-  },
-
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Carolina Diaz",
-    CUENTA: "NIKE",
-    "VENTA ESTIMADA": 35000000,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Carolina Diaz",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-10",
-    "FECHA DE ENTREGA": "2026-07-10",
-    "LINK DE PRESENTACION": "PROPUESTA NIKE.pptx",
-    "VALOR DE LA PROPUESTA": 39000000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 40,
-  },
-
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Natalia Zambrano",
-    CUENTA: "AMAZON",
-    "VENTA ESTIMADA": 30000000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL - FRANQUICIA TECNOLOGIA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Natalia Zambrano",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-10",
-    "FECHA DE ENTREGA": "2026-07-10",
-    "LINK DE PRESENTACION": "PROPUESTA AMAZON ECOMMERCE.pptx",
-    "VALOR DE LA PROPUESTA": 32600000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 41,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Camilo Prada",
-    CUENTA: "COLFONDOS S.A. PENSIONES Y CESANTIAS",
-    "VENTA ESTIMADA": 92198334,
-    "NECESIDAD 1":
-      "Tiene un decrecimiento en su participación del mercado de 91%. Y dejaron de invertir en la radio. FRANQUICIA EN SE LO EXPLICO CON EXPERTOS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "GENERAR PROPUESTA COMERCIAL - FRANQUICIA SE LO EXPLICO CON EXPERTOS",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: "En seguimiento",
-    ESTADO: "En seguimiento",
-    CLAVE: "N2|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Camilo Prada",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-04",
-    "FECHA DE ENTREGA": "2026-06-23",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL - COLFONDOS.pptx",
-    "VALOR DE LA PROPUESTA": 30000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 42,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Camilo Prada",
-    CUENTA: "BIOCOMBUSTIBLES S.A.",
-    "VENTA ESTIMADA": 42050587,
-    "NECESIDAD 1":
-      "Tiene un crecimiento en su participación del mercado de 77%. Radio tiene un crecimiento del 25%. Pero Prisa Media pierde la participación frente a RCN y Radio Polis.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "Con base en la retroalimentación del cliente, se ajusta la propuesta para la campaña específica y se entrega la versión final para su validación.",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N2|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Camilo Prada",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-23",
-    "FECHA DE ENTREGA": "2026-07-03",
-    "LINK DE PRESENTACION":
-      "Producto_Digital-EL MUNDIAL SE JUEGA CON BIOMAX.pptx",
-    "VALOR DE LA PROPUESTA": 30000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 43,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Camilo Prada",
-    CUENTA: "BEIJING XIAOMI MOBILE SOFTWARE CO LTD",
-    "VENTA ESTIMADA": 24015738,
-    "NECESIDAD 1":
-      "Tiene un decrecimiento en su participación del mercado de 82%. Y dejaron de invertir en la radio.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N2|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Camilo Prada",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 44,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Camilo Prada",
-    CUENTA: "FEDERACION NACIONAL DE CULTIVADORES DE PALMA DE ACEITE",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Tiene un crecimiento en su participación del mercado de 132%. Pero no tiene participación en la Radio.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N2|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Camilo Prada",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 45,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Camilo Prada",
-    CUENTA: "LABORATORIOS BUSSIE SA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Tienen un decrecimiento en su participación del mercado de 69%. Y tienen toda su participación en Diarios.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N2|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Camilo Prada",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 46,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Luisa Escobar",
-    CUENTA: "DISTRIBUIDORA TOYOTA S.A.S.",
-    "VENTA ESTIMADA": 28067985,
-    "NECESIDAD 1":
-      "Tiene un decrecimiento en su participación del mercado de 32%. Tienen el 61% de participación en la Radio, y Prisa Media perdió participación en el medio radial.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N2|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Luisa Escobar",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-04",
-    "FECHA DE ENTREGA": "2026-06-24",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL DISTOYOTA.pptx",
-    "VALOR DE LA PROPUESTA": 54244200,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 47,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Luisa Escobar",
-    CUENTA: "BRECCIA SALUD S A S",
-    "VENTA ESTIMADA": 13706000,
-    "NECESIDAD 1":
-      "Tiene un decrecimiento en la participación del mercado de 25%. Tiene el 37% de participación en la Radio, Prisa Media tiene el 6% perdiendo participación con RCN. FRANQUICIA EN ARMONIA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "GENERAR PROPUESTA COMERCIAL - FRANQUICIA EN ARMONIA",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N2|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Luisa Escobar",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-04",
-    "FECHA DE ENTREGA": "2026-06-25",
-    "LINK DE PRESENTACION": "Producto_Digital_EN EQUILIBRIO.pptx",
-    "VALOR DE LA PROPUESTA": 30200000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 48,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Luisa Escobar",
-    CUENTA: "GRUPO EMPRESARIAL OIKOS S.A.S.",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Tiene un crecimiento en la participación del mercado de 300%. Y tiene su participación en los medios Digital y Vias Publicas.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N2|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Luisa Escobar",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 49,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Lina Lemus",
-    CUENTA: "GRUPO EMPRESARIAL EN LINEA S.A.",
-    "VENTA ESTIMADA": 17507282,
-    "NECESIDAD 1":
-      "Tiene un decrecimiento en su participación del mercado de 59%. Y la Radio tiene una participación del 10%, Prisa Media tiene el 30% de la participación en la radio. Perdiendo participación frente a Oro.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N2|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Lina Lemus",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 50,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Lina Lemus",
-    CUENTA: "OPELLA HEALTHCARE COLOMBIA S.A.S.",
-    "VENTA ESTIMADA": 86896644,
-    "NECESIDAD 1":
-      "Tiene un decrecimiento en la participación del mercado de 75%, la radio tiene una participación del 2%, y Prisa Media tiene el 88% de la participación en la Radio.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N2|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Lina Lemus",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 51,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Lina Lemus",
-    CUENTA: "MERCADO LIBRE",
-    "VENTA ESTIMADA": 30000000,
-    "NECESIDAD 1": "PROPUESTA DIGITAL DINAMICA CAJA SORPRESA + PUNTOS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "Por cerrar",
-    CLAVE: "N2|Por cerrar",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Lina Lemus",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-04",
-    "FECHA DE ENTREGA": "2026-06-08",
-    "LINK DE PRESENTACION":
-      "Producto_Digital_MERCADO LIBRE LIVE COMMERCE.pptx",
-    "VALOR DE LA PROPUESTA": 30000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 52,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Luisa Escobar",
-    CUENTA: "CENCSUD",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N2|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Luisa Escobar",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 53,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Luisa Escobar",
-    CUENTA: "JUMBO",
-    "VENTA ESTIMADA": 50000000,
-    "NECESIDAD 1": "PROPUESTA DIGITAL DINAMICA CON NFC Y CHAT IA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N2|En seguimiento",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Luisa Escobar",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-23",
-    "FECHA DE ENTREGA": "2026-07-24",
-    "LINK DE PRESENTACION":
-      "Producto_Digital-LA GRAN FIESTA DEL FESTIVERSARIO.pptx",
-    "VALOR DE LA PROPUESTA": 50000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 54,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Lina Lemus",
-    CUENTA: "VANTI",
-    "VENTA ESTIMADA": 75000000,
-    "NECESIDAD 1":
-      "PROPUESTA DIGITAL DINAMICA PAUTA INVESTIGATIVA, CAMION TROPICANA Y NFC",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N2|En seguimiento",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Lina Lemus",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-22",
-    "FECHA DE ENTREGA": "2026-07-27",
-    "LINK DE PRESENTACION":
-      "MAPA DEL ULTIMO 1_ - VANTI - TROPICANA (1).pptx",
-    "VALOR DE LA PROPUESTA": 75000000,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 55,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Luisa Escobar",
-    CUENTA: "DAVIVIENDA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N2|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Luisa Escobar",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 56,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Lina Lemus",
-    CUENTA: "NU BANK",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N2|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Lina Lemus",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 57,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Lina Lemus",
-    CUENTA: "FENAVI",
-    "VENTA ESTIMADA": 40000000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL - FRANQUICIA PROBANDO PROBANDO",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "La propuesta fue presentada al cliente",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "El cliente acepta la propuesta y esta queda pendiente de ejecución.",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "Por cerrar",
-    CLAVE: "N2|Por cerrar",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Lina Lemus",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-01",
-    "FECHA DE ENTREGA": "2026-07-01",
-    "LINK DE PRESENTACION":
-      "Producto_Digital-La proteína que une a Colombia- FENAVI.pptx",
-    "VALOR DE LA PROPUESTA": 40000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 58,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Helen Fajardo",
-    CUENTA: "INVERSIONES GLP S.A.S. E.S.P.",
-    "VENTA ESTIMADA": 38566800,
-    "NECESIDAD 1":
-      "Tiene un decrecimiento en su participación del mercado de 99%. Tiene toda su participación en Diarios.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N3|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Helen Fajardo",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 59,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Helen Fajardo",
-    CUENTA: "UNIVERSIDAD EUROPEA",
-    "VENTA ESTIMADA": 40000000,
-    "NECESIDAD 1":
-      "PROPUESTA DIGITAL TODO Y MAS + FRANQUICIAS TECNOLOGIA Y LA OTRA ENTREVISTA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N3|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Helen Fajardo",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-12",
-    "FECHA DE ENTREGA": "2026-06-12",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL - FUTURO GLOBAL 1.pptx",
-    "VALOR DE LA PROPUESTA": 46437280,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 60,
-  },
-    {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Hugo Urrea",
-    CUENTA: "CLARO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "e-commerce / venta digital, tecnología, ciberseguridad, servicios de fibra, facturación electrónica",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N3|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Hugo Urrea",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 61,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Hugo Urrea",
-    CUENTA: "POLITECNICO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Leads - calidad - no registro - matricula",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N3|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Hugo Urrea",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 62,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Sofia Calvera",
-    CUENTA: "CORONA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Este año su campaña es muy visual NSE alto / se le ha ofrecido figital pero no les gusta",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N3|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Sofia Calvera",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 63,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Elsa Cortez",
-    CUENTA: "U AREA ANDINA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "Leads - calidad x inscripciones",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N3|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Elsa Cortez",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 64,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Helen Fajardo",
-    CUENTA: "MOTAI",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Es una app para comprar moto fácil, la idea es mostrar cómo es de fácil adquirir su moto. Presupuesto bajo",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N3|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Helen Fajardo",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 65,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Laura Melo",
-    CUENTA: "PARAMO",
-    "VENTA ESTIMADA": 15000000,
-    "NECESIDAD 1":
-      "Solo nos ven como radio pero hacen pauta en otro lado, necesitamos vendernos como plataforma digital",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "Propuesta entregada",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N3|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Laura Melo",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-05-26",
-    "FECHA DE ENTREGA": "2026-07-21",
-    "LINK DE PRESENTACION": "PROPUESTA PARAMO PRESENTA.pptx",
-    "VALOR DE LA PROPUESTA": 15000000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 66,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Diana Andrea Rodiguez",
-    CUENTA: "NESTOGENO",
-    "VENTA ESTIMADA": 50000000,
-    "NECESIDAD 1":
-      "Solicitud de propuesta digital a medida - FRANQUICIA MUJERES QUE TRANSFORMAN",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Generar propuesta - FRANQUICIA MUJERES QUE TRANSFORMAN",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "Entregar propuesta",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "POR CERRAR",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "Por cerrar",
-    CLAVE: "N3|Por cerrar",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Diana Andrea Rodiguez",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-24",
-    "FECHA DE ENTREGA": "2026-06-24",
-    "LINK DE PRESENTACION":
-      "Producto Digital - NESTOGENO - CRECIENDO JUNTAS.pptx",
-    "VALOR DE LA PROPUESTA": 50686060,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 67,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Diana Andrea Rodriguez",
-    CUENTA: "FALABELLA",
-    "VENTA ESTIMADA": 30000000,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N3|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Diana Andrea Rodriguez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-08",
-    "FECHA DE ENTREGA": "2026-07-10",
-    "LINK DE PRESENTACION": "FALABELLA SHOPPING EXPERIENCE.pptx",
-    "VALOR DE LA PROPUESTA": 30000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 68,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Laura Calvera",
-    CUENTA: "AUTONIZA",
-    "VENTA ESTIMADA": 5000000,
-    "NECESIDAD 1": "Ecosistema WhatsApp",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "Entregar la propuesta digital",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Se formaliza el cierre de la venta y se da inicio al proceso de ejecución.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Cerrada",
-    CLAVE: "N3|Cerrada",
-    PRIORIDAD: "Baja",
-    RESPONSABLE: "Laura Calvera",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-02",
-    "FECHA DE ENTREGA": "2026-06-02",
-    "LINK DE PRESENTACION":
-      "21-Producto_Digital_ECOSISTEMA-WHATSAPP.pptx",
-    "VALOR DE LA PROPUESTA": 5500000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 69,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Diana Andrea Rodriguez",
-    CUENTA: "CORONA",
-    "VENTA ESTIMADA": 40000000,
-    "NECESIDAD 1":
-      "PROPUESTA DE FRANQUICIA CÁPSULAS DE VIDEO CON CHECK IN",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N3|En seguimiento",
-    PRIORIDAD: "Baja",
-    RESPONSABLE: "Diana Andrea Rodriguez",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": "2026-06-24",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL - CERVEZA CORONA.pptx",
-    "VALOR DE LA PROPUESTA": 40000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 70,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Nicole Hincapie",
-    CUENTA: "RAPPI",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "Necesitan incrementar su ticket diario",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N3|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Nicole Hincapie",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 71,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Nicole Hincapie",
-    CUENTA: "CONSTRUCTORAS PLANIFICADAS",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Con qué estrategia podríamos dar a conocer más a fondo los proyectos inmobiliarios que tienen",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N3|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Nicole Hincapie",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 72,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Nicole Hincapie",
-    CUENTA: "BANCO DE OCCIDENTE",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Llevan más de un año sin comprar. Cuenta de ahorros que renta, inversión colombianos",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N3|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Nicole Hincapie",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 73,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "MEDPLUS",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Fortalecer el posicionamiento de la marca aprovechando el aniversario de Clínica Azul.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 74,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "WIN SPORTS",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Aumentar audiencias y suscripciones entre hinchas colombianos en el exterior.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 75,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Karen Perez",
-    CUENTA: "UNAD",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Atraer nuevos estudiantes en periodos de inscripción destacando flexibilidad, cobertura y accesibilidad.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Karen Perez",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 76,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Valentina Párraga",
-    CUENTA: "GAES",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Desarrollar campañas de sensibilización sobre pérdida auditiva y promover soluciones de bienestar e inclusión.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Valentina Párraga",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 77,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Valentina Párraga",
-    CUENTA: "BOSTON MEDICAL GROUP",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Fortalecer el posicionamiento mediante contenidos educativos y generación de confianza.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Valentina Párraga",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 78,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Mauricio Agudelo",
-    CUENTA: "LEVAPAN",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Incrementar reconocimiento de marca y preferencia entre profesionales y emprendedores del sector alimentario.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Mauricio Agudelo",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 79,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Mauricio Agudelo",
-    CUENTA: "FUNDACIÓN CARDIO INFANTIL",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Fortalecer el posicionamiento institucional y visibilizar su impacto social.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Mauricio Agudelo",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 80,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "URBANSA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Generar clientes potenciales para proyectos de vivienda VIS y No VIS.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 81,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Valentina Párraga",
-    CUENTA: "MASTERCARD",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Impulsar la adopción de medios de pago digitales, educación financiera e inclusión digital.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Valentina Párraga",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 82,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Luis López",
-    CUENTA: "SR SIMI",
-    "VENTA ESTIMADA": 200000000,
-    "NECESIDAD 1": "PROPUESTA FRANQUICIA - EL ALBÚM",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "ENTREGAR PROPUESTA",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "Cerrada",
-    CLAVE: "N4|Cerrada",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Luis López",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-16",
-    "FECHA DE ENTREGA": "2026-07-10",
-    "LINK DE PRESENTACION": "https://canva.link/7gihh7hu1w85rtl",
-    "VALOR DE LA PROPUESTA": 200000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 83,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "ALCIAUTOS",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 84,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "ALLIANZ SEGUROS",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 85,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "AUTOGERMANA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 86,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "BBVA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 87,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "BAT - BRITSH AMERICAN TOBACCO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 88,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "BROWN FORMAN",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 89,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "CASTROL",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 90,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "CODERE COLOMBIA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 91,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "COLCAN - VITALEA LAB",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 92,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "COVINOC",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 93,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "COVO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 94,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "EGALITE",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 95,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "FORD",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 96,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "GENCELL",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 97,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "ISHOP",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 98,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "KFC - INVERSIONES INT COLOMBIA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 99,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "MAZDA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 100,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "MEDPLUS",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 101,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "PASH - OSTU",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 102,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "PAVCO",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 103,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "PAX ASSISTANCE",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 104,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "SC JOHNSON",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 105,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "SIKA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 106,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Gina Tinjacá",
-    CUENTA: "UIP",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": null,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N4|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Gina Tinjacá",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 107,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Karen Perez",
-    CUENTA: "GAC",
-    "VENTA ESTIMADA": 15000000,
-    "NECESIDAD 1": "DESARROLO DE PROPUESTA DIGITAL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "La propuesta fue aprobada por el cliente. Actualmente nos encontramos a la espera de su ejecución.",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "Cerrada",
-    CLAVE: "N4|Cerrada",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Karen Perez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-07",
-    "FECHA DE ENTREGA": "2026-07-07",
-    "LINK DE PRESENTACION":
-      "Producto_Digital-CONDUCE EL FUTURO- GAC.pptx",
-    "VALOR DE LA PROPUESTA": 15577700,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 108,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Karen Perez",
-    CUENTA: "VALVOLINE",
-    "VENTA ESTIMADA": 47000000,
-    "NECESIDAD 1": "Franquicia Muchas Pelotas.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "Se concreta el cierre de la venta.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "Cerrada",
-    CLAVE: "N4|Cerrada",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Karen Perez",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-27",
-    "FECHA DE ENTREGA": "2026-06-27",
-    "LINK DE PRESENTACION": "FRANQUICIAS PRISA.pptx",
-    "VALOR DE LA PROPUESTA": 48000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 109,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Karen Perez",
-    CUENTA: "FLAMINGO",
-    "VENTA ESTIMADA": 30000000,
-    "NECESIDAD 1": "PROPUESTA PARA ANIVERSARIO",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "PROPUESTA GENERADA Y ENVIADA AL EJECUTIVO",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "SEGUIMIENTO",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N4|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Karen Perez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-14",
-    "FECHA DE ENTREGA": "2026-07-14",
-    "LINK DE PRESENTACION":
-      "https://grupoprisa-my.sharepoint.com/:p:/g/personal/juangodoy_est_caracol_com_co/IQCTvV2t-eLWQq2L9mflqXwPAfE1ADF1gSilO6Wk8SmQ5eY?CID=ad890f88-4ed8-9a0d-3c25-51ff00ffeb03&SI=SentItems&SLSync=F",
-    "VALOR DE LA PROPUESTA": 27980000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 110,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Karen Perez",
-    CUENTA: "UNIVERSIDAD DE CATALUÑA",
-    "VENTA ESTIMADA": 15000000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL - FRANQUICIA PANTALLEROS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N4|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Karen Perez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-14",
-    "FECHA DE ENTREGA": "2026-07-15",
-    "LINK DE PRESENTACION": "PROPUESTA UNIVERSIDAD DE CATALUÑA.pptx",
-    "VALOR DE LA PROPUESTA": 10300000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 111,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Luz Karime Hernandez",
-    CUENTA: "HALEON",
-    "VENTA ESTIMADA": 45700000,
-    "NECESIDAD 1":
-      "Desarrollar una propuesta altamente diferencial e innovadora que responda a sus altos estándares de aprobación y logre reactivar inversión frente a la participación activa que mantienen en otros medios. FRANQUICIA EN TENDENCIA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "GENERAR PROPUESTA COMERCIAL - FRANQUICIA EN TENDENCIA",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N5|En seguimiento",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Luz Hernandez",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-30",
-    "FECHA DE ENTREGA": "2026-06-30",
-    "LINK DE PRESENTACION": "PROPUESTA HALEON.pptx",
-    "VALOR DE LA PROPUESTA": 24664200,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 112,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Luz Karime Hernandez",
-    CUENTA: "LACTALIS",
-    "VENTA ESTIMADA": 8000000,
-    "NECESIDAD 1":
-      "Mantener seguimiento estratégico de la cuenta y monitorear oportunidades futuras mientras persisten restricciones regulatorias que limitan la reactivación en el corto plazo. TIENE UN PROBLEMA CON INVIMA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Luz Karime Hernandez",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 113,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Ana Maria Castañeda",
-    CUENTA: "SECTOR UNIVERSITARIO",
-    "VENTA ESTIMADA": 4000000,
-    "NECESIDAD 1":
-      "Construir estrategias de comunicación de largo plazo que permitan presencia continua durante el año y reduzcan la dependencia de campañas estacionales de matrícula.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Ana Maria Castañeda",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 114,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Ana Maria Castañeda",
-    CUENTA: "AR CONSTRUCCIONES",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Demostrar el valor de las plataformas de PRISA más allá de la radio tradicional, conectando soluciones comerciales con sus objetivos de negocio y generación de resultados.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Ana Maria Castañeda",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 115,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Ana Maria Castañeda",
-    CUENTA: "CONSTRUCTORA GALIAS",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Presentar propuestas innovadoras y diferenciadas que incentiven el retorno de inversión y reactiven la relación comercial.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Ana Maria Castañeda",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 116,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Ana Maria Castañeda",
-    CUENTA: "Cromantic y Aruma",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Diseñar iniciativas creativas que complementen sus estrategias digitales actuales y aumenten la participación de inversión en nuestros medios.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Ana Maria Castañeda",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 117,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Carol Beltan",
-    CUENTA: "CUSEZAR",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Desarrollar la cuenta mediante propuestas diferenciadoras que fortalezcan la relación y generen crecimiento sostenido de inversión.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Carol Beltan",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 118,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Carol Beltan",
-    CUENTA: "CEMEX",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Construir relacionamiento comercial y generar oportunidades desde una etapa temprana de exploración para consolidar futuras inversiones.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Carol Beltan",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 119,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Carol Beltan",
-    CUENTA: "DISTRITO SALVAJE",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Impulsar el desarrollo de la cuenta mediante acciones de valor que fortalezcan el posicionamiento de marca y generen nuevas oportunidades comerciales. NO TIENEN CONTACTO CON EL GERENTE",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Carol Beltan",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 120,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Raul Herrera",
-    CUENTA: "VIAJES FALABELLA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Desarrollar estrategias enfocadas y alineadas con objetivos de negocio para incrementar progresivamente su nivel de inversión.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Raul Herrera",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 121,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Raul Herrera",
-    CUENTA: "MOVISTAR",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1":
-      "Identificar alternativas comerciales que compensen la reducción de inversión derivada del proceso de integración con Tigo y sostener participación en la categoría.",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": 0,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 0,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Raul Herrera",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 122,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Carol Beltan",
-    CUENTA: "TA•DA",
-    "VENTA ESTIMADA": 50000000,
-    "NECESIDAD 1": "PROPUESTA DIGITAL - DINAMICA DE SUBASTA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N5|En seguimiento",
-    PRIORIDAD: "Baja",
-    RESPONSABLE: "Carol Beltan",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-01",
-    "FECHA DE ENTREGA": "2026-06-01",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL - TA•DA.pptx",
-    "VALOR DE LA PROPUESTA": 60000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 123,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Carol Beltan",
-    CUENTA: "BAVARIA",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "PROPUESTA DIGITAL LA RUTA DEL GOL",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "Cerrada",
-    CLAVE: "N5|Cerrada",
-    PRIORIDAD: "Baja",
-    RESPONSABLE: "Carol Beltan",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-09",
-    "FECHA DE ENTREGA": "2026-06-09",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 18000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 124,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Carol Beltan",
-    CUENTA: "AMALFITANA",
-    "VENTA ESTIMADA": 40000000,
-    "NECESIDAD 1":
-      "PROPUESTA DIGITAL CON DOS PUNTOS MAS FRANQUICIA DE PROBANDO PROBANDO",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "SIN CAMBIOS",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N5|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Carol Beltran",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": "2026-06-26",
-    "FECHA DE ENTREGA": "2026-06-22",
-    "LINK DE PRESENTACION": "PRODUCTO DIGITAL - AMALFITANA.pptx",
-    "VALOR DE LA PROPUESTA": 45000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 125,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Carol Beltan",
-    CUENTA: "COCA-COLA",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Carol Beltan",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 126,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Raul Herrera",
-    CUENTA: "MOVISTAR",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Raul Herrera",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 127,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Ana Maria Castañeda",
-    CUENTA: "DECATHLON",
-    "VENTA ESTIMADA": 30000000,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2": "Propuesta entregada",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": "PROPUESTA CERRADA",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "Cerrada",
-    CLAVE: "N5|Cerrada",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Ana Maria Castañeda",
-    MES: "JUNIO",
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 30000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 128,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Raul Herrera",
-    CUENTA: "COMPENSAR",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": null,
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1": "GENERAR PROPUESTA COMERCIAL",
-    "AVANCE PLAN 1": 0,
-    "PLAN DE ACCIÓN 2": null,
-    "AVANCE PLAN 2": null,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": null,
-    OPORTUNIDAD: null,
-    ESTADO: "Por Mejorar",
-    CLAVE: "N5|Por Mejorar",
-    PRIORIDAD: "Alta",
-    RESPONSABLE: "Raul Herrera",
-    MES: null,
-    "FECHA SOLICITUD": null,
-    "FECHA DE ENTREGA": null,
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 0,
-    "ASESOR INNOVACION DIGITAL": null,
-    id: 129,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Raul Herrera",
-    CUENTA: "DESPEGAR",
-    "VENTA ESTIMADA": 35000000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL - FRANQUICIA CHECK IN",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N5|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Raul Herrera",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-03",
-    "FECHA DE ENTREGA": "2026-07-03",
-    "LINK DE PRESENTACION": "PROPUESTA DESPEGAR.pptx",
-    "VALOR DE LA PROPUESTA": 39000000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 130,
-  },
-    {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Carol Beltan",
-    CUENTA: "BAN 100",
-    "VENTA ESTIMADA": 8000000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL - FRANQUICIA SE LO EXPLICO CON EXPERTOS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N5|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Carol Beltan",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-07",
-    "FECHA DE ENTREGA": "2026-07-07",
-    "LINK DE PRESENTACION": "PROPUESTA BAN100.pptx",
-    "VALOR DE LA PROPUESTA": 8500000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 131,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Carol Beltan",
-    CUENTA: "CERVEZA TRIBUTO",
-    "VENTA ESTIMADA": 40000000,
-    "NECESIDAD 1":
-      "PROPUESTA DIGITAL - FRANQUICIA PROBANDO PROBANDO",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N5|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Carol Beltan",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-10",
-    "FECHA DE ENTREGA": "2026-07-15",
-    "LINK DE PRESENTACION": "Producto_Digital-TRIBUTO.pptx",
-    "VALOR DE LA PROPUESTA": 45000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 132,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Luz Karime Hernandez",
-    CUENTA: "HP",
-    "VENTA ESTIMADA": 48000000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL CON FRANQUICIA TECNOLOGIA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "Por cerrar",
-    CLAVE: "N5|Por cerrar",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Luz Karime Hernandez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-17",
-    "FECHA DE ENTREGA": "2026-07-17",
-    "LINK DE PRESENTACION": "PROPUESTA HP.pptx",
-    "VALOR DE LA PROPUESTA": 48000000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 133,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Karen Perez",
-    CUENTA: "FONTANAR",
-    "VENTA ESTIMADA": 42000000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL - FRANQUICIA CAPSULAS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "Se realiza un re ajuste, estamos a la espera por aprobación del cliente",
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N4|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Karen Perez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-23",
-    "FECHA DE ENTREGA": "2026-07-24",
-    "LINK DE PRESENTACION": "Presentación Escape Game - Fontanar.pptx",
-    "VALOR DE LA PROPUESTA": 40000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 134,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Mauricio Agudelo",
-    CUENTA: "AVIATUR",
-    "VENTA ESTIMADA": 28800000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL - FRANQUICIA ENTE VALIENTES Y TEAM HATER",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N4|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Mauricio Agudelo",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-23",
-    "FECHA DE ENTREGA": "2026-07-23",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 28800000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 135,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Mauricio Agudelo",
-    CUENTA: "KIMBERLY CLARK",
-    "VENTA ESTIMADA": 40000000,
-    "NECESIDAD 1":
-      "DESARROLO DE PROPUESTA DIGITAL - FRANQUICIAS CARTAS A MI EX Y LA LUCIERNAGA PARODIAS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 51,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N4|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Mauricio Agudelo",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-23",
-    "FECHA DE ENTREGA": "2026-07-23",
-    "LINK DE PRESENTACION":
-      "https://grupoprisa-my.sharepoint.com/:p:/g/personal/juangodoy_est_caracol_com_co/IQAQHCjHLHXeQpGijneN_H5lActlHYQNn5Jhxg8oQL12bn8 https://grupoprisa-my.sharepoint.com/:p:/g/personal/juangodoy_est_caracol_com_co/IQCZl1yA5ZmPS7yCUZS3T5--AeQJKQE2dQZJJX-atpvHzDg",
-    "VALOR DE LA PROPUESTA": 43000000,
-    "ASESOR INNOVACION DIGITAL": "Juan Pablo Godoy",
-    id: 136,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Karen Perez",
-    CUENTA: "PUNTO RED",
-    "VENTA ESTIMADA": 23568560,
-    "NECESIDAD 1": "FRANQUICIA - SE LO EXPLICO CON EXPERTOS",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N4|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Karen Perez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-28",
-    "FECHA DE ENTREGA": "2026-07-30",
-    "LINK DE PRESENTACION": "PUNTO RED + TROPICANA.pptx",
-    "VALOR DE LA PROPUESTA": 23568560,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 137,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Laura Melo",
-    CUENTA: "TEATRO NACIONAL",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "FRANQUICIA - PARODIAS LA LUCIERNAGA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3":
-      "Se realizó un ajuste a la propuesta enviada, de acuerdo a lo conversado con el cliente",
-    "AVANCE PLAN 3": 100,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N3|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Laura Melo",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-27",
-    "FECHA DE ENTREGA": "2026-07-28",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Sthefanie Botello",
-    id: 138,
-  },
-
-  {
-    EQUIPO: "N3",
-    "NOMBRE EJECUTIVO": "Elsa Cortez",
-    CUENTA: "DALE!",
-    "VENTA ESTIMADA": 42950000,
-    "NECESIDAD 1": "Video remoto + Chat IA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 100,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N3|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Elsa Graciliana",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-07-12",
-    "FECHA DE ENTREGA": "2026-07-13",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 42950000,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 139,
-  },
-
-  {
-    EQUIPO: "N1",
-    "NOMBRE EJECUTIVO": "Andrea Morales",
-    CUENTA: "ZURICH",
-    "VENTA ESTIMADA": 20000000,
-    "NECESIDAD 1": "FRANQUICIA - EL RADAR DE VILLAR",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N1|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Andrea Morales",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-08-04",
-    "FECHA DE ENTREGA": "2026-08-04",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 20000000,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 140,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Ana Maria Castañeda",
-    CUENTA: "GRAN ESTACIÓN",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "SUBASTA SMARTPROMO",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N5|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Ana Maria Castañeda",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-08-18",
-    "FECHA DE ENTREGA": "2026-08-18",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": null,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 141,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Luz Karime Hernandez",
-    CUENTA: "ALKOMPRAR",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "SUBASTA SMARTPROMO",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N5|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Luz Karime Hernandez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-08-18",
-    "FECHA DE ENTREGA": "2026-08-18",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": null,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 142,
-  },
-
-  {
-    EQUIPO: "N5",
-    "NOMBRE EJECUTIVO": "Luz Karime Hernandez",
-    CUENTA: "KALLEY",
-    "VENTA ESTIMADA": 35442850,
-    "NECESIDAD 1": "FRANQUICIA - EL RADAR DE VILLAR",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N5|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Luz Karime Hernandez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-08-19",
-    "FECHA DE ENTREGA": "2026-08-20",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 35442850,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 143,
-  },
-
-  {
-    EQUIPO: "N2",
-    "NOMBRE EJECUTIVO": "Luisa Escobar",
-    CUENTA: "RUSHBET",
-    "VENTA ESTIMADA": 0,
-    "NECESIDAD 1": "FRANQUICIA - EL RADAR DE VILLAR",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N2|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Luisa Escobar",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-08-19",
-    "FECHA DE ENTREGA": "2026-08-19",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": null,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 144,
-  },
-
-  {
-    EQUIPO: "N4",
-    "NOMBRE EJECUTIVO": "Luis López",
-    CUENTA: "DR SIMI",
-    "VENTA ESTIMADA": 31500000,
-    "NECESIDAD 1": "VIDEO SECCION LA LUCIERNGA",
-    "NECESIDAD 2": null,
-    "NECESIDAD 3": null,
-    "PLAN DE ACCIÓN 1":
-      "Entregar la propuesta digital y su valorización al ejecutivo correspondiente.",
-    "AVANCE PLAN 1": 100,
-    "PLAN DE ACCIÓN 2":
-      "Realizar seguimiento a la propuesta para conocer su estado, confirmar si se concretó el cierre e identificar oportunidades de mejora.",
-    "AVANCE PLAN 2": 50,
-    "PLAN DE ACCIÓN 3": null,
-    "AVANCE PLAN 3": 50,
-    OPORTUNIDAD: null,
-    ESTADO: "En seguimiento",
-    CLAVE: "N4|En seguimiento",
-    PRIORIDAD: "Media",
-    RESPONSABLE: "Luis Alberto Lopez",
-    MES: "JULIO",
-    "FECHA SOLICITUD": "2026-08-13",
-    "FECHA DE ENTREGA": "2026-08-20",
-    "LINK DE PRESENTACION": null,
-    "VALOR DE LA PROPUESTA": 31500000,
-    "ASESOR INNOVACION DIGITAL": "Jonathan Velasquez",
-    id: 145,
-  },
-  ];
-
-  const COLORS = [
-  "#e6197a",
-  "#2e9cf0",
-  "#8b5cf6",
-  "#22c55e",
-  "#f59e0b",
-  "#ef4444",
-  "#06b6d4",
 ];
 
-const money = (value) => {
-  if (typeof value === "number") {
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      maximumFractionDigits: 0,
-    }).format(value);
+
+/* =========================================================
+   ICONOS DE RUBROS
+   ========================================================= */
+
+const RUBRO_ICONS = {
+
+  Banca:
+    Landmark,
+
+  Moda:
+    Shirt,
+
+  Gastronomía:
+    UtensilsCrossed,
+
+  Educación:
+    GraduationCap,
+
+  "Consumo Masivo":
+    ShoppingCart,
+
+  Automotriz:
+    Car,
+
+  Servicios:
+    Briefcase,
+
+  Salud:
+    HeartPulse,
+
+  Seguros:
+    ShieldCheck,
+
+  Tecnología:
+    Cpu,
+
+  Inmobiliario:
+    Building2,
+
+  Entretenimiento:
+    Clapperboard,
+
+  Viajes:
+    Plane,
+
+  Otros:
+    LayoutGrid,
+
+};
+
+
+/* =========================================================
+   METADATA DE ESTADOS
+   ========================================================= */
+
+const ESTADO_META = {
+
+  seguimiento: {
+
+    label:
+      "En seguimiento",
+
+    color:
+      COLORS.pink,
+
+    soft:
+      COLORS.pinkSoft,
+
+  },
+
+
+  cerrada: {
+
+    label:
+      "Cerrada",
+
+    color:
+      COLORS.green,
+
+    soft:
+      COLORS.greenSoft,
+
+  },
+
+
+  oportunidad: {
+
+    label:
+      "Oportunidad",
+
+    color:
+      COLORS.amber,
+
+    soft:
+      COLORS.amberSoft,
+
+  },
+
+};
+
+
+/* =========================================================
+   NORMALIZAR TEXTO
+   ========================================================= */
+
+function normalizeText(value) {
+
+  return String(value ?? "")
+
+    .normalize("NFD")
+
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+
+    .replace(
+      /\s+/g,
+      " "
+    )
+
+    .trim()
+
+    .toLowerCase();
+
+}
+
+/* =========================================================
+   DETECTAR RUBRO POR CONTENIDO
+   ========================================================= */
+
+function detectarRubroPorContenido(
+  texto = ""
+) {
+
+  const t =
+    normalizeText(texto);
+
+
+  if (
+    /adidas|nike|arturo calle|decathlon|pash|ostu|flamingo|egalite|ta.?da|cromantic|aruma/.test(t)
+  ) {
+    return "Moda";
   }
 
-  if (typeof value === "string") {
-    const limpio = value
-      .replace(/\$/g, "")
-      .replace(/\./g, "")
-      .replace(/,/g, ".")
-      .replace(/\s/g, "");
 
-    const numero = Number(limpio);
+  if (
+    /automotriz|automovil|automóvil|carro|vehiculo|vehículo|concesionario|concesionaria|toyota|mazda|nissan|ford|volvo|autogermana|alciautos|autoniza|changan/.test(t)
+  ) {
+    return "Automotriz";
+  }
 
-    if (Number.isFinite(numero)) {
-      return new Intl.NumberFormat("es-CO", {
-        style: "currency",
-        currency: "COP",
-        maximumFractionDigits: 0,
-      }).format(numero);
+
+  if (
+    /banco|banca|davivienda|bbva|bancolombia|banco de occidente|tarjeta de credito|tarjeta de crédito|financiero|financiera/.test(t)
+  ) {
+    return "Banca";
+  }
+
+
+  if (
+    /educacion|educación|universidad|universitario|colegio|instituto|academia|politecnico|politécnico|andina/.test(t)
+  ) {
+    return "Educación";
+  }
+
+
+  if (
+    /salud|clinica|clínica|hospital|medico|médico|medicina|farmacia|laboratorio|laboratorios|dr simi|colsanitas|compensar|cafam|medplus/.test(t)
+  ) {
+    return "Salud";
+  }
+
+
+  if (
+    /seguro|seguros|aseguradora|asegurador|allianz|zurich|prosegur/.test(t)
+  ) {
+    return "Seguros";
+  }
+
+
+  if (
+    /tecnologia|tecnología|software|digital|tecnologico|tecnológico|celular|computador|internet|telecomunicaciones|claro|movistar|samsung|xiaomi|honor|hp|ciberseguridad|ecommerce|e-commerce/.test(t)
+  ) {
+    return "Tecnología";
+  }
+
+
+  if (
+    /inmobiliaria|inmobiliario|constructora|construccion|construcción|vivienda|apartamento|apartamentos|edificio|edificios|oikos|cusezar|urbansa|casa|hogar/.test(t)
+  ) {
+    return "Inmobiliario";
+  }
+
+
+  if (
+    /viaje|viajes|turismo|turistico|turístico|hotel|aerolinea|aerolínea|aviatur|despegar|vacaciones/.test(t)
+  ) {
+    return "Viajes";
+  }
+
+
+  if (
+    /entretenimiento|cine|teatro|musica|música|evento|eventos|concierto|spotify|tiquetes|tiqueteras|disquera|deporte|win sports/.test(t)
+  ) {
+    return "Entretenimiento";
+  }
+
+
+  if (
+    /gastronomia|gastronomía|restaurante|restaurantes|comida|alimento|alimentos|bebida|bebidas|cerveza|cafe|café|cocina|kfc|bavaria|coca cola|coca-cola|casa luker|alqueria/.test(t)
+  ) {
+    return "Gastronomía";
+  }
+
+
+  if (
+    /consumo masivo|supermercado|retail|tienda|tiendas|productos de consumo|consumo|jumbo|makro|falabella|mercado|mercados/.test(t)
+  ) {
+    return "Consumo Masivo";
+  }
+
+
+  if (
+    /servicio|servicios|rappi|amazon|mercado libre|mercadolibre|vanti|punto red/.test(t)
+  ) {
+    return "Servicios";
+  }
+
+
+  return "Otros";
+}
+
+/* =========================================================
+   NORMALIZAR NACIONAL
+   ========================================================= */
+
+function normalizeNacional(value) {
+
+  const text =
+    normalizeText(value);
+
+  if (!text) {
+    return "";
+  }
+
+  const match =
+    text.match(
+      /(?:nacional|n)\s*([1-5])/
+    );
+
+  if (!match) {
+    return "";
+  }
+
+  return `Nacional ${match[1]}`;
+
+}
+
+
+/* =========================================================
+   COMPARAR NACIONALES
+   ========================================================= */
+
+function nacionalMatches(
+  first,
+  second
+) {
+
+  const a =
+    normalizeNacional(first);
+
+  const b =
+    normalizeNacional(second);
+
+  return (
+    a !== "" &&
+    a === b
+  );
+
+}
+
+
+/* =========================================================
+   OBTENER NÚMERO DE NACIONAL
+   ========================================================= */
+
+function getNationalNumber(value) {
+
+  const normalized =
+    normalizeNacional(value);
+
+  const match =
+    normalized.match(
+      /(\d+)/
+    );
+
+  if (!match) {
+    return null;
+  }
+
+  return Number(
+    match[1]
+  );
+
+}
+
+
+/* =========================================================
+   CONVERTIR VALORES DEL EXCEL
+   ========================================================= */
+
+function toNumber(value) {
+
+  if (
+    typeof value ===
+    "number"
+  ) {
+
+    return Number.isFinite(
+      value
+    )
+      ? value
+      : 0;
+
+  }
+
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return 0;
+
+  }
+
+
+  let text =
+    String(value)
+
+      .trim()
+
+      .replace(
+        /\$/g,
+        ""
+      )
+
+      .replace(
+        /\s/g,
+        ""
+      );
+
+
+  if (!text) {
+    return 0;
+  }
+
+
+  /*
+   * FORMATO COLOMBIANO
+   *
+   * 1.250.000
+   * 1.250.000,50
+   */
+
+  if (
+    text.includes(".") &&
+    text.includes(",")
+  ) {
+
+    const lastDot =
+      text.lastIndexOf(".");
+
+    const lastComma =
+      text.lastIndexOf(",");
+
+
+    if (
+      lastComma >
+      lastDot
+    ) {
+
+      text =
+        text
+
+          .replace(
+            /\./g,
+            ""
+          )
+
+          .replace(
+            ",",
+            "."
+          );
+
+    } else {
+
+      text =
+        text.replace(
+          /,/g,
+          ""
+        );
+
     }
+
   }
 
-  return "$ 0";
-};
+  else if (
+    text.includes(",")
+  ) {
 
-const number = (value) =>
-  new Intl.NumberFormat("es-CO", {
-    maximumFractionDigits: 0,
-  }).format(Number(value) || 0);
+    const commaParts =
+      text.split(",");
 
-const numericValue = (value) => {
-  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
 
-  if (typeof value === "string") {
-    const limpio = value
-      .replace(/\$/g, "")
-      .replace(/\./g, "")
-      .replace(/,/g, ".")
-      .replace(/\s/g, "");
+    if (
+      commaParts.length === 2 &&
+      commaParts[1].length <= 2
+    ) {
 
-    const numero = Number(limpio);
-    return Number.isFinite(numero) ? numero : 0;
+      text =
+        text.replace(
+          ",",
+          "."
+        );
+
+    } else {
+
+      text =
+        text.replace(
+          /,/g,
+          ""
+        );
+
+    }
+
   }
 
-  return 0;
-};
+  else if (
+    text.includes(".")
+  ) {
 
-/*
- * Valor solicitado por tu compañera:
- * aproximadamente $349 millones ya cerrados.
- *
- * Los registros marcados como "Cerrada" se siguen mostrando
- * individualmente y se suman al valor cerrado del Excel.
- *
- * Este valor solo se usa como referencia ejecutiva cuando
- * el total de las propuestas cerradas del tablero está por debajo
- * del valor informado por el equipo.
- */
-const VALOR_CERRADO_REFERENCIA = 349000000;
+    const dotParts =
+      text.split(".");
 
-function AvatarImage({ src, alt, className = "" }) {
-  const [imagenDisponible, setImagenDisponible] = useState(true);
 
-  if (!src || !imagenDisponible) {
+    if (
+      dotParts.length > 2
+    ) {
+
+      text =
+        text.replace(
+          /\./g,
+          ""
+        );
+
+    }
+
+  }
+
+
+  const result =
+    Number(text);
+
+
+  return Number.isFinite(
+    result
+  )
+    ? result
+    : 0;
+
+}
+
+
+/* =========================================================
+   FORMATEAR MONEDA
+   ========================================================= */
+
+function formatCurrency(value) {
+
+  return new Intl.NumberFormat(
+    "es-CO",
+    {
+
+      style:
+        "currency",
+
+      currency:
+        "COP",
+
+      maximumFractionDigits:
+        0,
+
+    }
+  ).format(
+    toNumber(value)
+  );
+
+}
+
+
+/* =========================================================
+   FORMATEAR DINERO CORTO
+   ========================================================= */
+
+function formatMoneyShort(value) {
+
+  const amount =
+    toNumber(value);
+
+
+  if (
+    amount >=
+    1000000000
+  ) {
+
+    return `$${(
+      amount / 1000000000
+    ).toFixed(1)} B`;
+
+  }
+
+
+  if (
+    amount >=
+    1000000
+  ) {
+
+    return `$${(
+      amount / 1000000
+    ).toFixed(1)} M`;
+
+  }
+
+
+  if (
+    amount >=
+    1000
+  ) {
+
+    return `$${(
+      amount / 1000
+    ).toFixed(1)} K`;
+
+  }
+
+
+  return formatCurrency(
+    amount
+  );
+
+}
+
+
+/* =========================================================
+   FORMATEAR FECHA
+   ========================================================= */
+
+function formatDate(value) {
+
+  if (!value) {
+    return "—";
+  }
+
+
+  let date;
+
+
+  if (
+    value instanceof Date
+  ) {
+
+    date = value;
+
+  } else {
+
+    date =
+      new Date(value);
+
+  }
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return String(value);
+
+  }
+
+
+  return new Intl.DateTimeFormat(
+    "es-CO",
+    {
+
+      day:
+        "2-digit",
+
+      month:
+        "2-digit",
+
+      year:
+        "numeric",
+
+    }
+  ).format(date);
+
+}
+
+
+/* =========================================================
+   OBTENER INICIALES
+   ========================================================= */
+
+function getInitials(name) {
+
+  const text =
+    String(name ?? "")
+      .trim();
+
+
+  if (!text) {
+    return "—";
+  }
+
+
+  const parts =
+    text
+
+      .split(/\s+/)
+
+      .filter(Boolean);
+
+
+  if (
+    parts.length === 1
+  ) {
+
+    return parts[0]
+
+      .slice(0, 2)
+
+      .toUpperCase();
+
+  }
+
+
+  return (
+
+    parts[0][0] +
+
+    parts[
+      parts.length - 1
+    ][0]
+
+  ).toUpperCase();
+
+}
+/* =========================================================
+   BUSCAR FOTO DEL USUARIO / ASESOR
+   ========================================================= */
+
+function getUserImage(name) {
+
+  const normalized =
+    normalizeText(name);
+
+
+  if (
+    normalized.includes("glen")
+  ) {
+
+    return `${IMAGE_PATH}GlenHD.png`;
+
+  }
+
+
+  if (
+    normalized.includes("juan pablo")
+  ) {
+
+    return `${IMAGE_PATH}JuanPabloHD.png`;
+
+  }
+
+
+  if (
+    normalized.includes("jonathan")
+  ) {
+
+    return `${IMAGE_PATH}JonathanHD.png`;
+
+  }
+
+
+  if (
+    normalized.includes("sthefanie") ||
+    normalized.includes("stefanie")
+  ) {
+
+    return `${IMAGE_PATH}SthefHD.png`;
+
+  }
+
+
+  if (
+    normalized.includes("diana")
+  ) {
+
+    return `${IMAGE_PATH}DianaMilenaContreras.png`;
+
+  }
+
+
+  if (
+    normalized.includes("juan sebastian")
+  ) {
+
+    return `${IMAGE_PATH}JuanSebastianAbellaQuintero.png`;
+
+  }
+
+
+  if (
+    normalized.includes("tatiana pelaez")
+  ) {
+
+    return `${IMAGE_PATH}TatianaPelaezCopete.png`;
+
+  }
+
+
+  if (
+    normalized.includes("ivonne")
+  ) {
+
+    return `${IMAGE_PATH}IvonneAdrianaMorionesAlvarez.png`;
+
+  }
+
+
+  if (
+    normalized.includes("william")
+  ) {
+
+    return `${IMAGE_PATH}WilliamOcampoArguello.png`;
+
+  }
+
+
+  if (
+    normalized.includes("tatiana garcia")
+  ) {
+
+    return `${IMAGE_PATH}TatianaGarciaCalderon.png`;
+
+  }
+
+
+  return "";
+
+}
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+function Avatar({
+  name,
+  initials,
+  image,
+  size = "medium",
+}) {
+
+  const [
+    imageFailed,
+    setImageFailed,
+  ] = useState(false);
+
+
+  useEffect(() => {
+
+    setImageFailed(false);
+
+  }, [image]);
+
+
+  const finalInitials =
+    initials ||
+    getInitials(name);
+
+
+  return (
+
+    <div
+      className={
+        `avatar avatar-${size}`
+      }
+    >
+
+      {image && !imageFailed ? (
+
+        <img
+          src={image}
+          alt={
+            name ||
+            "Usuario"
+          }
+          onError={() =>
+            setImageFailed(true)
+          }
+        />
+
+      ) : (
+
+        <span>
+          {finalInitials}
+        </span>
+
+      )}
+
+    </div>
+
+  );
+
+}
+
+
+/* =========================================================
+   OBTENER VALOR DE UNA COLUMNA
+   ---------------------------------------------------------
+   Permite trabajar aunque Excel tenga pequeñas diferencias
+   en mayúsculas, tildes o espacios.
+   ========================================================= */
+
+function getRowValue(
+  row,
+  possibleNames = []
+) {
+
+  const entries =
+    Object.entries(row || {});
+
+
+  for (
+    const possibleName
+    of possibleNames
+  ) {
+
+    const target =
+      normalizeText(
+        possibleName
+      );
+
+
+    const found =
+      entries.find(
+        ([key]) =>
+          normalizeText(key) ===
+          target
+      );
+
+
+    if (found) {
+
+      return found[1];
+
+    }
+
+  }
+
+
+  return "";
+
+}
+
+
+/* =========================================================
+   BUSCAR NACIONAL DENTRO DE UNA FILA
+   ========================================================= */
+
+function getRowNacional(row) {
+
+  const value =
+    getRowValue(
+      row,
+      [
+        "NACIONAL",
+        "NACIONAL ",
+        "NACIONALES",
+        "EQUIPO",
+        "EQUIPO NACIONAL",
+        "NACIONALIDAD",
+      ]
+    );
+
+
+  const normalized =
+    normalizeNacional(value);
+
+
+  if (normalized) {
+
+    return normalized;
+
+  }
+
+
+  /*
+   * Algunas hojas del Excel pueden venir
+   * organizadas por bloques N1, N2, etc.
+   *
+   * Si no existe una columna Nacional,
+   * la Nacional será suministrada por
+   * loadExcelData() según la hoja/bloque.
+   */
+
+  return "";
+
+}
+
+
+/* =========================================================
+   BUSCAR ESTADO
+   ========================================================= */
+
+function normalizeEstado(value) {
+
+  const text =
+    normalizeText(value);
+
+
+  if (
+    text.includes(
+      "seguimiento"
+    )
+  ) {
+
+    return "seguimiento";
+
+  }
+
+
+  if (
+    text.includes(
+      "cerrada"
+    ) ||
+    text.includes(
+      "cerrado"
+    )
+  ) {
+
+    return "cerrada";
+
+  }
+
+
+  if (
+    text.includes(
+      "oportunidad"
+    )
+  ) {
+
+    return "oportunidad";
+
+  }
+
+
+  return "oportunidad";
+
+}
+
+
+/* =========================================================
+   BUSCAR RUBRO
+   ========================================================= */
+
+function normalizeRubro(value) {
+
+  const text =
+    normalizeText(value);
+
+
+  if (!text) {
+
+    return "";
+
+  }
+
+
+  const found =
+    RUBRO_ORDER.find(
+      (rubro) =>
+        normalizeText(rubro) ===
+        text
+    );
+
+
+  if (found) {
+
+    return found;
+
+  }
+
+
+  /*
+   * Permite detectar rubros aunque
+   * el Excel tenga texto adicional.
+   */
+
+  const contains =
+    RUBRO_ORDER.find(
+      (rubro) =>
+        text.includes(
+          normalizeText(rubro)
+        )
+    );
+
+
+  return contains || String(value).trim();
+
+}
+
+/* =========================================================
+   NORMALIZAR FILA DEL EXCEL
+   ========================================================= */
+
+function normalizeExcelRow(
+  row,
+  index = 0,
+  nacionalFromSheet = ""
+) {
+
+  const clean = (value) =>
+    String(value ?? "").trim();
+
+
+  /* =====================================================
+     NACIONAL
+     ===================================================== */
+
+  const nacionalFromRow =
+    getRowNacional(row);
+
+  const normalizedNacional =
+    nacionalFromRow ||
+    normalizeNacional(
+      nacionalFromSheet
+    );
+
+
+  /* =====================================================
+     ESTADO
+     ===================================================== */
+
+  const estadoRaw =
+    clean(
+      getRowValue(
+        row,
+        [
+          "ESTADO",
+        ]
+      )
+    );
+
+  const estado =
+    normalizeEstado(
+      estadoRaw
+    );
+
+
+  /* =====================================================
+     VALORES
+     ===================================================== */
+
+  const valorPropuesta =
+    toNumber(
+      getRowValue(
+        row,
+        [
+          "VALOR DE LA PROPUESTA",
+          "VALOR PROPUESTA",
+          "VALOR DE PROPUESTA",
+          "VALOR",
+        ]
+      )
+    );
+
+
+  const ventaEstimada =
+    toNumber(
+      getRowValue(
+        row,
+        [
+          "VENTA ESTIMADA",
+        ]
+      )
+    );
+
+
+  /* =====================================================
+     EJECUTIVO
+     ===================================================== */
+
+  const ejecutivo =
+    clean(
+      getRowValue(
+        row,
+        [
+          "NOMBRE EJECUTIVO",
+          "EJECUTIVO",
+        ]
+      )
+    );
+
+
+  /* =====================================================
+     CUENTA / MARCA
+     ===================================================== */
+
+  const cuenta =
+    clean(
+      getRowValue(
+        row,
+        [
+          "CUENTA",
+          "MARCA",
+          "EMPRESA",
+        ]
+      )
+    );
+
+
+  /* =====================================================
+     NECESIDADES
+     ===================================================== */
+
+  const necesidad1 =
+    clean(
+      getRowValue(
+        row,
+        [
+          "NECESIDAD 1",
+        ]
+      )
+    );
+
+
+  const necesidad2 =
+    clean(
+      getRowValue(
+        row,
+        [
+          "NECESIDAD 2",
+        ]
+      )
+    );
+
+
+  const necesidad3 =
+    clean(
+      getRowValue(
+        row,
+        [
+          "NECESIDAD 3",
+        ]
+      )
+    );
+
+
+  const necesidad =
+    necesidad1 ||
+    necesidad2 ||
+    necesidad3;
+
+
+  /* =====================================================
+     PLANES DE ACCIÓN
+     ===================================================== */
+
+  const planAccion1 =
+    clean(
+      getRowValue(
+        row,
+        [
+          "PLAN DE ACCIÓN 1",
+          "PLAN DE ACCION 1",
+        ]
+      )
+    );
+
+
+  const avancePlan1 =
+    toNumber(
+      getRowValue(
+        row,
+        [
+          "AVANCE PLAN 1",
+        ]
+      )
+    );
+
+
+  const planAccion2 =
+    clean(
+      getRowValue(
+        row,
+        [
+          "PLAN DE ACCIÓN 2",
+          "PLAN DE ACCION 2",
+        ]
+      )
+    );
+
+
+  const avancePlan2 =
+    toNumber(
+      getRowValue(
+        row,
+        [
+          "AVANCE PLAN 2",
+        ]
+      )
+    );
+
+
+  const planAccion3 =
+    clean(
+      getRowValue(
+        row,
+        [
+          "PLAN DE ACCIÓN 3",
+          "PLAN DE ACCION 3",
+        ]
+      )
+    );
+
+
+  const avancePlan3 =
+    toNumber(
+      getRowValue(
+        row,
+        [
+          "AVANCE PLAN 3",
+        ]
+      )
+    );
+
+
+  /* =====================================================
+     OPORTUNIDAD
+     ===================================================== */
+
+  const oportunidad =
+    clean(
+      getRowValue(
+        row,
+        [
+          "OPORTUNIDAD",
+        ]
+      )
+    );
+
+
+  /* =====================================================
+     RUBRO
+     ===================================================== */
+
+  const rubroExcel =
+    normalizeRubro(
+      getRowValue(
+        row,
+        [
+          "RUBRO",
+          "Rubro",
+          "rubro",
+          "SECTOR",
+          "SECTOR / RUBRO",
+        ]
+      )
+    );
+
+
+  /*
+   * Primero usamos el rubro que venga
+   * directamente desde el Excel.
+   *
+   * Si está vacío, utilizamos el contenido
+   * de la propuesta para identificarlo.
+   */
+
+  const textoRubro =
+    normalizeText(
+      [
+        cuenta,
+        necesidad1,
+        necesidad2,
+        necesidad3,
+        oportunidad,
+        planAccion1,
+        planAccion2,
+        planAccion3,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    );
+
+
+  const rubro =
+    rubroExcel ||
+    detectarRubroPorContenido(
+      textoRubro
+    );
+
+
+  /* =====================================================
+     ASESOR
+     ===================================================== */
+
+  const asesor =
+    clean(
+      getRowValue(
+        row,
+        [
+          "ASESOR INNOVACION DIGITAL",
+          "ASESOR INNOVACIÓN DIGITAL",
+          "ASESOR",
+          "ASESOR INNOVACION",
+          "ASESOR INNOVACIÓN",
+        ]
+      )
+    );
+
+
+  /* =====================================================
+     OTROS CAMPOS
+     ===================================================== */
+
+  const clave =
+    clean(
+      getRowValue(
+        row,
+        [
+          "CLAVE",
+        ]
+      )
+    );
+
+
+  const prioridad =
+    clean(
+      getRowValue(
+        row,
+        [
+          "PRIORIDAD",
+        ]
+      )
+    );
+
+
+  const responsable =
+    clean(
+      getRowValue(
+        row,
+        [
+          "RESPONSABLE",
+        ]
+      )
+    );
+
+
+  const mes =
+    clean(
+      getRowValue(
+        row,
+        [
+          "MES",
+        ]
+      )
+    );
+
+
+  const fechaSolicitud =
+    getRowValue(
+      row,
+      [
+        "FECHA SOLICITUD",
+      ]
+    );
+
+
+  const fechaEntrega =
+    getRowValue(
+      row,
+      [
+        "FECHA DE ENTREGA",
+      ]
+    );
+
+
+  const linkPresentacion =
+    clean(
+      getRowValue(
+        row,
+        [
+          "LINK DE PRESENTACION",
+          "LINK DE PRESENTACIÓN",
+        ]
+      )
+    );
+
+
+  /* =====================================================
+     RESULTADO NORMALIZADO
+     ===================================================== */
+
+  return {
+
+    id:
+      index,
+
+
+    nacional:
+      normalizedNacional,
+
+
+    equipo:
+      normalizedNacional
+        ? normalizedNacional
+            .replace(
+              "Nacional ",
+              "N"
+            )
+            .trim()
+        : "",
+
+
+    ejecutivo,
+
+    cuenta,
+
+    rubro,
+
+
+    ventaEstimada,
+
+
+    necesidad1,
+
+    necesidad2,
+
+    necesidad3,
+
+    necesidad,
+
+
+    planAccion1,
+
+    avancePlan1,
+
+    planAccion2,
+
+    avancePlan2,
+
+    planAccion3,
+
+    avancePlan3,
+
+
+    oportunidad,
+
+
+    estadoRaw,
+
+    estado,
+
+
+    clave,
+
+    prioridad,
+
+    responsable,
+
+    mes,
+
+
+    fechaSolicitud,
+
+    fechaEntrega,
+
+
+    linkPresentacion,
+
+
+    valorPropuesta,
+
+    valor:
+      valorPropuesta,
+
+
+    asesor,
+
+    asesorInnovacionDigital:
+      asesor,
+
+
+    tieneBudget:
+      valorPropuesta > 0 ||
+      ventaEstimada > 0,
+
+  };
+
+}
+
+/* =========================================================
+   IDENTIFICAR NACIONAL POR NOMBRE DE HOJA
+   ========================================================= */
+
+function getSheetNacional(
+  sheetName
+) {
+
+  const normalized =
+    normalizeText(
+      sheetName
+    );
+
+
+  /*
+   * N1 / N2 / N3 / N4 / N5
+   */
+
+  const nMatch =
+    normalized.match(
+      /\bn\s*([1-5])\b/
+    );
+
+
+  if (nMatch) {
+
+    return `Nacional ${nMatch[1]}`;
+
+  }
+
+
+  /*
+   * Nacional 1 / Nacional 2...
+   */
+
+  const nacionalMatch =
+    normalized.match(
+      /nacional\s*([1-5])/
+    );
+
+
+  if (nacionalMatch) {
+
+    return `Nacional ${nacionalMatch[1]}`;
+
+  }
+
+
+  return "";
+
+}
+
+
+/* =========================================================
+   DEDUCIR NACIONAL POR BLOQUE
+   ========================================================= */
+
+function inferNacionalFromRow(
+  row,
+  fallbackNacional = ""
+) {
+
+  const direct =
+    getRowNacional(row);
+
+
+  if (direct) {
+
+    return direct;
+
+  }
+
+
+  return normalizeNacional(
+    fallbackNacional
+  );
+
+}
+
+
+/* =========================================================
+   CARGAR EXCEL
+   ========================================================= */
+
+async function loadExcelData() {
+
+  const response =
+    await fetch(
+      EXCEL_FILE
+    );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      `No se pudo cargar ${EXCEL_FILE}`
+    );
+
+  }
+
+
+  const buffer =
+    await response.arrayBuffer();
+
+
+  const workbook =
+    XLSX.read(
+      buffer,
+      {
+        type: "array",
+        cellDates: true,
+      }
+    );
+
+
+  const allRows = [];
+
+
+  workbook.SheetNames.forEach(
+    (
+      sheetName,
+      sheetIndex
+    ) => {
+
+      const worksheet =
+        workbook.Sheets[
+          sheetName
+        ];
+
+
+      if (!worksheet) {
+        return;
+      }
+
+
+      const rawRows =
+        XLSX.utils.sheet_to_json(
+          worksheet,
+          {
+            defval: "",
+            raw: true,
+          }
+        );
+
+
+      if (
+        !rawRows ||
+        rawRows.length === 0
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+       * Intentamos identificar la Nacional
+       * de la hoja.
+       */
+
+      const sheetNacional =
+        getSheetNacional(
+          sheetName
+        );
+
+
+      rawRows.forEach(
+        (
+          row,
+          rowIndex
+        ) => {
+
+          /*
+           * Si la fila trae Nacional,
+           * tiene prioridad.
+           */
+
+          const rowNacional =
+            inferNacionalFromRow(
+              row,
+              sheetNacional
+            );
+
+
+          const normalized =
+            normalizeExcelRow(
+              row,
+              `${sheetIndex}-${rowIndex}`,
+              rowNacional
+            );
+
+
+          /*
+           * Ignorar filas completamente vacías.
+           */
+
+          const hasData =
+            normalized.ejecutivo ||
+            normalized.cuenta ||
+            normalized.necesidad ||
+            normalized.valorPropuesta ||
+            normalized.rubro ||
+            normalized.estadoRaw;
+
+
+          if (!hasData) {
+            return;
+          }
+
+
+          allRows.push(
+            normalized
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+  /*
+   * Si existen filas duplicadas,
+   * las eliminamos usando una firma
+   * estable de sus datos principales.
+   */
+
+  const uniqueRows =
+    [];
+
+  const seen =
+    new Set();
+
+
+  allRows.forEach(
+    (row) => {
+
+      const signature =
+        [
+
+          normalizeText(
+            row.nacional
+          ),
+
+          normalizeText(
+            row.ejecutivo
+          ),
+
+          normalizeText(
+            row.cuenta
+          ),
+
+          normalizeText(
+            row.necesidad
+          ),
+
+          normalizeText(
+            row.estadoRaw
+          ),
+
+          row.valorPropuesta,
+
+        ].join("|");
+
+
+      if (
+        seen.has(signature)
+      ) {
+
+        return;
+
+      }
+
+
+      seen.add(
+        signature
+      );
+
+      uniqueRows.push(
+        row
+      );
+
+    }
+  );
+
+
+  return uniqueRows.map(
+    (row, index) => ({
+      ...row,
+      id: index,
+    })
+  );
+
+}
+
+
+/* =========================================================
+   PARTE 2 TERMINADA
+   ========================================================= */
+
+   /* =========================================================
+   PARTE 3/6
+   USUARIOS + PERMISOS + FILTROS + MÉTRICAS
+   ========================================================= */
+
+
+/* =========================================================
+   BUSCAR USUARIO POR NOMBRE
+   ========================================================= */
+
+function findUserByName(name) {
+
+  const normalized =
+    normalizeText(name);
+
+  if (!normalized) {
     return null;
   }
 
   return (
-    <img
-      src={src}
-      alt={alt}
-      className={className}
-      onError={() => setImagenDisponible(false)}
-    />
+    USERS.find(
+      (user) =>
+        normalizeText(
+          user.name
+        ) === normalized
+    ) ||
+    USERS.find(
+      (user) =>
+        normalized.includes(
+          normalizeText(
+            user.name
+          )
+        ) ||
+        normalizeText(
+          user.name
+        ).includes(
+          normalized
+        )
+    ) ||
+    null
   );
+
 }
 
-function UserCard({
-  usuario,
-  seleccionado,
-  onSelect,
-  colorClass,
-}) {
-  return (
-    <div
-      className={`user-card ${colorClass} ${
-        seleccionado ? "selected" : ""
-      }`}
-      onClick={() => onSelect(usuario.id)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          onSelect(usuario.id);
-        }
-      }}
-    >
-      <div className={`avatar ${usuario.foto ? "avatar-photo" : ""}`}>
-        {usuario.foto ? (
-          <AvatarImage
-            src={usuario.foto}
-            alt={usuario.nombre}
-          />
-        ) : (
-          usuario.iniciales
-        )}
-      </div>
 
-      <h3>{usuario.nombre}</h3>
-      <p className="cargo">{usuario.cargo}</p>
-      <span className="tag">{usuario.tag}</span>
-    </div>
-  );
-}
+/* =========================================================
+   OBTENER ASESOR
+   ========================================================= */
 
-function KPI({
-  label,
-  value,
-  detail,
-  accent = "pink",
-}) {
-  return (
-    <div className={`kpi-card ${accent}`}>
-      <span>{label}</span>
-      <strong>{value}</strong>
-      {detail && <small>{detail}</small>}
-    </div>
-  );
-}
+function getAdvisorData(
+  advisorName
+) {
 
-function ChartCard({
-  title,
-  subtitle,
-  children,
-  wide = false,
-}) {
-  return (
-    <div
-      className={`chart-card ${
-        wide ? "chart-wide" : ""
-      }`}
-    >
-      <div className="chart-heading">
-        <h3>{title}</h3>
-        <span>{subtitle}</span>
-      </div>
+  const name =
+    String(
+      advisorName ?? ""
+    ).trim();
 
-      <div className="chart-box">
-        {children}
-      </div>
-    </div>
-  );
-}
 
-function InnovationTeam() {
-  return (
-    <section className="innovation-team">
-      <div className="innovation-team-header">
-        <div>
-          <h2>Área de Innovación Digital</h2>
-          <span>Somos el equipo detrás de cada propuesta</span>
-        </div>
-      </div>
-
-      <div className="innovation-lead">
-        <div className="innovation-photo innovation-photo-lead">
-          <AvatarImage
-            src="/images/GlenHD.png"
-            alt="Glen Orillo Starke"
-          />
-          <span className="innovation-badge">JEFE</span>
-        </div>
-
-        <div className="innovation-lead-text">
-          <h3>Glen Orillo Starke</h3>
-          <strong>Director Innovación Digital</strong>
-          <p>
-            Lidera la estrategia y visión del Área de
-            Innovación Digital de Prisa Media.
-          </p>
-        </div>
-      </div>
-
-      <div className="innovation-members">
-        <div className="innovation-member">
-          <div className="innovation-photo">
-            <AvatarImage
-              src="/images/Juan_PabloHD.png"
-              alt="Juan Pablo Godoy"
-            />
-          </div>
-
-          <div className="innovation-member-text">
-            <h3>Juan Pablo Godoy</h3>
-            <span>Encargado de N1 y N3</span>
-            <p>
-              Lidera la creación y desarrollo de
-              propuestas digitales para las Nacionales
-              N1 y N3.
-            </p>
-          </div>
-        </div>
-
-        <div className="innovation-member">
-          <div className="innovation-photo">
-            <AvatarImage
-              src="/images/JonathanHD.png"
-              alt="Jonathan Velásquez"
-            />
-          </div>
-
-          <div className="innovation-member-text">
-            <h3>Jonathan Velásquez</h3>
-            <span>Encargado de N2 y N4</span>
-            <p>
-              Responsable del diseño y ejecución de
-              propuestas digitales para las Nacionales
-              N2 y N4.
-            </p>
-          </div>
-        </div>
-
-        <div className="innovation-member">
-          <div className="innovation-photo">
-            <AvatarImage
-              src="/images/SthefHD.png"
-              alt="Sthefanie Botello"
-            />
-          </div>
-
-          <div className="innovation-member-text">
-            <h3>Sthefanie Botello</h3>
-            <span>Encargada de N5</span>
-            <p>
-              Encargada de desarrollar y optimizar
-              propuestas digitales para la Nacional N5.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function App() {
-  const [vista, setVista] = useState("bienvenida");
-  const [seleccionadoId, setSeleccionadoId] =
-    useState(null);
-  const [usuarioActivo, setUsuarioActivo] =
-    useState(null);
-
-  const [filtroEstado, setFiltroEstado] =
-    useState("Todos");
-  const [filtroPrioridad, setFiltroPrioridad] =
-    useState("Todas");
-  const [filtroEquipo, setFiltroEquipo] =
-    useState("Todos");
-  const [filtroEjecutivo, setFiltroEjecutivo] =
-    useState("Todos");
-  const [busqueda, setBusqueda] = useState("");
-
-  const [registroSeleccionado, setRegistroSeleccionado] =
-    useState(null);
-
-  const handleContinuar = () => {
-    const usuario = todosLosUsuarios.find(
-      (u) => u.id === seleccionadoId
-    );
-
-    if (!usuario) return;
-
-    setUsuarioActivo(usuario);
-    setVista("dashboard");
-  };
-
-  const cambiarUsuario = () => {
-    setSeleccionadoId(null);
-    setUsuarioActivo(null);
-    setVista("seleccion");
-  };
-
-  const datosPermitidos = useMemo(() => {
-    if (!usuarioActivo) return [];
-
-    if (usuarioActivo.acceso === "todo") {
-      return datosComerciales;
-    }
-
-    return datosComerciales.filter(
-      (r) => r.EQUIPO === usuarioActivo.acceso
-    );
-  }, [usuarioActivo]);
-
-  const datosFiltrados = useMemo(() => {
-    const q = busqueda.trim().toLowerCase();
-
-    return datosPermitidos.filter((r) => {
-      const coincideEstado =
-        filtroEstado === "Todos" ||
-        r.ESTADO === filtroEstado;
-
-      const coincidePrioridad =
-        filtroPrioridad === "Todas" ||
-        r.PRIORIDAD === filtroPrioridad;
-
-      const coincideEquipo =
-        filtroEquipo === "Todos" ||
-        r.EQUIPO === filtroEquipo;
-
-      const coincideEjecutivo =
-        filtroEjecutivo === "Todos" ||
-        r["NOMBRE EJECUTIVO"] === filtroEjecutivo;
-
-      const texto = [
-        r.CUENTA,
-        r["NOMBRE EJECUTIVO"],
-        r.RESPONSABLE,
-        r.EQUIPO,
-        r.ESTADO,
-        r.PRIORIDAD,
-        r["NECESIDAD 1"],
-        r["NECESIDAD 2"],
-        r["NECESIDAD 3"],
-        r["PLAN DE ACCIÓN 1"],
-        r["PLAN DE ACCIÓN 2"],
-        r["PLAN DE ACCIÓN 3"],
-        r["ASESOR INNOVACION DIGITAL"],
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
-      return (
-        coincideEstado &&
-        coincidePrioridad &&
-        coincideEquipo &&
-        coincideEjecutivo &&
-        (!q || texto.includes(q))
-      );
-    });
-  }, [
-    datosPermitidos,
-    filtroEstado,
-    filtroPrioridad,
-    filtroEquipo,
-    filtroEjecutivo,
-    busqueda,
-  ]);
-
-  const resumen = useMemo(() => {
-    const venta = datosFiltrados.reduce(
-      (total, r) =>
-        total + numericValue(r["VENTA ESTIMADA"]),
-      0
-    );
-
-    const propuesta = datosFiltrados.reduce(
-      (total, r) =>
-        total +
-        numericValue(r["VALOR DE LA PROPUESTA"]),
-      0
-    );
-
-    const cerradas = datosFiltrados.filter(
-      (r) => r.ESTADO === "Cerrada"
-    );
-
-    const seguimiento = datosFiltrados.filter(
-      (r) => r.ESTADO === "En seguimiento"
-    );
-
-    const porCerrar = datosFiltrados.filter(
-      (r) => r.ESTADO === "Por cerrar"
-    );
-
-    const porMejorar = datosFiltrados.filter(
-      (r) => r.ESTADO === "Por Mejorar"
-    );
-
-    const noAprobadas = datosFiltrados.filter(
-      (r) =>
-        String(r.ESTADO || "")
-          .toLowerCase()
-          .includes("no aprobada")
-    );
-
-    const propuestaCerrada = cerradas.reduce(
-      (total, r) =>
-        total +
-        numericValue(r["VALOR DE LA PROPUESTA"]),
-      0
-    );
-
-    const propuestaSeguimiento = seguimiento.reduce(
-      (total, r) =>
-        total +
-        numericValue(r["VALOR DE LA PROPUESTA"]),
-      0
-    );
-
-    const propuestaPorCerrar = porCerrar.reduce(
-      (total, r) =>
-        total +
-        numericValue(r["VALOR DE LA PROPUESTA"]),
-      0
-    );
-
-    /*
-     * La compañera pidió que el valor ya cerrado,
-     * alrededor de $349 millones, quede visible.
-     *
-     * Tomamos primero lo que realmente está marcado
-     * como Cerrada en los datos. El KPI incorpora como
-     * referencia el valor solicitado cuando corresponde.
-     */
-    const valorCerradoVisible = Math.max(
-      propuestaCerrada,
-      VALOR_CERRADO_REFERENCIA
-    );
+  if (!name) {
 
     return {
-      venta,
-      propuesta,
-      propuestaCerrada,
-      propuestaSeguimiento,
-      propuestaPorCerrar,
-      valorCerradoVisible,
-      cerradas: cerradas.length,
-      seguimiento: seguimiento.length,
-      porCerrar: porCerrar.length,
-      porMejorar: porMejorar.length,
-      noAprobadas: noAprobadas.length,
+      name: "Sin asignar",
+      image: "",
+      initials: "SA",
     };
-  }, [datosFiltrados]);
 
-  const estadosData = useMemo(() => {
-    const map = {};
+  }
 
-    datosFiltrados.forEach((r) => {
-      const estado = r.ESTADO || "Sin estado";
-      map[estado] = (map[estado] || 0) + 1;
-    });
 
-    return Object.entries(map)
-      .sort((a, b) => b[1] - a[1])
-      .map(([name, value]) => ({
-        name,
-        value,
-      }));
-  }, [datosFiltrados]);
-
-  /*
-   * Vista por MESA:
-   * Registros
-   * Venta estimada
-   * Valor de propuestas
-   * Cerrado
-   */
-  const mesasData = useMemo(() => {
-    const map = {};
-
-    datosFiltrados.forEach((r) => {
-      const equipo = r.EQUIPO || "Sin equipo";
-
-      if (!map[equipo]) {
-        map[equipo] = {
-          equipo,
-          registros: 0,
-          venta: 0,
-          propuesta: 0,
-          cerrado: 0,
-          seguimiento: 0,
-        };
-      }
-
-      map[equipo].registros += 1;
-
-      map[equipo].venta += numericValue(
-        r["VENTA ESTIMADA"]
-      );
-
-      map[equipo].propuesta += numericValue(
-        r["VALOR DE LA PROPUESTA"]
-      );
-
-      if (r.ESTADO === "Cerrada") {
-        map[equipo].cerrado += numericValue(
-          r["VALOR DE LA PROPUESTA"]
-        );
-      }
-
-      if (r.ESTADO === "En seguimiento") {
-        map[equipo].seguimiento += numericValue(
-          r["VALOR DE LA PROPUESTA"]
-        );
-      }
-    });
-
-    return Object.values(map).sort(
-      (a, b) => b.propuesta - a.propuesta
+  const user =
+    findUserByName(
+      name
     );
-  }, [datosFiltrados]);
 
-  /*
-   * Vista por ejecutivo:
-   * permite bajar del nivel de mesa al responsable
-   * comercial.
-   */
-  const ejecutivosData = useMemo(() => {
-    const map = {};
 
-    datosFiltrados.forEach((r) => {
-      const ejecutivo =
-        r["NOMBRE EJECUTIVO"] || "Sin ejecutivo";
+  if (user) {
 
-      if (!map[ejecutivo]) {
-        map[ejecutivo] = {
-          ejecutivo,
-          equipo: r.EQUIPO || "Sin equipo",
-          registros: 0,
-          venta: 0,
-          propuesta: 0,
-          cerrado: 0,
-        };
-      }
+    return {
+      name:
+        user.name,
 
-      map[ejecutivo].registros += 1;
+      image:
+        user.image,
 
-      map[ejecutivo].venta += numericValue(
-        r["VENTA ESTIMADA"]
-      );
-
-      map[ejecutivo].propuesta += numericValue(
-        r["VALOR DE LA PROPUESTA"]
-      );
-
-      if (r.ESTADO === "Cerrada") {
-        map[ejecutivo].cerrado += numericValue(
-          r["VALOR DE LA PROPUESTA"]
-        );
-      }
-    });
-
-    return Object.values(map)
-      .sort((a, b) => b.propuesta - a.propuesta)
-      .slice(0, 15);
-  }, [datosFiltrados]);
-
-  const prioridadData = useMemo(() => {
-    const map = {
-      Alta: 0,
-      Media: 0,
-      Baja: 0,
+      initials:
+        user.initials ||
+        getInitials(
+          user.name
+        ),
     };
 
-    datosFiltrados.forEach((r) => {
-      if (
-        Object.prototype.hasOwnProperty.call(
-          map,
-          r.PRIORIDAD
+  }
+
+
+  return {
+    name,
+
+    image:
+      getUserImage(
+        name
+      ),
+
+    initials:
+      getInitials(
+        name
+      ),
+  };
+
+}
+
+
+/* =========================================================
+   FILTRAR POR PERMISOS DEL USUARIO
+   ========================================================= */
+
+function applyUserPermissions(
+  rows = [],
+  user = null
+) {
+
+  if (!user) {
+    return [];
+  }
+
+
+  /*
+   * USUARIOS CON ACCESO TOTAL
+   *
+   * Tatiana García
+   * Glen
+   * Juan Pablo
+   * Jonathan
+   * Sthefanie
+   */
+
+  if (
+    user.canViewAll
+  ) {
+
+    return rows;
+
+  }
+
+
+  /*
+   * USUARIOS DE NACIONAL
+   *
+   * Diana → N1
+   * Juan Sebastián → N2
+   * Tatiana Peláez → N3
+   * Ivonne → N4
+   * William → N5
+   */
+
+  if (
+    user.filterTeam
+  ) {
+
+    return rows.filter(
+      (row) =>
+        nacionalMatches(
+          row.nacional,
+          user.filterTeam
         )
-      ) {
-        map[r.PRIORIDAD] += 1;
-      }
-    });
-
-    return Object.entries(map).map(
-      ([name, value]) => ({
-        name,
-        value,
-      })
     );
-  }, [datosFiltrados]);
 
-  const mesesData = useMemo(() => {
-    const orden = [
-      "JUNIO",
-      "JULIO",
-      "AGOSTO",
-    ];
+  }
 
-    const map = {};
 
-    datosFiltrados.forEach((r) => {
-      const mes = r.MES;
+  return [];
 
-      if (!mes) return;
+}
 
-      if (!map[mes]) {
-        map[mes] = {
-          mes,
-          venta: 0,
-          propuesta: 0,
-          cerrado: 0,
-          registros: 0,
-        };
-      }
 
-      map[mes].venta += numericValue(
-        r["VENTA ESTIMADA"]
-      );
+/* =========================================================
+   FILTRAR FILAS
+   ========================================================= */
 
-      map[mes].propuesta += numericValue(
-        r["VALOR DE LA PROPUESTA"]
-      );
+function filterRows({
+  rows = [],
+  user = null,
+  selectedTeam = "Todos",
+  selectedStatus = "Todos",
+  selectedRubro = "Todos",
+  searchTerm = "",
+}) {
 
-      if (r.ESTADO === "Cerrada") {
-        map[mes].cerrado += numericValue(
-          r["VALOR DE LA PROPUESTA"]
+  /*
+   * PRIMER NIVEL:
+   * permisos del usuario.
+   */
+
+  let result =
+    applyUserPermissions(
+      rows,
+      user
+    );
+
+
+  /* =======================================================
+     SEGUNDO NIVEL:
+     NACIONAL
+     ======================================================= */
+
+  if (
+    selectedTeam &&
+    selectedTeam !== "Todos"
+  ) {
+
+    /*
+     * Un líder nacional NO puede cambiar
+     * a otra Nacional.
+     */
+
+    if (
+      user?.filterTeam
+    ) {
+
+      result =
+        result.filter(
+          (row) =>
+            nacionalMatches(
+              row.nacional,
+              user.filterTeam
+            )
         );
-      }
 
-      map[mes].registros += 1;
-    });
+    } else {
 
-    return orden
-      .filter((m) => map[m])
-      .map((m) => map[m]);
-  }, [datosFiltrados]);
+      result =
+        result.filter(
+          (row) =>
+            nacionalMatches(
+              row.nacional,
+              selectedTeam
+            )
+        );
 
-  const asesorData = useMemo(() => {
-    const map = {};
+    }
 
-    datosFiltrados.forEach((r) => {
-      const asesor =
-        r["ASESOR INNOVACION DIGITAL"] ||
-        "Sin asignar";
+  }
 
-      if (!map[asesor]) {
-        map[asesor] = {
-          asesor,
-          propuestas: 0,
-          cerradas: 0,
-          valor: 0,
-        };
-      }
 
-      map[asesor].propuestas += 1;
+  /* =======================================================
+     TERCER NIVEL:
+     ESTADO
+     ======================================================= */
 
-      map[asesor].valor += numericValue(
-        r["VALOR DE LA PROPUESTA"]
+  if (
+    selectedStatus &&
+    selectedStatus !== "Todos"
+  ) {
+
+    const target =
+      normalizeText(
+        selectedStatus
       );
 
-      if (r.ESTADO === "Cerrada") {
-        map[asesor].cerradas += 1;
-      }
-    });
 
-    return Object.values(map).sort(
-      (a, b) => b.valor - a.valor
+    result =
+      result.filter(
+        (row) => {
+
+          const estado =
+            normalizeText(
+              row.estado
+            );
+
+
+          if (
+            target ===
+            "en seguimiento"
+          ) {
+
+            return (
+              estado ===
+              "seguimiento"
+            );
+
+          }
+
+
+          if (
+            target ===
+            "cerrada"
+          ) {
+
+            return (
+              estado ===
+              "cerrada"
+            );
+
+          }
+
+
+          if (
+            target ===
+            "oportunidad"
+          ) {
+
+            return (
+              estado ===
+              "oportunidad"
+            );
+
+          }
+
+
+          return true;
+
+        }
+      );
+
+  }
+
+
+  /* =======================================================
+     CUARTO NIVEL:
+     SECTOR / RUBRO
+     ======================================================= */
+
+  if (
+    selectedRubro &&
+    selectedRubro !== "Todos"
+  ) {
+
+    const target =
+      normalizeText(
+        selectedRubro
+      );
+
+
+    result =
+      result.filter(
+        (row) => {
+
+          const rubro =
+            normalizeText(
+              row.rubro
+            );
+
+
+          return (
+            rubro ===
+            target
+          );
+
+        }
+      );
+
+  }
+
+
+  /* =======================================================
+     QUINTO NIVEL:
+     BÚSQUEDA
+     ======================================================= */
+
+  const search =
+    normalizeText(
+      searchTerm
     );
-  }, [datosFiltrados]);
 
-  const estados = [
-    ...new Set(
-      datosPermitidos
-        .map((r) => r.ESTADO)
-        .filter(Boolean)
+
+  if (search) {
+
+    result =
+      result.filter(
+        (row) => {
+
+          const searchable =
+            [
+
+              row.nacional,
+
+              row.equipo,
+
+              row.ejecutivo,
+
+              row.cuenta,
+
+              row.rubro,
+
+              row.necesidad,
+
+              row.necesidad1,
+
+              row.necesidad2,
+
+              row.necesidad3,
+
+              row.oportunidad,
+
+              row.estado,
+
+              row.asesor,
+
+              row.responsable,
+
+              row.clave,
+
+            ]
+
+              .map(
+                (value) =>
+                  normalizeText(
+                    value
+                  )
+              )
+
+              .join(" ");
+
+
+          return searchable.includes(
+            search
+          );
+
+        }
+      );
+
+  }
+
+
+  return result;
+
+}
+
+
+/* =========================================================
+   MARCAS ÚNICAS
+   ========================================================= */
+
+function getUniqueBrands(
+  rows = []
+) {
+
+  const brands =
+    new Set();
+
+
+  rows.forEach(
+    (row) => {
+
+      const brand =
+        normalizeText(
+          row.cuenta
+        );
+
+
+      if (brand) {
+
+        brands.add(
+          brand
+        );
+
+      }
+
+    }
+  );
+
+
+  return brands;
+
+}
+
+
+/* =========================================================
+   EJECUTIVOS ÚNICOS
+   ========================================================= */
+
+function getUniqueExecutives(
+  rows = []
+) {
+
+  const executives =
+    new Set();
+
+
+  rows.forEach(
+    (row) => {
+
+      const executive =
+        normalizeText(
+          row.ejecutivo
+        );
+
+
+      if (executive) {
+
+        executives.add(
+          executive
+        );
+
+      }
+
+    }
+  );
+
+
+  return executives;
+
+}
+
+
+/* =========================================================
+   CONTAR MARCAS POR RUBRO
+   ========================================================= */
+
+function getBrandCountsByRubro(
+  rows = []
+) {
+
+  const result =
+    {};
+
+
+  RUBRO_ORDER.forEach(
+    (rubro) => {
+
+      result[rubro] =
+        new Set();
+
+    }
+  );
+
+
+  rows.forEach(
+    (row) => {
+
+      const rubro =
+        normalizeRubro(
+          row.rubro
+        );
+
+
+      const brand =
+        String(
+          row.cuenta ?? ""
+        ).trim();
+
+
+      if (
+        !rubro ||
+        !brand
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+       * Si el Excel tiene un rubro
+       * que coincide con nuestro catálogo,
+       * lo usamos directamente.
+       */
+
+      const matchingRubro =
+        RUBRO_ORDER.find(
+          (item) =>
+            normalizeText(
+              item
+            ) ===
+            normalizeText(
+              rubro
+            )
+        );
+
+
+      if (
+        matchingRubro &&
+        result[
+          matchingRubro
+        ]
+      ) {
+
+        result[
+          matchingRubro
+        ].add(
+          normalizeText(
+            brand
+          )
+        );
+
+      }
+
+    }
+  );
+
+
+  /*
+   * Convertimos Set → número.
+   */
+
+  const counts =
+    {};
+
+
+  RUBRO_ORDER.forEach(
+    (rubro) => {
+
+      counts[rubro] =
+        result[rubro]
+          ? result[rubro].size
+          : 0;
+
+    }
+  );
+
+
+  return counts;
+
+}
+
+
+/* =========================================================
+   OBTENER SECTORES DISPONIBLES
+   ========================================================= */
+
+function getAvailableRubros(
+  rows = []
+) {
+
+  const available =
+    new Set();
+
+
+  rows.forEach(
+    (row) => {
+
+      const rubro =
+        normalizeRubro(
+          row.rubro
+        );
+
+
+      if (
+        rubro
+      ) {
+
+        const match =
+          RUBRO_ORDER.find(
+            (item) =>
+              normalizeText(
+                item
+              ) ===
+              normalizeText(
+                rubro
+              )
+          );
+
+
+        if (match) {
+
+          available.add(
+            match
+          );
+
+        }
+
+      }
+
+    }
+  );
+
+
+  return RUBRO_ORDER.filter(
+    (rubro) =>
+      available.has(
+        rubro
+      )
+  );
+
+}
+
+
+/* =========================================================
+   EQUIPOS / NACIONALES DISPONIBLES
+   ========================================================= */
+
+function getAvailableTeams(
+  rows = []
+) {
+
+  const teams =
+    new Set();
+
+
+  rows.forEach(
+    (row) => {
+
+      const nacional =
+        normalizeNacional(
+          row.nacional
+        );
+
+
+      if (
+        nacional
+      ) {
+
+        teams.add(
+          nacional
+        );
+
+      }
+
+    }
+  );
+
+
+  return [
+    "Todos",
+
+    ...Array.from(
+      teams
+    ).sort(
+      (a, b) =>
+        getNationalNumber(
+          a
+        ) -
+        getNationalNumber(
+          b
+        )
     ),
   ];
 
-  const prioridades = [
-    ...new Set(
-      datosPermitidos
-        .map((r) => r.PRIORIDAD)
-        .filter(Boolean)
+}
+
+
+/* =========================================================
+   ESTADOS DISPONIBLES
+   ========================================================= */
+
+function getAvailableStatuses(
+  rows = []
+) {
+
+  const states =
+    new Set();
+
+
+  rows.forEach(
+    (row) => {
+
+      if (
+        row.estado ===
+        "seguimiento"
+      ) {
+
+        states.add(
+          "En seguimiento"
+        );
+
+      }
+
+
+      if (
+        row.estado ===
+        "cerrada"
+      ) {
+
+        states.add(
+          "Cerrada"
+        );
+
+      }
+
+
+      if (
+        row.estado ===
+        "oportunidad"
+      ) {
+
+        states.add(
+          "Oportunidad"
+        );
+
+      }
+
+    }
+  );
+
+
+  return [
+    "Todos",
+
+    ...Array.from(
+      states
     ),
   ];
 
-  const equipos = [
-    ...new Set(
-      datosPermitidos
-        .map((r) => r.EQUIPO)
-        .filter(Boolean)
-    ),
+}
+
+
+/* =========================================================
+   RESUMEN GENERAL
+   ========================================================= */
+
+function calculateSummary(
+  rows = []
+) {
+
+  const brands =
+    getUniqueBrands(
+      rows
+    );
+
+
+  const executives =
+    getUniqueExecutives(
+      rows
+    );
+
+
+  const proposals =
+    rows.length;
+
+
+  const closedRows =
+    rows.filter(
+      (row) =>
+        row.estado ===
+        "cerrada"
+    );
+
+
+  const followUpRows =
+    rows.filter(
+      (row) =>
+        row.estado ===
+        "seguimiento"
+    );
+
+
+  const closedValue =
+    closedRows.reduce(
+      (sum, row) =>
+        sum +
+        toNumber(
+          row.valorPropuesta
+        ),
+      0
+    );
+
+
+  const followUpValue =
+    followUpRows.reduce(
+      (sum, row) =>
+        sum +
+        toNumber(
+          row.valorPropuesta
+        ),
+      0
+    );
+
+
+  const totalValue =
+    rows.reduce(
+      (sum, row) =>
+        sum +
+        toNumber(
+          row.valorPropuesta
+        ),
+      0
+    );
+
+
+  return {
+
+    brands:
+      brands.size,
+
+    executives:
+      executives.size,
+
+    proposals,
+
+    closed:
+      closedRows.length,
+
+    followUp:
+      followUpRows.length,
+
+    closedValue,
+
+    followUpValue,
+
+    totalValue,
+
+  };
+
+}
+
+
+/* =========================================================
+   DATOS DE ESTADOS PARA GRÁFICA
+   ========================================================= */
+
+function calculateStatusData(
+  rows = []
+) {
+
+  const counts = {
+
+    seguimiento:
+      0,
+
+    cerrada:
+      0,
+
+    oportunidad:
+      0,
+
+  };
+
+
+  rows.forEach(
+    (row) => {
+
+      if (
+        counts[
+          row.estado
+        ] !== undefined
+      ) {
+
+        counts[
+          row.estado
+        ] += 1;
+
+      }
+
+    }
+  );
+
+
+  return [
+
+    {
+
+      name:
+        "En seguimiento",
+
+      key:
+        "seguimiento",
+
+      value:
+        counts.seguimiento,
+
+      color:
+        COLORS.pink,
+
+    },
+
+
+    {
+
+      name:
+        "Cerrada",
+
+      key:
+        "cerrada",
+
+      value:
+        counts.cerrada,
+
+      color:
+        COLORS.green,
+
+    },
+
+
+    {
+
+      name:
+        "Oportunidad",
+
+      key:
+        "oportunidad",
+
+      value:
+        counts.oportunidad,
+
+      color:
+        COLORS.amber,
+
+    },
+
   ];
 
-  const ejecutivos = [
-    ...new Set(
-      datosPermitidos
-        .map((r) => r["NOMBRE EJECUTIVO"])
-        .filter(Boolean)
-    ),
-  ].sort();
+}
 
-  if (vista === "bienvenida") {
+
+/* =========================================================
+   VALOR GESTIONADO POR NACIONAL
+   ========================================================= */
+
+function calculateNationalValueData(
+  rows = []
+) {
+
+  return [
+
+    "Nacional 1",
+
+    "Nacional 2",
+
+    "Nacional 3",
+
+    "Nacional 4",
+
+    "Nacional 5",
+
+  ].map(
+    (nacional) => {
+
+      const nationalRows =
+        rows.filter(
+          (row) =>
+            nacionalMatches(
+              row.nacional,
+              nacional
+            )
+        );
+
+
+      const value =
+        nationalRows.reduce(
+          (sum, row) =>
+            sum +
+            toNumber(
+              row.valorPropuesta
+            ),
+          0
+        );
+
+
+      return {
+
+        nacional:
+          nacional.replace(
+            "Nacional ",
+            "N"
+          ),
+
+        name:
+          nacional,
+
+        value,
+
+        proposals:
+          nationalRows.length,
+
+      };
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   TOP MARCAS POR VALOR
+   ========================================================= */
+
+function calculateTopBrands(
+  rows = []
+) {
+
+  const brands =
+    {};
+
+
+  rows.forEach(
+    (row) => {
+
+      const brand =
+        String(
+          row.cuenta ?? ""
+        ).trim();
+
+
+      if (!brand) {
+
+        return;
+
+      }
+
+
+      const key =
+        normalizeText(
+          brand
+        );
+
+
+      if (
+        !brands[key]
+      ) {
+
+        brands[key] = {
+
+          name:
+            brand,
+
+          value:
+            0,
+
+          proposals:
+            0,
+
+        };
+
+      }
+
+
+      brands[key].value +=
+        toNumber(
+          row.valorPropuesta
+        );
+
+
+      brands[key].proposals +=
+        1;
+
+    }
+  );
+
+
+  return Object.values(
+    brands
+  )
+
+    .sort(
+      (a, b) =>
+        b.value -
+        a.value
+    )
+
+    .slice(
+      0,
+      5
+    );
+
+}
+
+
+/* =========================================================
+   VALOR POR ESTADO
+   ========================================================= */
+
+function calculateValueByStatus(
+  rows = []
+) {
+
+  const closed =
+    rows
+      .filter(
+        (row) =>
+          row.estado ===
+          "cerrada"
+      )
+      .reduce(
+        (sum, row) =>
+          sum +
+          toNumber(
+            row.valorPropuesta
+          ),
+        0
+      );
+
+
+  const followUp =
+    rows
+      .filter(
+        (row) =>
+          row.estado ===
+          "seguimiento"
+      )
+      .reduce(
+        (sum, row) =>
+          sum +
+          toNumber(
+            row.valorPropuesta
+          ),
+        0
+      );
+
+
+  return {
+
+    closed,
+
+    followUp,
+
+  };
+
+}
+
+
+/* =========================================================
+   FIN APP.JSX — PARTE 3/6
+   ========================================================= */
+
+   /* =========================================================
+   APP.JSX — PARTE 4/6
+   COMPONENTES VISUALES PRINCIPALES
+   ========================================================= */
+
+
+/* =========================================================
+   AVATAR DE USUARIO
+   ========================================================= */
+
+function UserAvatar({
+  user,
+  size = "medium",
+}) {
+
+  if (!user) {
     return (
-      <div className="app">
-        <div className="welcome-card">
-          <img
-            src="/images/PRISA.png"
-            alt="Prisa Media"
-            className="prisa-logo"
-          />
-
-          <span className="eyebrow">
-            DASHBOARD COMERCIAL
-          </span>
-
-          <h1>Bienvenido</h1>
-
-          <p>
-            Selecciona tu usuario para acceder al
-            dashboard comercial.
-          </p>
-
-          <button
-            type="button"
-            onClick={() =>
-              setVista("seleccion")
-            }
-          >
-            Seleccionar usuario
-          </button>
-        </div>
-      </div>
+      <Avatar
+        name="Usuario"
+        initials="US"
+        size={size}
+      />
     );
   }
 
-  if (vista === "seleccion") {
-    return (
-      <div className="app selection-screen">
-        <h1>Dashboard comercial</h1>
 
-        <p className="subtitle">
-          Selecciona tu usuario para acceder al
-          dashboard
-        </p>
+  return (
+    <Avatar
+      name={user.name}
+      initials={user.initials}
+      image={user.image}
+      size={size}
+    />
+  );
 
-        <h2 className="section-label">
-          DIRECCIÓN COMERCIAL
-        </h2>
+}
 
-        <div className="row row-direccion">
-          {usuarios.direccion.map((u) => (
-            <UserCard
-              key={u.id}
-              usuario={u}
-              colorClass="direccion"
-              seleccionado={
-                seleccionadoId === u.id
-              }
-              onSelect={setSeleccionadoId}
-            />
-          ))}
-        </div>
 
-        <h2 className="section-label">
-          ÁREA DE INNOVACIÓN DIGITAL
-        </h2>
+/* =========================================================
+   BADGE DE ESTADO
+   ========================================================= */
 
-        <div className="row row-innovacion">
-          {usuarios.innovacion.map((u) => (
-            <UserCard
-              key={u.id}
-              usuario={u}
-              colorClass="innovacion"
-              seleccionado={
-                seleccionadoId === u.id
-              }
-              onSelect={setSeleccionadoId}
-            />
-          ))}
-        </div>
+function StatusBadge({
+  estado,
+}) {
 
-        <h2 className="section-label">
-          EQUIPOS NACIONALES
-        </h2>
+  const meta =
+    ESTADO_META[
+      estado
+    ] ||
+    {
+      label:
+        estado ||
+        "Sin estado",
 
-        <div className="row row-nacionales">
-          {usuarios.nacionales.map((u) => (
-            <UserCard
-              key={u.id}
-              usuario={u}
-              colorClass="nacionales"
-              seleccionado={
-                seleccionadoId === u.id
-              }
-              onSelect={setSeleccionadoId}
-            />
-          ))}
-        </div>
+      color:
+        "#777c8e",
+
+      soft:
+        "rgba(119,124,142,0.12)",
+    };
+
+
+  return (
+    <span
+      className="status-badge"
+      style={{
+        color:
+          meta.color,
+
+        background:
+          meta.soft,
+      }}
+    >
+      {meta.label}
+    </span>
+  );
+
+}
+
+
+/* =========================================================
+   KPI CARD
+   ========================================================= */
+
+function KpiCard({
+  icon: Icon,
+  label,
+  value,
+  sublabel,
+}) {
+
+  return (
+    <div className="kpi-card">
+
+      <div className="kpi-card-icon">
+
+        {Icon && (
+          <Icon
+            size={16}
+            strokeWidth={1.8}
+          />
+        )}
+
+      </div>
+
+
+      <div className="kpi-card-content">
+
+        <span>
+          {label}
+        </span>
+
+        <strong>
+          {value}
+        </strong>
+
+        {sublabel && (
+          <small>
+            {sublabel}
+          </small>
+        )}
+
+      </div>
+
+    </div>
+  );
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+function DashboardSidebar({
+  activeSection,
+  onSectionChange,
+
+  selectedUser,
+  onChangeUser,
+
+  selectedTeam,
+  onTeamChange,
+
+  selectedStatus,
+  onStatusChange,
+
+  selectedRubro,
+  onRubroChange,
+
+  brandCountsByRubro,
+}) {
+
+  const [
+    userMenuOpen,
+    setUserMenuOpen,
+  ] = useState(false);
+
+
+  /*
+   * Sectores que queremos mostrar
+   * siempre en el mismo orden.
+   */
+
+  const sectors =
+    RUBRO_ORDER;
+
+
+  return (
+    <aside className="dashboard-sidebar">
+
+      {/* =================================================
+         LOGO
+         ================================================= */}
+
+      <div className="sidebar-brand">
+
+        <img
+          src={`${IMAGE_PATH}PRISA.png`}
+          alt="PRISA"
+          className="sidebar-prisa-logo"
+        />
+
+      </div>
+
+
+      {/* =================================================
+         NAVEGACIÓN
+         ================================================= */}
+
+      <nav className="sidebar-nav">
 
         <button
           type="button"
-          className="btn-continuar"
-          disabled={!seleccionadoId}
-          onClick={handleContinuar}
+          className={
+            `sidebar-nav-item ${
+              activeSection ===
+              "resumen"
+                ? "active"
+                : ""
+            }`
+          }
+          onClick={() => {
+
+            onSectionChange(
+              "resumen"
+            );
+
+            onRubroChange(
+              "Todos"
+            );
+
+          }}
         >
-          {seleccionadoId
-            ? "Continuar"
-            : "Selecciona un usuario"}
-        </button>
 
-        <p className="footer-text">
-          Prisa Media · Área de Innovación Digital
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="app dashboard-page">
-      <header className="dashboard-header">
-        <div className="header-brand">
-          <img
-            src="/images/PRISA.png"
-            alt="Prisa Media"
+          <LayoutGrid
+            size={15}
           />
 
-          <div>
-            <span className="eyebrow">
-              DASHBOARD COMERCIAL
+          <span>
+            Resumen
+          </span>
+
+        </button>
+
+      </nav>
+
+
+      {/* =================================================
+         FILTROS
+         ================================================= */}
+
+      <div className="sidebar-filters">
+
+        {/* EQUIPO */}
+
+        <div className="sidebar-filter-group">
+
+          <div className="sidebar-filter-title">
+
+            <span>
+              EQUIPO
             </span>
 
-            <h1>Panel de gestión</h1>
           </div>
+
+
+          <div className="sidebar-filter-select">
+
+            <select
+              value={
+                selectedTeam
+              }
+              onChange={(event) =>
+                onTeamChange(
+                  event.target.value
+                )
+              }
+
+              disabled={
+                Boolean(
+                  selectedUser?.filterTeam
+                )
+              }
+            >
+
+              {!selectedUser?.filterTeam && (
+                <option value="Todos">
+                  Todos
+                </option>
+              )}
+
+
+              {[
+                "Nacional 1",
+                "Nacional 2",
+                "Nacional 3",
+                "Nacional 4",
+                "Nacional 5",
+              ].map(
+                (team) => (
+                  <option
+                    key={team}
+                    value={team}
+                  >
+                    {team}
+                  </option>
+                )
+              )}
+
+            </select>
+
+
+            <ChevronDown
+              size={13}
+            />
+
+          </div>
+
         </div>
 
-        <div className="header-user">
-          <div className="header-avatar">
-            {usuarioActivo?.iniciales}
+
+        {/* ESTADO */}
+
+        <div className="sidebar-filter-group">
+
+          <div className="sidebar-filter-title">
+
+            <span>
+              ESTADO
+            </span>
+
           </div>
 
-          <div className="header-user-info">
+
+          <div className="sidebar-filter-select">
+
+            <select
+              value={
+                selectedStatus
+              }
+              onChange={(event) =>
+                onStatusChange(
+                  event.target.value
+                )
+              }
+            >
+
+              <option value="Todos">
+                Todos
+              </option>
+
+              <option value="En seguimiento">
+                En seguimiento
+              </option>
+
+              <option value="Cerrada">
+                Cerrada
+              </option>
+
+              <option value="Oportunidad">
+                Oportunidad
+              </option>
+
+            </select>
+
+
+            <ChevronDown
+              size={13}
+            />
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+         SECTORES
+         ================================================= */}
+
+      <div className="sidebar-sectors">
+
+        <div className="sidebar-section-title">
+
+          <span>
+            SECTORES
+          </span>
+
+          <ChevronDown
+            size={12}
+          />
+
+        </div>
+
+
+        <div className="sector-list">
+
+          {sectors.map(
+            (rubro) => {
+
+              const Icon =
+                RUBRO_ICONS[
+                  rubro
+                ] ||
+                LayoutGrid;
+
+
+              const count =
+                brandCountsByRubro?.[
+                  rubro
+                ] ??
+                0;
+
+
+              const isActive =
+                selectedRubro ===
+                rubro;
+
+
+              return (
+                <button
+                  type="button"
+                  key={rubro}
+                  className={
+                    `sector-item ${
+                      isActive
+                        ? "active"
+                        : ""
+                    }`
+                  }
+
+                  onClick={() =>
+                    onRubroChange(
+                      isActive
+                        ? "Todos"
+                        : rubro
+                    )
+                  }
+                >
+
+                  <span className="sector-icon">
+
+                    <Icon
+                      size={14}
+                      strokeWidth={1.8}
+                    />
+
+                  </span>
+
+
+                  <span className="sector-name">
+                    {rubro}
+                  </span>
+
+
+                  <span className="sector-count">
+                    {count}
+                  </span>
+
+                </button>
+              );
+
+            }
+          )}
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+         USUARIO ACTUAL
+         ================================================= */}
+
+      <div className="sidebar-user-area">
+
+        {userMenuOpen && (
+
+          <div className="sidebar-user-menu">
+
+            {USERS.map(
+              (user) => (
+
+                <button
+                  type="button"
+                  key={user.id}
+                  className="sidebar-user-option"
+
+                  onClick={() => {
+
+                    onChangeUser(
+                      user
+                    );
+
+                    setUserMenuOpen(
+                      false
+                    );
+
+                  }}
+                >
+
+                  <UserAvatar
+                    user={user}
+                    size="small"
+                  />
+
+
+                  <div>
+
+                    <strong>
+                      {user.name}
+                    </strong>
+
+                    <span>
+                      {user.role}
+                    </span>
+
+                  </div>
+
+                </button>
+
+              )
+            )}
+
+          </div>
+
+        )}
+
+
+        <button
+          type="button"
+          className="sidebar-user-button"
+
+          onClick={() =>
+            setUserMenuOpen(
+              (current) =>
+                !current
+            )
+          }
+        >
+
+          <UserAvatar
+            user={
+              selectedUser
+            }
+            size="small"
+          />
+
+
+          <div className="sidebar-user-info">
+
             <strong>
-              {usuarioActivo?.nombre}
+              {selectedUser?.name ||
+                "Usuario"}
             </strong>
 
             <span>
-              {usuarioActivo?.tag}
+              {selectedUser?.role ||
+                ""}
             </span>
+
           </div>
 
-          <button
-            className="change-user-btn"
-            onClick={cambiarUsuario}
-          >
-            Cambiar usuario
-          </button>
+
+          <ChevronDown
+            size={13}
+          />
+
+        </button>
+
+      </div>
+
+    </aside>
+  );
+
+}
+
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+function DashboardTopbar({
+  currentUser,
+  searchTerm,
+  onSearchChange,
+}) {
+
+  return (
+    <header className="dashboard-topbar">
+
+      <div className="topbar-left">
+
+        <div className="topbar-title">
+
+          <span>
+            PRISA MEDIA
+          </span>
+
+          <ChevronRight
+            size={12}
+          />
+
+          <strong>
+            Dashboard Comercial
+          </strong>
+
         </div>
-      </header>
 
-      <main className="dashboard-content">
-        <section className="dashboard-intro">
-          <div>
-            <span className="eyebrow">
-              ACCESO AUTORIZADO
-            </span>
+      </div>
 
-            <h2>Resumen comercial</h2>
 
-            <p>
-              {usuarioActivo?.acceso === "todo"
-                ? "Visualización completa por mesas de trabajo, ejecutivos y oportunidades."
-                : `Visualización restringida exclusivamente a ${usuarioActivo?.tag}.`}
-            </p>
-          </div>
+      <div className="topbar-center">
 
-          <div className="access-badge">
-            Permiso:
+        <label className="topbar-search">
 
-            <strong>
-              {usuarioActivo?.acceso === "todo"
-                ? "TODAS LAS NACIONALES"
-                : usuarioActivo?.tag}
-            </strong>
-          </div>
-        </section>
-
-        <section className="kpi-grid">
-          <KPI
-            label="Oportunidades"
-            value={number(
-              datosFiltrados.length
-            )}
-            detail="Registros con los filtros actuales"
+          <Search
+            size={14}
           />
-
-          <KPI
-            label="Venta estimada"
-            value={money(resumen.venta)}
-            detail="Potencial comercial"
-            accent="blue"
-          />
-
-          <KPI
-            label="Valor cerrado"
-            value={money(
-              resumen.valorCerradoVisible
-            )}
-            detail={`${number(
-              resumen.cerradas
-            )} propuestas marcadas como cerradas`}
-            accent="green"
-          />
-
-          <KPI
-            label="En seguimiento"
-            value={money(
-              resumen.propuestaSeguimiento
-            )}
-            detail={`${number(
-              resumen.seguimiento
-            )} oportunidades`}
-            accent="purple"
-          />
-
-          <KPI
-            label="Por cerrar"
-            value={money(
-              resumen.propuestaPorCerrar
-            )}
-            detail={`${number(
-              resumen.porCerrar
-            )} oportunidades`}
-            accent="orange"
-          />
-        </section>
-
-        <section className="proposal-value-grid">
-          <KPI
-            label="Valor total de propuestas"
-            value={money(resumen.propuesta)}
-            detail="Valor acumulado visible"
-            accent="blue"
-          />
-
-          <KPI
-            label="Propuestas cerradas"
-            value={number(resumen.cerradas)}
-            detail={`${money(
-              resumen.propuestaCerrada
-            )} registrado en estado Cerrada`}
-            accent="green"
-          />
-        </section>
-
-        <section className="filters-panel">
-          <div className="filter-title">
-            <strong>
-              Análisis y filtros
-            </strong>
-
-            <button
-              type="button"
-              onClick={() => {
-                setFiltroEstado("Todos");
-                setFiltroPrioridad("Todas");
-                setFiltroEquipo("Todos");
-                setFiltroEjecutivo("Todos");
-                setBusqueda("");
-              }}
-            >
-              Limpiar filtros
-            </button>
-          </div>
 
           <input
-            className="search-input"
-            value={busqueda}
-            onChange={(e) =>
-              setBusqueda(e.target.value)
+            type="search"
+            value={
+              searchTerm
             }
-            placeholder="Buscar cuenta, ejecutivo, necesidad, asesor..."
+            onChange={(event) =>
+              onSearchChange(
+                event.target.value
+              )
+            }
+            placeholder="Buscar marca, ejecutivo, asesor..."
           />
 
-          <div className="filter-row">
-            <select
-              value={filtroEquipo}
-              onChange={(e) =>
-                setFiltroEquipo(e.target.value)
-              }
-            >
-              <option>Todos</option>
+        </label>
 
-              {equipos.map((x) => (
-                <option key={x} value={x}>
-                  {x}
-                </option>
-              ))}
-            </select>
+      </div>
 
-            <select
-              value={filtroEjecutivo}
-              onChange={(e) =>
-                setFiltroEjecutivo(e.target.value)
-              }
-            >
-              <option>Todos</option>
 
-              {ejecutivos.map((x) => (
-                <option key={x} value={x}>
-                  {x}
-                </option>
-              ))}
-            </select>
+      <div className="topbar-right">
 
-            <select
-              value={filtroEstado}
-              onChange={(e) =>
-                setFiltroEstado(e.target.value)
-              }
-            >
-              <option>Todos</option>
+        <button
+          type="button"
+          className="topbar-icon-button"
+          title="Ayuda"
+        >
 
-              {estados.map((x) => (
-                <option key={x} value={x}>
-                  {x}
-                </option>
-              ))}
-            </select>
+          <HelpCircle
+            size={15}
+          />
 
-            <select
-              value={filtroPrioridad}
-              onChange={(e) =>
-                setFiltroPrioridad(e.target.value)
-              }
-            >
-              <option>Todas</option>
+        </button>
 
-              {prioridades.map((x) => (
-                <option key={x} value={x}>
-                  {x}
-                </option>
-              ))}
-            </select>
+
+        <button
+          type="button"
+          className="topbar-icon-button"
+          title="Notificaciones"
+        >
+
+          <Bell
+            size={15}
+          />
+
+        </button>
+
+
+        <div className="topbar-user">
+
+          <UserAvatar
+            user={
+              currentUser
+            }
+            size="small"
+          />
+
+
+          <div className="topbar-user-info">
+
+            <strong>
+              {currentUser?.name ||
+                "Usuario"}
+            </strong>
+
+            <span>
+              {currentUser?.role ||
+                ""}
+            </span>
+
           </div>
-        </section>
 
-        <section className="charts-grid">
-          <ChartCard
-            title="Estado de las oportunidades"
-            subtitle={`${number(
-              datosFiltrados.length
-            )} registros`}
+        </div>
+
+      </div>
+
+    </header>
+  );
+
+}
+
+
+/* =========================================================
+   EQUIPO DE INNOVACIÓN DIGITAL
+   ========================================================= */
+
+function InnovationTeamSection({
+  selectedTeam,
+}) {
+
+  const showAll =
+    selectedTeam ===
+      "Todos" ||
+    !selectedTeam;
+
+
+  /*
+   * El director siempre aparece.
+   */
+
+  const director =
+    INNOVATION_TEAM[0];
+
+
+  /*
+   * Los miembros se mantienen visibles
+   * como en el diseño original.
+   */
+
+  const members =
+    INNOVATION_TEAM.slice(
+      1
+    );
+
+
+  return (
+    <section className="innovation-section">
+
+      <div className="innovation-section-header">
+
+        <div>
+
+          <span className="eyebrow">
+            EQUIPO
+          </span>
+
+          <h2>
+            Innovación Digital
+          </h2>
+
+        </div>
+
+
+        <span>
+          {showAll
+            ? "Todas las Nacionales"
+            : selectedTeam}
+        </span>
+
+      </div>
+
+
+      {/* DIRECTOR */}
+
+      <div className="innovation-director-card">
+
+        <UserAvatar
+          user={
+            findUserByName(
+              director.name
+            )
+          }
+          size="large"
+        />
+
+
+        <div className="innovation-director-info">
+
+          <strong>
+            {director.name}
+          </strong>
+
+          <span className="innovation-director-role">
+            {director.role}
+          </span>
+
+          <p>
+            {director.desc}
+          </p>
+
+        </div>
+
+
+        <span className="innovation-director-badge">
+          INNOVACIÓN DIGITAL
+        </span>
+
+      </div>
+
+
+      {/* MIEMBROS */}
+
+      <div className="innovation-members-grid">
+
+        {members.map(
+          (member) => {
+
+            const user =
+              findUserByName(
+                member.name
+              );
+
+
+            return (
+              <div
+                className="innovation-member-card"
+                key={
+                  member.name
+                }
+              >
+
+                <UserAvatar
+                  user={
+                    user
+                  }
+                  size="medium"
+                />
+
+
+                <div className="innovation-member-info">
+
+                  <strong>
+                    {member.name}
+                  </strong>
+
+                  <span>
+                    {member.role}
+                  </span>
+
+                </div>
+
+              </div>
+            );
+
+          }
+        )}
+
+      </div>
+
+    </section>
+  );
+
+}
+
+
+/* =========================================================
+   EQUIPOS NACIONALES
+   ========================================================= */
+
+function NationalTeamSection({
+  rows = [],
+  selectedTeam,
+}) {
+
+  /*
+   * Cuando se selecciona una Nacional,
+   * solamente mostramos SU líder.
+   *
+   * Para Todos mostramos las cinco.
+   */
+
+  const visibleTeams =
+    selectedTeam &&
+    selectedTeam !== "Todos"
+
+      ? NATIONAL_TEAMS.filter(
+          (team) =>
+            nacionalMatches(
+              team.national,
+              selectedTeam
+            )
+        )
+
+      : NATIONAL_TEAMS;
+
+
+  return (
+    <section className="national-team-section">
+
+      <div className="section-divider">
+
+        <span />
+
+        <strong>
+          EQUIPOS NACIONALES
+        </strong>
+
+        <span />
+
+      </div>
+
+
+      <div className="national-team-grid">
+
+        {visibleTeams.map(
+          (team) => {
+
+            const teamRows =
+              rows.filter(
+                (row) =>
+                  nacionalMatches(
+                    row.nacional,
+                    team.national
+                  )
+              );
+
+
+            return (
+              <div
+                className="national-member-card"
+                key={
+                  team.national
+                }
+              >
+
+                <UserAvatar
+                  user={
+                    findUserByName(
+                      team.name
+                    )
+                  }
+                  size="medium"
+                />
+
+
+                <strong>
+                  {team.name}
+                </strong>
+
+                <span>
+                  {team.role}
+                </span>
+
+                <small>
+                  {teamRows.length} propuestas
+                </small>
+
+              </div>
+            );
+
+          }
+        )}
+
+      </div>
+
+    </section>
+  );
+
+}
+
+
+/* =========================================================
+   FIN APP.JSX — PARTE 4/6
+   ========================================================= */
+
+/* =========================================================
+   APP.JSX — PARTE 5/6
+   RESUMEN + VISTA DE SECTORES + GRÁFICAS + TABLA
+   ========================================================= */
+
+
+/* =========================================================
+   TOOLTIP PERSONALIZADO
+   ========================================================= */
+
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}) {
+
+  if (
+    !active ||
+    !payload ||
+    payload.length === 0
+  ) {
+    return null;
+  }
+
+
+  return (
+    <div className="chart-tooltip">
+
+      {label && (
+        <strong>
+          {label}
+        </strong>
+      )}
+
+
+      {payload.map(
+        (item, index) => (
+
+          <div
+            key={
+              `${item.name}-${index}`
+            }
           >
+
+            <span>
+              {item.name}
+            </span>
+
+            <b>
+              {typeof item.value ===
+              "number"
+                ? formatMoneyShort(
+                    item.value
+                  )
+                : item.value}
+            </b>
+
+          </div>
+
+        )
+      )}
+
+    </div>
+  );
+
+}
+
+
+/* =========================================================
+   TABLA DE PROPUESTAS
+   ========================================================= */
+
+function ProposalTable({
+  rows = [],
+  onOpenProposal,
+}) {
+
+  if (
+    rows.length === 0
+  ) {
+
+    return (
+      <div className="dashboard-panel">
+
+        <div className="empty-state">
+
+          <FileText
+            size={25}
+          />
+
+          <strong>
+            No hay propuestas
+          </strong>
+
+          <span>
+            No encontramos propuestas
+            que coincidan con los
+            filtros seleccionados.
+          </span>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  return (
+    <div className="dashboard-panel">
+
+      <div className="dashboard-panel-header">
+
+        <div>
+
+          <span>
+            DETALLE
+          </span>
+
+          <h3>
+            Ejecutivos, marcas y propuestas
+          </h3>
+
+        </div>
+
+
+        <span>
+          {rows.length} propuestas
+        </span>
+
+      </div>
+
+
+      <div className="proposal-table">
+
+        <div className="proposal-table-header">
+
+          <div>
+            EJECUTIVO
+          </div>
+
+          <div>
+            NACIONAL
+          </div>
+
+          <div>
+            MARCA
+          </div>
+
+          <div>
+            NECESIDAD / PROPUESTA
+          </div>
+
+          <div>
+            ESTADO
+          </div>
+
+          <div>
+            VALOR
+          </div>
+
+          <div>
+            ASESOR
+          </div>
+
+        </div>
+
+
+        <div className="proposal-table-body">
+
+          {rows.map(
+            (row) => {
+
+              const advisor =
+                getAdvisorData(
+                  row.asesor
+                );
+
+
+              return (
+                <div
+                  className="proposal-table-row"
+                  key={
+                    row.id
+                  }
+                >
+
+                  {/* EJECUTIVO */}
+
+                  <div>
+
+                    <strong>
+                      {row.ejecutivo ||
+                        "—"}
+                    </strong>
+
+                  </div>
+
+
+                  {/* NACIONAL */}
+
+                  <div>
+
+                    {row.nacional ||
+                      "—"}
+
+                  </div>
+
+
+                  {/* MARCA */}
+
+                  <div>
+
+                    <strong>
+                      {row.cuenta ||
+                        "—"}
+                    </strong>
+
+                  </div>
+
+
+                  {/* PROPUESTA */}
+
+                  <div>
+
+                    <div className="proposal-table-need">
+
+                      {row.necesidad ||
+                        row.oportunidad ||
+                        "—"}
+
+                    </div>
+
+                  </div>
+
+
+                  {/* ESTADO */}
+
+                  <div>
+
+                    <StatusBadge
+                      estado={
+                        row.estado
+                      }
+                    />
+
+                  </div>
+
+
+                  {/* VALOR */}
+
+                  <div>
+
+                    <strong>
+                      {formatMoneyShort(
+                        row.valorPropuesta
+                      )}
+                    </strong>
+
+                  </div>
+
+
+                  {/* ASESOR */}
+
+                  <div>
+
+                    <div className="proposal-table-advisor">
+
+                      <Avatar
+                        name={
+                          advisor.name
+                        }
+                        initials={
+                          advisor.initials
+                        }
+                        image={
+                          advisor.image
+                        }
+                        size="small"
+                      />
+
+
+                      <span>
+                        {advisor.name}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </div>
+              );
+
+            }
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+
+}
+
+
+/* =========================================================
+   HEADER DE FILTROS ACTIVOS
+   ========================================================= */
+
+function ActiveFilters({
+  selectedTeam,
+  selectedStatus,
+  selectedRubro,
+  onClear,
+}) {
+
+  const filters = [];
+
+
+  if (
+    selectedTeam &&
+    selectedTeam !== "Todos"
+  ) {
+
+    filters.push(
+      selectedTeam
+    );
+
+  }
+
+
+  if (
+    selectedStatus &&
+    selectedStatus !== "Todos"
+  ) {
+
+    filters.push(
+      selectedStatus
+    );
+
+  }
+
+
+  if (
+    selectedRubro &&
+    selectedRubro !== "Todos"
+  ) {
+
+    filters.push(
+      selectedRubro
+    );
+
+  }
+
+
+  if (
+    filters.length === 0
+  ) {
+
+    return null;
+
+  }
+
+
+  return (
+    <div className="active-filters-bar">
+
+      <div className="active-filter-chips">
+
+        <span>
+          FILTROS ACTIVOS
+        </span>
+
+
+        {filters.map(
+          (filter) => (
+
+            <span
+              className="active-filter-chip"
+              key={filter}
+            >
+              {filter}
+            </span>
+
+          )
+        )}
+
+      </div>
+
+
+      <button
+        type="button"
+        className="clear-filters-button"
+
+        onClick={
+          onClear
+        }
+      >
+        Limpiar filtros
+      </button>
+
+    </div>
+  );
+
+}
+
+
+/* =========================================================
+   RESUMEN GENERAL
+   ========================================================= */
+
+function SummaryView({
+  rows,
+  selectedTeam,
+  selectedStatus,
+  selectedRubro,
+  onOpenProposal,
+}) {
+
+  const summary =
+    useMemo(
+      () =>
+        calculateSummary(
+          rows
+        ),
+      [rows]
+    );
+
+
+  const statusData =
+    useMemo(
+      () =>
+        calculateStatusData(
+          rows
+        ),
+      [rows]
+    );
+
+
+  const nationalData =
+    useMemo(
+      () =>
+        calculateNationalValueData(
+          rows
+        ),
+      [rows]
+    );
+
+
+  const topBrands =
+    useMemo(
+      () =>
+        calculateTopBrands(
+          rows
+        ),
+      [rows]
+    );
+
+
+  return (
+    <div className="dashboard-page">
+
+      {/* =================================================
+         HEADER
+         ================================================= */}
+
+      <div className="dashboard-page-header">
+
+        <div>
+
+          <span className="eyebrow">
+            RESUMEN COMERCIAL
+          </span>
+
+          <h1>
+            Dashboard Comercial
+          </h1>
+
+          <p>
+            Seguimiento de propuestas,
+            marcas y gestión comercial.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+         FILTROS
+         ================================================= */}
+
+      <ActiveFilters
+        selectedTeam={
+          selectedTeam
+        }
+
+        selectedStatus={
+          selectedStatus
+        }
+
+        selectedRubro={
+          selectedRubro
+        }
+
+        onClear={() => {}}
+      />
+
+
+      {/* =================================================
+         KPIs
+         ================================================= */}
+
+      <div className="summary-kpi-grid">
+
+        <KpiCard
+          icon={
+            Users
+          }
+
+          label="Marcas activas"
+
+          value={
+            summary.brands
+          }
+
+          sublabel="Marcas únicas"
+        />
+
+
+        <KpiCard
+          icon={
+            FileText
+          }
+
+          label="Propuestas desarrolladas"
+
+          value={
+            summary.proposals
+          }
+
+          sublabel="Registros del Excel"
+        />
+
+
+        <KpiCard
+          icon={
+            CheckCircle2
+          }
+
+          label="Valor propuestas cerradas"
+
+          value={
+            formatMoneyShort(
+              summary.closedValue
+            )
+          }
+
+          sublabel={
+            `${summary.closed} cerradas`
+          }
+        />
+
+
+        <KpiCard
+          icon={
+            TrendingUp
+          }
+
+          label="Valor propuestas en seguimiento"
+
+          value={
+            formatMoneyShort(
+              summary.followUpValue
+            )
+          }
+
+          sublabel={
+            `${summary.followUp} en seguimiento`
+          }
+        />
+
+      </div>
+
+
+      {/* =================================================
+         GRÁFICAS
+         ================================================= */}
+
+      <div className="stats-grid">
+
+        {/* ESTADOS */}
+
+        <div className="dashboard-panel stats-panel">
+
+          <div className="dashboard-panel-header">
+
+            <div>
+
+              <span>
+                ESTADO
+              </span>
+
+              <h3>
+                Distribución de propuestas
+              </h3>
+
+            </div>
+
+          </div>
+
+
+          <div className="rubro-donut-area">
+
             <ResponsiveContainer
               width="100%"
-              height="100%"
+              height={210}
             >
+
               <PieChart>
+
                 <Pie
-                  data={estadosData}
+                  data={
+                    statusData
+                  }
+
                   dataKey="value"
+
                   nameKey="name"
+
                   cx="50%"
-                  cy="45%"
-                  outerRadius="66%"
-                  innerRadius="32%"
+
+                  cy="50%"
+
+                  innerRadius={55}
+
+                  outerRadius={82}
+
                   paddingAngle={3}
-                  label
                 >
-                  {estadosData.map(
-                    (entry, index) => (
+
+                  {statusData.map(
+                    (item) => (
+
                       <Cell
-                        key={entry.name}
+                        key={
+                          item.key
+                        }
+
                         fill={
-                          COLORS[
-                            index %
-                              COLORS.length
-                          ]
+                          item.color
                         }
                       />
+
                     )
                   )}
+
                 </Pie>
 
-                <Tooltip />
-
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="Prioridad comercial"
-            subtitle="Distribución por mesa"
-          >
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
-              <BarChart
-                data={prioridadData}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#292c37"
-                />
-
-                <XAxis
-                  dataKey="name"
-                  stroke="#85899b"
-                />
-
-                <YAxis
-                  allowDecimals={false}
-                  stroke="#85899b"
-                />
-
-                <Tooltip />
-
-                <Bar
-                  dataKey="value"
-                  name="Oportunidades"
-                  fill="#e6197a"
-                  radius={[
-                    6, 6, 0, 0
-                  ]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            wide
-            title="Valor comercial por mesa de trabajo"
-            subtitle="Venta estimada vs propuesta vs cerrado"
-          >
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
-              <BarChart
-                data={mesasData}
-                margin={{
-                  top: 10,
-                  right: 20,
-                  left: 5,
-                  bottom: 10,
-                }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#292c37"
-                />
-
-                <XAxis
-                  dataKey="equipo"
-                  stroke="#85899b"
-                />
-
-                <YAxis
-                  tickFormatter={(v) =>
-                    `${Math.round(
-                      v / 1000000
-                    )}M`
-                  }
-                  stroke="#85899b"
-                />
 
                 <Tooltip
-                  formatter={(value) =>
-                    money(value)
+                  content={
+                    <CustomTooltip />
                   }
                 />
 
-                <Legend />
+              </PieChart>
 
-                <Bar
-                  dataKey="venta"
-                  name="Venta estimada"
-                  fill="#8b5cf6"
-                  radius={[
-                    6, 6, 0, 0
-                  ]}
-                />
-
-                <Bar
-                  dataKey="propuesta"
-                  name="Valor propuesta"
-                  fill="#2e9cf0"
-                  radius={[
-                    6, 6, 0, 0
-                  ]}
-                />
-
-                <Bar
-                  dataKey="cerrado"
-                  name="Cerrado"
-                  fill="#22c55e"
-                  radius={[
-                    6, 6, 0, 0
-                  ]}
-                />
-              </BarChart>
             </ResponsiveContainer>
-          </ChartCard>
 
-          <ChartCard
-            title="Top ejecutivos por valor de propuesta"
-            subtitle="Primeros 15 ejecutivos"
-          >
+
+            <div className="rubro-status-list">
+
+              {statusData.map(
+                (item) => (
+
+                  <div
+                    className="rubro-status-item"
+                    key={
+                      item.key
+                    }
+                  >
+
+                    <span
+                      className="rubro-status-dot"
+
+                      style={{
+                        background:
+                          item.color,
+                      }}
+                    />
+
+
+                    <span>
+                      {item.name}
+                    </span>
+
+
+                    <strong>
+                      {item.value}
+                    </strong>
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* NACIONALES */}
+
+        <div className="dashboard-panel stats-panel">
+
+          <div className="dashboard-panel-header">
+
+            <div>
+
+              <span>
+                VALOR
+              </span>
+
+              <h3>
+                Valor gestionado por Nacional
+              </h3>
+
+            </div>
+
+          </div>
+
+
+          <div className="rubro-national-chart">
+
             <ResponsiveContainer
               width="100%"
-              height="100%"
+              height={220}
             >
-              <BarChart
-                data={ejecutivosData}
-                layout="vertical"
+
+              <LineChart
+                data={
+                  nationalData
+                }
+
                 margin={{
-                  left: 20,
+                  top: 10,
                   right: 10,
-                  top: 5,
+                  left: 5,
                   bottom: 5,
                 }}
               >
+
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="#292c37"
                 />
 
                 <XAxis
-                  type="number"
-                  tickFormatter={(v) =>
-                    `${Math.round(
-                      v / 1000000
-                    )}M`
-                  }
-                  stroke="#85899b"
+                  dataKey="nacional"
                 />
 
                 <YAxis
-                  type="category"
-                  dataKey="ejecutivo"
-                  width={125}
-                  stroke="#85899b"
-                  tick={{
-                    fontSize: 8,
+                  tickFormatter={
+                    formatMoneyShort
+                  }
+                />
+
+                <Tooltip
+                  content={
+                    <CustomTooltip />
+                  }
+                />
+
+                <Line
+                  type="monotone"
+
+                  dataKey="value"
+
+                  name="Valor"
+
+                  stroke={
+                    COLORS.pink
+                  }
+
+                  strokeWidth={2}
+
+                  dot={{
+                    r: 3,
                   }}
                 />
 
-                <Tooltip
-                  formatter={(value) =>
-                    money(value)
-                  }
-                />
-
-                <Bar
-                  dataKey="propuesta"
-                  name="Propuesta"
-                  fill="#e6197a"
-                  radius={[
-                    0, 6, 6, 0
-                  ]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="Valor por asesor de Innovación"
-            subtitle="Propuestas gestionadas"
-          >
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
-              <BarChart
-                data={asesorData}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#292c37"
-                />
-
-                <XAxis
-                  dataKey="asesor"
-                  stroke="#85899b"
-                  tick={{
-                    fontSize: 8,
-                  }}
-                />
-
-                <YAxis
-                  tickFormatter={(v) =>
-                    `${Math.round(
-                      v / 1000000
-                    )}M`
-                  }
-                  stroke="#85899b"
-                />
-
-                <Tooltip
-                  formatter={(value) =>
-                    money(value)
-                  }
-                />
-
-                <Legend />
-
-                <Bar
-                  dataKey="valor"
-                  name="Valor propuesta"
-                  fill="#8b5cf6"
-                  radius={[
-                    6, 6, 0, 0
-                  ]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            wide
-            title="Evolución mensual del negocio"
-            subtitle="Venta, propuestas y cierres"
-          >
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
-              <LineChart
-                data={mesesData}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#292c37"
-                />
-
-                <XAxis
-                  dataKey="mes"
-                  stroke="#85899b"
-                />
-
-                <YAxis
-                  tickFormatter={(v) =>
-                    `${Math.round(
-                      v / 1000000
-                    )}M`
-                  }
-                  stroke="#85899b"
-                />
-
-                <Tooltip
-                  formatter={(value) =>
-                    money(value)
-                  }
-                />
-
-                <Legend />
-
-                <Line
-                  type="monotone"
-                  dataKey="venta"
-                  name="Venta estimada"
-                  stroke="#2e9cf0"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                />
-
-                <Line
-                  type="monotone"
-                  dataKey="propuesta"
-                  name="Valor propuesta"
-                  stroke="#e6197a"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                />
-
-                <Line
-                  type="monotone"
-                  dataKey="cerrado"
-                  name="Cerrado"
-                  stroke="#22c55e"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                />
               </LineChart>
+
             </ResponsiveContainer>
-          </ChartCard>
-        </section>
 
-        <InnovationTeam />
+          </div>
 
-        <section className="table-card">
-          <div className="table-heading">
-            <div>
-              <h3>
-                Detalle de oportunidades
-              </h3>
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+         TOP MARCAS
+         ================================================= */}
+
+      <div className="dashboard-panel">
+
+        <div className="dashboard-panel-header">
+
+          <div>
+
+            <span>
+              MARCAS
+            </span>
+
+            <h3>
+              Principales marcas por valor
+            </h3>
+
+          </div>
+
+        </div>
+
+
+        <div className="top-brands-list">
+
+          {topBrands.length ===
+          0 ? (
+
+            <div className="empty-state">
 
               <span>
-                {number(
-                  datosFiltrados.length
-                )} resultados visibles · Haz clic
-                sobre una fila para ver el detalle
+                No hay marcas para
+                mostrar.
               </span>
-            </div>
-          </div>
 
-          <div className="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Mesa</th>
-                  <th>Cuenta</th>
-                  <th>Ejecutivo</th>
-                  <th>Venta estimada</th>
-                  <th>Propuesta</th>
-                  <th>Cerrado</th>
-                  <th>Estado</th>
-                  <th>Prioridad</th>
-                  <th>Asesor</th>
-                  <th>Necesidad</th>
-                  <th>Avance</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {datosFiltrados.map((r) => (
-                  <tr
-                    key={r.id}
-                    onClick={() =>
-                      setRegistroSeleccionado(r)
-                    }
-                    className="clickable-row"
-                  >
-                    <td>
-                      <span className="team-pill">
-                        {r.EQUIPO}
-                      </span>
-                    </td>
-
-                    <td>
-                      <strong>
-                        {r.CUENTA || "—"}
-                      </strong>
-                    </td>
-
-                    <td>
-                      {r[
-                        "NOMBRE EJECUTIVO"
-                      ] || "—"}
-                    </td>
-
-                    <td>
-                      {money(
-                        r["VENTA ESTIMADA"]
-                      )}
-                    </td>
-
-                    <td>
-                      {money(
-                        r[
-                          "VALOR DE LA PROPUESTA"
-                        ]
-                      )}
-                    </td>
-
-                    <td>
-                      {r.ESTADO ===
-                      "Cerrada"
-                        ? money(
-                            r[
-                              "VALOR DE LA PROPUESTA"
-                            ]
-                          )
-                        : "—"}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`status-pill ${String(
-                          r.ESTADO || ""
-                        )
-                          .toLowerCase()
-                          .replace(
-                            /\s+/g,
-                            "-"
-                          )}`}
-                      >
-                        {r.ESTADO || "—"}
-                      </span>
-                    </td>
-
-                    <td>
-                      {r.PRIORIDAD || "—"}
-                    </td>
-
-                    <td>
-                      {r[
-                        "ASESOR INNOVACION DIGITAL"
-                      ] || "—"}
-                    </td>
-
-                    <td className="need-cell">
-                      {r["NECESIDAD 1"] ||
-                        "—"}
-                    </td>
-
-                    <td>
-                      {number(
-                        r[
-                          "AVANCE PLAN 1"
-                        ] || 0
-                      )}
-                      %
-                    </td>
-                  </tr>
-                ))}
-
-                {!datosFiltrados.length && (
-                  <tr>
-                    <td
-                      colSpan="11"
-                      className="empty-state"
-                    >
-                      No hay registros que
-                      coincidan con los filtros.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </main>
-
-      {registroSeleccionado && (
-        <div
-          className="modal-backdrop"
-          onClick={() =>
-            setRegistroSeleccionado(null)
-          }
-        >
-          <div
-            className="record-modal"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
-          >
-            <div className="record-modal-header">
-              <div>
-                <span className="eyebrow">
-                  DETALLE DEL REGISTRO #
-                  {registroSeleccionado.id}
-                </span>
-
-                <h2>
-                  {registroSeleccionado.CUENTA ||
-                    "Sin cuenta"}
-                </h2>
-
-                <p>
-                  {registroSeleccionado[
-                    "NOMBRE EJECUTIVO"
-                  ] || "Sin ejecutivo"}{" "}
-                  ·{" "}
-                  {registroSeleccionado.EQUIPO ||
-                    "Sin equipo"}
-                </p>
-              </div>
-
-              <button
-                className="modal-close"
-                onClick={() =>
-                  setRegistroSeleccionado(null)
-                }
-                aria-label="Cerrar"
-              >
-                ×
-              </button>
             </div>
 
-            <div className="record-grid">
-              {[
-                [
-                  "Mesa de trabajo",
-                  registroSeleccionado.EQUIPO,
-                ],
-                [
-                  "Ejecutivo",
-                  registroSeleccionado[
-                    "NOMBRE EJECUTIVO"
-                  ],
-                ],
-                [
-                  "Cuenta",
-                  registroSeleccionado.CUENTA,
-                ],
-                [
-                  "Venta estimada",
-                  money(
-                    registroSeleccionado[
-                      "VENTA ESTIMADA"
-                    ]
-                  ),
-                ],
-                [
-                  "Valor de propuesta",
-                  money(
-                    registroSeleccionado[
-                      "VALOR DE LA PROPUESTA"
-                    ]
-                  ),
-                ],
-                [
-                  "Valor cerrado",
-                  registroSeleccionado.ESTADO ===
-                  "Cerrada"
-                    ? money(
-                        registroSeleccionado[
-                          "VALOR DE LA PROPUESTA"
-                        ]
-                      )
-                    : "—",
-                ],
-                [
-                  "Estado",
-                  registroSeleccionado.ESTADO,
-                ],
-                [
-                  "Prioridad",
-                  registroSeleccionado.PRIORIDAD,
-                ],
-                [
-                  "Responsable",
-                  registroSeleccionado.RESPONSABLE,
-                ],
-                [
-                  "Mes",
-                  registroSeleccionado.MES,
-                ],
-                [
-                  "Fecha solicitud",
-                  registroSeleccionado[
-                    "FECHA SOLICITUD"
-                  ],
-                ],
-                [
-                  "Fecha entrega",
-                  registroSeleccionado[
-                    "FECHA DE ENTREGA"
-                  ],
-                ],
-                [
-                  "Asesor Innovación Digital",
-                  registroSeleccionado[
-                    "ASESOR INNOVACION DIGITAL"
-                  ],
-                ],
-                [
-                  "Oportunidad",
-                  registroSeleccionado.OPORTUNIDAD,
-                ],
-                [
-                  "Link / presentación",
-                  registroSeleccionado[
-                    "LINK DE PRESENTACION"
-                  ],
-                ],
-              ].map(([label, value]) => (
+          ) : (
+
+            topBrands.map(
+              (brand, index) => (
+
                 <div
-                  className="record-field"
-                  key={label}
+                  className="top-brand-item"
+                  key={
+                    brand.name
+                  }
                 >
-                  <span>{label}</span>
+
+                  <span className="top-brand-position">
+                    {index + 1}
+                  </span>
+
+
+                  <div className="top-brand-info">
+
+                    <strong>
+                      {brand.name}
+                    </strong>
+
+                    <span>
+                      {brand.proposals}
+                      {" "}
+                      propuestas
+                    </span>
+
+                  </div>
+
+
                   <strong>
-                    {value || "—"}
+                    {formatMoneyShort(
+                      brand.value
+                    )}
                   </strong>
+
                 </div>
-              ))}
-            </div>
 
-            <div className="record-section">
-              <h3>Necesidades</h3>
+              )
+            )
 
-              <p>
-                <b>Necesidad 1:</b>{" "}
-                {registroSeleccionado[
-                  "NECESIDAD 1"
-                ] || "—"}
-              </p>
+          )}
 
-              <p>
-                <b>Necesidad 2:</b>{" "}
-                {registroSeleccionado[
-                  "NECESIDAD 2"
-                ] || "—"}
-              </p>
-
-              <p>
-                <b>Necesidad 3:</b>{" "}
-                {registroSeleccionado[
-                  "NECESIDAD 3"
-                ] || "—"}
-              </p>
-            </div>
-
-            <div className="record-section">
-              <h3>
-                Plan de acción y avances
-              </h3>
-
-              <p>
-                <b>
-                  Plan 1 (
-                  {number(
-                    registroSeleccionado[
-                      "AVANCE PLAN 1"
-                    ] || 0
-                  )}
-                  %):
-                </b>{" "}
-                {registroSeleccionado[
-                  "PLAN DE ACCIÓN 1"
-                ] || "—"}
-              </p>
-
-              <p>
-                <b>
-                  Plan 2 (
-                  {number(
-                    registroSeleccionado[
-                      "AVANCE PLAN 2"
-                    ] || 0
-                  )}
-                  %):
-                </b>{" "}
-                {registroSeleccionado[
-                  "PLAN DE ACCIÓN 2"
-                ] || "—"}
-              </p>
-
-              <p>
-                <b>
-                  Plan 3 (
-                  {number(
-                    registroSeleccionado[
-                      "AVANCE PLAN 3"
-                    ] || 0
-                  )}
-                  %):
-                </b>{" "}
-                {registroSeleccionado[
-                  "PLAN DE ACCIÓN 3"
-                ] || "—"}
-              </p>
-            </div>
-          </div>
         </div>
-      )}
 
-      <footer className="dashboard-footer">
-        Prisa Media · Área de Innovación Digital ·
-        Dashboard comercial
-      </footer>
+      </div>
+
+
+      {/* =================================================
+         TABLA
+         ================================================= */}
+
+      <div
+        style={{
+          marginTop: 10,
+        }}
+      >
+
+        <ProposalTable
+          rows={
+            rows
+          }
+
+          onOpenProposal={
+            onOpenProposal
+          }
+        />
+
+      </div>
+
     </div>
   );
+
 }
 
-export default App;
+
+/* =========================================================
+   VISTA DE SECTOR
+   ========================================================= */
+
+function RubroView({
+  rubro,
+  rows,
+  selectedTeam,
+  selectedStatus,
+  onOpenProposal,
+}) {
+
+  const summary =
+    useMemo(
+      () =>
+        calculateSummary(
+          rows
+        ),
+      [rows]
+    );
+
+
+  const statusData =
+    useMemo(
+      () =>
+        calculateStatusData(
+          rows
+        ),
+      [rows]
+    );
+
+
+  const nationalData =
+    useMemo(
+      () =>
+        calculateNationalValueData(
+          rows
+        ),
+      [rows]
+    );
+
+
+  const topBrands =
+    useMemo(
+      () =>
+        calculateTopBrands(
+          rows
+        ),
+      [rows]
+    );
+
+
+  const Icon =
+    RUBRO_ICONS[
+      rubro
+    ] ||
+    LayoutGrid;
+
+
+  return (
+    <div className="rubro-view">
+
+      {/* =================================================
+         HEADER
+         ================================================= */}
+
+      <div className="rubro-view-header">
+
+        <div>
+
+          <div className="rubro-view-header">
+
+            <div>
+
+              <div className="rubro-title-icon">
+
+                <Icon
+                  size={20}
+                />
+
+              </div>
+
+
+              <div>
+
+                <span className="eyebrow">
+                  SECTOR
+                </span>
+
+                <h1>
+                  {rubro}
+                </h1>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <span className="rubro-record-count">
+
+          {rows.length}
+
+          {" "}
+
+          {rows.length ===
+          1
+            ? "propuesta"
+            : "propuestas"}
+
+        </span>
+
+      </div>
+
+
+      {/* =================================================
+         KPIs — EXACTAMENTE LOS SOLICITADOS
+         ================================================= */}
+
+      <div className="rubro-kpi-grid">
+
+        <KpiCard
+          icon={
+            Users
+          }
+
+          label="Ejecutivos relacionados"
+
+          value={
+            summary.executives
+          }
+
+          sublabel="Ejecutivos únicos"
+        />
+
+
+        <KpiCard
+          icon={
+            Tag
+          }
+
+          label="Marcas activas"
+
+          value={
+            summary.brands
+          }
+
+          sublabel="Marcas únicas"
+        />
+
+
+        <KpiCard
+          icon={
+            FileText
+          }
+
+          label="Propuestas desarrolladas"
+
+          value={
+            summary.proposals
+          }
+
+          sublabel="Propuestas del rubro"
+        />
+
+
+        <KpiCard
+          icon={
+            DollarSign
+          }
+
+          label="Valor total gestionado"
+
+          value={
+            formatMoneyShort(
+              summary.totalValue
+            )
+          }
+
+          sublabel="Valor de propuestas"
+        />
+
+      </div>
+
+
+      {/* =================================================
+         GRÁFICAS
+         ================================================= */}
+
+      <div className="rubro-chart-grid">
+
+        {/* -------------------------------------------------
+           DISTRIBUCIÓN DEL RUBRO
+           ------------------------------------------------- */}
+
+        <div className="dashboard-panel">
+
+          <div className="dashboard-panel-header">
+
+            <div>
+
+              <span>
+                DISTRIBUCIÓN DEL RUBRO
+              </span>
+
+              <h3>
+                Estado de las propuestas
+              </h3>
+
+            </div>
+
+          </div>
+
+
+          <div className="rubro-donut-area">
+
+            <ResponsiveContainer
+              width="100%"
+              height={220}
+            >
+
+              <PieChart>
+
+                <Pie
+                  data={
+                    statusData
+                  }
+
+                  dataKey="value"
+
+                  nameKey="name"
+
+                  cx="50%"
+
+                  cy="50%"
+
+                  innerRadius={58}
+
+                  outerRadius={84}
+
+                  paddingAngle={3}
+                >
+
+                  {statusData.map(
+                    (item) => (
+
+                      <Cell
+                        key={
+                          item.key
+                        }
+
+                        fill={
+                          item.color
+                        }
+                      />
+
+                    )
+                  )}
+
+                </Pie>
+
+
+                <Tooltip
+                  content={
+                    <CustomTooltip />
+                  }
+                />
+
+              </PieChart>
+
+            </ResponsiveContainer>
+
+
+            <div className="rubro-status-list">
+
+              {statusData.map(
+                (item) => (
+
+                  <div
+                    className="rubro-status-item"
+                    key={
+                      item.key
+                    }
+                  >
+
+                    <span
+                      className="rubro-status-dot"
+
+                      style={{
+                        background:
+                          item.color,
+                      }}
+                    />
+
+
+                    <span>
+                      {item.name}
+                    </span>
+
+
+                    <strong>
+                      {item.value}
+                    </strong>
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* -------------------------------------------------
+           VALOR GESTIONADO POR NACIONAL
+           ------------------------------------------------- */}
+
+        <div className="dashboard-panel">
+
+          <div className="dashboard-panel-header">
+
+            <div>
+
+              <span>
+                VALOR GESTIONADO
+              </span>
+
+              <h3>
+                Valor gestionado por Nacional
+              </h3>
+
+            </div>
+
+          </div>
+
+
+          <div className="rubro-national-chart">
+
+            <ResponsiveContainer
+              width="100%"
+              height={220}
+            >
+
+              <LineChart
+                data={
+                  nationalData
+                }
+
+                margin={{
+                  top: 10,
+                  right: 12,
+                  left: 4,
+                  bottom: 5,
+                }}
+              >
+
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                />
+
+                <XAxis
+                  dataKey="nacional"
+                />
+
+                <YAxis
+                  tickFormatter={
+                    formatMoneyShort
+                  }
+                />
+
+                <Tooltip
+                  content={
+                    <CustomTooltip />
+                  }
+                />
+
+                <Line
+                  type="monotone"
+
+                  dataKey="value"
+
+                  name="Valor"
+
+                  stroke={
+                    COLORS.pink
+                  }
+
+                  strokeWidth={2}
+
+                  dot={{
+                    r: 3,
+                  }}
+
+                  activeDot={{
+                    r: 5,
+                  }}
+                />
+
+              </LineChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+         TABLA DEL SECTOR
+         ================================================= */}
+
+      <ProposalTable
+        rows={
+          rows
+        }
+
+        onOpenProposal={
+          onOpenProposal
+        }
+      />
+
+
+      {/* =================================================
+         TOP MARCAS
+         ================================================= */}
+
+      <div
+        className="dashboard-panel"
+        style={{
+          marginTop: 10,
+        }}
+      >
+
+        <div className="dashboard-panel-header">
+
+          <div>
+
+            <span>
+              MARCAS
+            </span>
+
+            <h3>
+              Marcas de {rubro}
+            </h3>
+
+          </div>
+
+        </div>
+
+
+        <div className="top-brands-list">
+
+          {topBrands.length ===
+          0 ? (
+
+            <div className="empty-state">
+
+              <span>
+                No hay marcas
+                disponibles.
+              </span>
+
+            </div>
+
+          ) : (
+
+            topBrands.map(
+              (brand, index) => (
+
+                <div
+                  className="top-brand-item"
+                  key={
+                    brand.name
+                  }
+                >
+
+                  <span className="top-brand-position">
+                    {index + 1}
+                  </span>
+
+
+                  <div className="top-brand-info">
+
+                    <strong>
+                      {brand.name}
+                    </strong>
+
+                    <span>
+                      {brand.proposals}
+                      {" "}
+                      propuestas
+                    </span>
+
+                  </div>
+
+
+                  <strong>
+                    {formatMoneyShort(
+                      brand.value
+                    )}
+                  </strong>
+
+                </div>
+
+              )
+            )
+
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+
+}
+
+
+/* =========================================================
+   FIN APP.JSX — PARTE 5/6
+   ========================================================= */
+   
+   /* =========================================================
+   APP.JSX — PARTE 6/6
+   APP PRINCIPAL + CARGA EXCEL + MODAL + RENDER
+   ========================================================= */
+
+
+/* =========================================================
+   MODAL DE PROPUESTA
+   ========================================================= */
+
+function ProposalModal({
+  row,
+  onClose,
+}) {
+
+  if (!row) {
+    return null;
+  }
+
+
+  const advisor =
+    getAdvisorData(
+      row.asesor
+    );
+
+
+  return (
+    <div
+      className="proposal-modal-overlay"
+
+      onMouseDown={(event) => {
+
+        if (
+          event.target ===
+          event.currentTarget
+        ) {
+
+          onClose();
+
+        }
+
+      }}
+    >
+
+      <div className="proposal-modal">
+
+        {/* HEADER */}
+
+        <div className="proposal-modal-header">
+
+          <div>
+
+            <span>
+              DETALLE DE PROPUESTA
+            </span>
+
+            <h2>
+              {row.cuenta ||
+                "Propuesta"}
+            </h2>
+
+          </div>
+
+
+          <button
+            type="button"
+            onClick={
+              onClose
+            }
+            aria-label="Cerrar"
+          >
+
+            <X
+              size={17}
+            />
+
+          </button>
+
+        </div>
+
+
+        {/* BODY */}
+
+        <div className="proposal-modal-body">
+
+          {/* INFORMACIÓN PRINCIPAL */}
+
+          <div className="proposal-detail-grid">
+
+            <div className="proposal-detail-item">
+
+              <span>
+                Ejecutivo
+              </span>
+
+              <strong>
+                {row.ejecutivo ||
+                  "—"}
+              </strong>
+
+            </div>
+
+
+            <div className="proposal-detail-item">
+
+              <span>
+                Nacional
+              </span>
+
+              <strong>
+                {row.nacional ||
+                  "—"}
+              </strong>
+
+            </div>
+
+
+            <div className="proposal-detail-item">
+
+              <span>
+                Marca
+              </span>
+
+              <strong>
+                {row.cuenta ||
+                  "—"}
+              </strong>
+
+            </div>
+
+
+            <div className="proposal-detail-item">
+
+              <span>
+                Sector
+              </span>
+
+              <strong>
+                {row.rubro ||
+                  "—"}
+              </strong>
+
+            </div>
+
+
+            <div className="proposal-detail-item">
+
+              <span>
+                Estado
+              </span>
+
+              <StatusBadge
+                estado={
+                  row.estado
+                }
+              />
+
+            </div>
+
+
+            <div className="proposal-detail-item">
+
+              <span>
+                Valor de la propuesta
+              </span>
+
+              <strong>
+                {formatCurrency(
+                  row.valorPropuesta
+                )}
+              </strong>
+
+            </div>
+
+
+            {/* ASESOR */}
+
+            <div
+              className="proposal-detail-item"
+              style={{
+                gridColumn:
+                  "1 / -1",
+              }}
+            >
+
+              <span>
+                Asesor Innovación Digital
+              </span>
+
+
+              <div className="proposal-detail-advisor">
+
+                <Avatar
+                  name={
+                    advisor.name
+                  }
+
+                  initials={
+                    advisor.initials
+                  }
+
+                  image={
+                    advisor.image
+                  }
+
+                  size="small"
+                />
+
+
+                <strong>
+                  {advisor.name}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* NECESIDAD */}
+
+          <div className="proposal-detail-section">
+
+            <span>
+              NECESIDAD / PROPUESTA
+            </span>
+
+            <p>
+              {row.necesidad ||
+                row.oportunidad ||
+                "Sin información"}
+            </p>
+
+          </div>
+
+
+          {/* OPORTUNIDAD */}
+
+          {row.oportunidad && (
+
+            <div className="proposal-detail-section">
+
+              <span>
+                OPORTUNIDAD
+              </span>
+
+              <p>
+                {row.oportunidad}
+              </p>
+
+            </div>
+
+          )}
+
+
+          {/* PLAN DE ACCIÓN */}
+
+          {(
+            row.planAccion1 ||
+            row.planAccion2 ||
+            row.planAccion3
+          ) && (
+
+            <div className="proposal-detail-section">
+
+              <span>
+                PLAN DE ACCIÓN
+              </span>
+
+
+              {row.planAccion1 && (
+                <p>
+                  {row.planAccion1}
+                </p>
+              )}
+
+
+              {row.planAccion2 && (
+                <p
+                  style={{
+                    marginTop: 7,
+                  }}
+                >
+                  {row.planAccion2}
+                </p>
+              )}
+
+
+              {row.planAccion3 && (
+                <p
+                  style={{
+                    marginTop: 7,
+                  }}
+                >
+                  {row.planAccion3}
+                </p>
+              )}
+
+            </div>
+
+          )}
+
+
+          {/* FECHAS */}
+
+          {(row.fechaSolicitud ||
+            row.fechaEntrega) && (
+
+            <div className="proposal-detail-grid">
+
+              <div className="proposal-detail-item">
+
+                <span>
+                  Fecha solicitud
+                </span>
+
+                <strong>
+                  {formatDate(
+                    row.fechaSolicitud
+                  )}
+                </strong>
+
+              </div>
+
+
+              <div className="proposal-detail-item">
+
+                <span>
+                  Fecha entrega
+                </span>
+
+                <strong>
+                  {formatDate(
+                    row.fechaEntrega
+                  )}
+                </strong>
+
+              </div>
+
+            </div>
+
+          )}
+
+
+          {/* PRESENTACIÓN */}
+
+          {row.linkPresentacion && (
+
+            <div
+              style={{
+                marginTop: 14,
+              }}
+            >
+
+              <a
+                href={
+                  row.linkPresentacion
+                }
+
+                target="_blank"
+
+                rel="noreferrer"
+
+                className="proposal-presentation-link"
+              >
+
+                <Eye
+                  size={13}
+                />
+
+                Ver presentación
+
+              </a>
+
+            </div>
+
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+
+}
+
+
+/* =========================================================
+   APP PRINCIPAL
+   ========================================================= */
+
+export default function App() {
+
+  /* =======================================================
+     DATOS
+     ======================================================= */
+
+  const [
+    rows,
+    setRows,
+  ] = useState([]);
+
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+
+  /* =======================================================
+     USUARIO
+     ======================================================= */
+
+  const [
+  selectedUser,
+  setSelectedUser,
+] = useState(null);
+
+
+  /* =======================================================
+     NAVEGACIÓN
+     ======================================================= */
+
+  const [
+    activeSection,
+    setActiveSection,
+  ] = useState(
+    "resumen"
+  );
+
+
+  /* =======================================================
+     FILTRO NACIONAL
+     ======================================================= */
+
+  const [
+    selectedTeam,
+    setSelectedTeam,
+  ] = useState(
+    "Todos"
+  );
+
+
+  /* =======================================================
+     FILTRO ESTADO
+     ======================================================= */
+
+  const [
+    selectedStatus,
+    setSelectedStatus,
+  ] = useState(
+    "Todos"
+  );
+
+
+  /* =======================================================
+     FILTRO SECTOR
+     ======================================================= */
+
+  const [
+    selectedRubro,
+    setSelectedRubro,
+  ] = useState(
+    "Todos"
+  );
+
+
+  /* =======================================================
+     BUSCADOR
+     ======================================================= */
+
+  const [
+    searchTerm,
+    setSearchTerm,
+  ] = useState("");
+
+
+  /* =======================================================
+     MODAL
+     ======================================================= */
+
+  const [
+    selectedProposal,
+    setSelectedProposal,
+  ] = useState(null);
+
+
+  /* =======================================================
+     SIDEBAR MOBILE
+     ======================================================= */
+
+  const [
+    mobileSidebarOpen,
+    setMobileSidebarOpen,
+  ] = useState(false);
+
+
+  /* =======================================================
+     CARGAR EXCEL
+     ======================================================= */
+
+  useEffect(() => {
+
+    let cancelled =
+      false;
+
+
+    async function load() {
+
+      try {
+
+        setLoading(
+          true
+        );
+
+        setError("");
+
+
+        const data =
+          await loadExcelData();
+
+
+        if (
+          cancelled
+        ) {
+
+          return;
+
+        }
+
+
+        setRows(
+          data
+        );
+
+      }
+
+      catch (err) {
+
+        console.error(
+          err
+        );
+
+
+        if (
+          cancelled
+        ) {
+
+          return;
+
+        }
+
+
+        setError(
+          err?.message ||
+          "No fue posible cargar el Excel."
+        );
+
+      }
+
+      finally {
+
+        if (
+          !cancelled
+        ) {
+
+          setLoading(
+            false
+          );
+
+        }
+
+      }
+
+    }
+
+
+    load();
+
+
+    return () => {
+
+      cancelled =
+        true;
+
+    };
+
+  }, []);
+
+
+  /* =======================================================
+     CUANDO CAMBIA EL USUARIO
+     ======================================================= */
+
+  useEffect(() => {
+
+    /*
+     * Si el usuario tiene una Nacional
+     * asignada, la seleccionamos automáticamente.
+     */
+
+    if (
+      selectedUser?.filterTeam
+    ) {
+
+      setSelectedTeam(
+        selectedUser.filterTeam
+      );
+
+    } else {
+
+      setSelectedTeam(
+        "Todos"
+      );
+
+    }
+
+
+    /*
+     * Al cambiar de usuario
+     * reiniciamos Estado y Sector.
+     */
+
+    setSelectedStatus(
+      "Todos"
+    );
+
+    setSelectedRubro(
+      "Todos"
+    );
+
+    setSearchTerm("");
+
+  }, [
+    selectedUser,
+  ]);
+
+
+  /* =======================================================
+     FILAS BASE SEGÚN USUARIO
+     ======================================================= */
+
+  const permittedRows =
+    useMemo(
+      () =>
+        applyUserPermissions(
+          rows,
+          selectedUser
+        ),
+
+      [
+        rows,
+        selectedUser,
+      ]
+    );
+
+
+  /* =======================================================
+     FILAS FILTRADAS
+     ======================================================= */
+
+  const filteredRows =
+    useMemo(
+      () =>
+        filterRows({
+
+          rows,
+
+          user:
+            selectedUser,
+
+          selectedTeam,
+
+          selectedStatus,
+
+          selectedRubro,
+
+          searchTerm,
+
+        }),
+
+      [
+        rows,
+
+        selectedUser,
+
+        selectedTeam,
+
+        selectedStatus,
+
+        selectedRubro,
+
+        searchTerm,
+      ]
+    );
+
+
+  /* =======================================================
+     CONTADORES DE SECTORES
+     ======================================================= */
+
+  /*
+   * IMPORTANTE:
+   *
+   * Los números de cada sector representan
+   * MARCAS ÚNICAS, no cantidad de propuestas.
+   *
+   * Además respetan el usuario y la Nacional
+   * seleccionada.
+   *
+   * Si se selecciona un sector concreto,
+   * los contadores siguen mostrando el
+   * total por sector del contexto actual.
+   */
+
+  const sectorContextRows =
+    useMemo(
+      () => {
+
+        let result =
+          permittedRows;
+
+
+        if (
+          selectedTeam &&
+          selectedTeam !==
+            "Todos"
+        ) {
+
+          result =
+            result.filter(
+              (row) =>
+                nacionalMatches(
+                  row.nacional,
+                  selectedTeam
+                )
+            );
+
+        }
+
+
+        if (
+          selectedStatus &&
+          selectedStatus !==
+            "Todos"
+        ) {
+
+          result =
+            result.filter(
+              (row) =>
+                row.estado ===
+                normalizeEstado(
+                  selectedStatus
+                )
+            );
+
+        }
+
+
+        return result;
+
+      },
+
+      [
+        permittedRows,
+
+        selectedTeam,
+
+        selectedStatus,
+      ]
+    );
+
+
+  const brandCountsByRubro =
+    useMemo(
+      () =>
+        getBrandCountsByRubro(
+          sectorContextRows
+        ),
+
+      [
+        sectorContextRows,
+      ]
+    );
+
+
+  /* =======================================================
+     FILTROS ACTIVOS PARA LA VISTA
+     ======================================================= */
+
+  const currentRows =
+    filteredRows;
+
+
+  /* =======================================================
+     NOMBRE DE VISTA
+     ======================================================= */
+
+  const pageTitle =
+    selectedRubro !==
+      "Todos"
+      ? selectedRubro
+      : "Dashboard Comercial";
+
+
+  /* =======================================================
+     LIMPIAR FILTROS
+     ======================================================= */
+
+  function clearFilters() {
+
+    if (
+      selectedUser?.filterTeam
+    ) {
+
+      setSelectedTeam(
+        selectedUser.filterTeam
+      );
+
+    } else {
+
+      setSelectedTeam(
+        "Todos"
+      );
+
+    }
+
+
+    setSelectedStatus(
+      "Todos"
+    );
+
+    setSelectedRubro(
+      "Todos"
+    );
+
+    setSearchTerm("");
+
+  }
+
+
+  /* =======================================================
+     CAMBIAR USUARIO
+     ======================================================= */
+
+  function handleChangeUser(
+    user
+  ) {
+
+    setSelectedUser(
+      user
+    );
+
+    setMobileSidebarOpen(
+      false
+    );
+
+  }
+
+
+  /* =======================================================
+     CAMBIAR NACIONAL
+     ======================================================= */
+
+  function handleTeamChange(
+    team
+  ) {
+
+    /*
+     * Si es líder nacional,
+     * nunca permitimos cambiar
+     * de su Nacional.
+     */
+
+    if (
+      selectedUser?.filterTeam
+    ) {
+
+      setSelectedTeam(
+        selectedUser.filterTeam
+      );
+
+      return;
+
+    }
+
+
+    setSelectedTeam(
+      team
+    );
+
+
+    /*
+     * Al cambiar Nacional,
+     * el sector seleccionado
+     * sigue funcionando como
+     * filtro combinado.
+     */
+
+  }
+
+
+  /* =======================================================
+     CAMBIAR SECTOR
+     ======================================================= */
+
+  function handleRubroChange(
+    rubro
+  ) {
+
+    setSelectedRubro(
+      rubro
+    );
+
+
+    /*
+     * Cuando seleccionamos un sector
+     * pasamos a la vista del sector.
+     */
+
+    if (
+      rubro &&
+      rubro !==
+        "Todos"
+    ) {
+
+      setActiveSection(
+        "sector"
+      );
+
+    } else {
+
+      setActiveSection(
+        "resumen"
+      );
+
+    }
+
+  }
+
+
+  /* =======================================================
+     CAMBIAR RESUMEN
+     ======================================================= */
+
+  function handleSectionChange(
+    section
+  ) {
+
+    setActiveSection(
+      section
+    );
+
+
+    if (
+      section ===
+      "resumen"
+    ) {
+
+      setSelectedRubro(
+        "Todos"
+      );
+
+    }
+
+  }
+
+/* =======================================================
+   SELECCIÓN INICIAL DE USUARIO
+   ======================================================= */
+
+if (!selectedUser) {
+
+  const normalizeName = (name = "") =>
+  name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+
+
+const tatiana = USERS.find(
+  (user) =>
+    normalizeName(user.name).includes(
+      "tatiana garcia calderon"
+    )
+);
+
+
+const innovationNames = [
+  "glen orillo starke",
+  "juan pablo godoy",
+  "jonathan velasquez",
+  "sthefanie botello",
+];
+
+
+const nationalNames = [
+  "diana milena contreras rodriguez",
+  "juan sebastian abella quintero",
+  "tatiana pelaez copete",
+  "ivonne adriana moriones alvarez",
+  "william ocampo arguello",
+];
+
+
+const innovationUsers = USERS.filter(
+  (user) =>
+    innovationNames.includes(
+      normalizeName(user.name)
+    )
+);
+
+
+const nationalUsers = USERS.filter(
+  (user) =>
+    nationalNames.includes(
+      normalizeName(user.name)
+    )
+);
+
+  return (
+    <div className="user-selection-screen">
+
+      <div className="user-selection-content">
+
+        {/* =================================================
+            TÍTULO
+        ================================================= */}
+
+        <h1>
+          Dashboard comercial
+        </h1>
+
+        <p className="user-selection-subtitle">
+          Selecciona tu usuario para acceder al dashboard
+        </p>
+
+
+        {/* =================================================
+            DIRECCIÓN COMERCIAL
+        ================================================= */}
+
+        <div className="selection-section">
+
+          <div className="selection-section-title">
+
+            <span></span>
+
+            <strong>
+              DIRECCIÓN COMERCIAL
+            </strong>
+
+            <span></span>
+
+          </div>
+
+
+          {tatiana && (
+
+            <button
+              type="button"
+              className="selection-director-card"
+              onClick={() =>
+                setSelectedUser(tatiana)
+              }
+            >
+
+              <UserAvatar
+                user={tatiana}
+                size="large"
+              />
+
+
+              <strong>
+                {tatiana.name}
+              </strong>
+
+
+              <span>
+                {tatiana.role}
+              </span>
+
+
+              <small>
+                Todas las nacionales
+              </small>
+
+            </button>
+
+          )}
+
+        </div>
+
+
+        {/* =================================================
+            ÁREA DE INNOVACIÓN DIGITAL
+        ================================================= */}
+
+        <div className="selection-section">
+
+          <div className="selection-section-title">
+
+            <span></span>
+
+            <strong>
+              ÁREA DE INNOVACIÓN DIGITAL
+            </strong>
+
+            <span></span>
+
+          </div>
+
+
+          <div className="selection-innovation-grid">
+
+            {innovationUsers.map(
+              (user) => (
+
+                <button
+                  type="button"
+                  key={user.id}
+                  className="selection-innovation-card"
+
+                  onClick={() =>
+                    setSelectedUser(user)
+                  }
+                >
+
+                  <UserAvatar
+                    user={user}
+                    size="large"
+                  />
+
+
+                  <strong>
+                    {user.name}
+                  </strong>
+
+
+                  <span>
+                    {user.role}
+                  </span>
+
+
+                  <small>
+                    Todas las nacionales
+                  </small>
+
+                </button>
+
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        {/* =================================================
+            EQUIPOS NACIONALES
+        ================================================= */}
+
+        <div className="selection-section">
+
+          <div className="selection-section-title">
+
+            <span></span>
+
+            <strong>
+              EQUIPOS NACIONALES
+            </strong>
+
+            <span></span>
+
+          </div>
+
+
+          <div className="selection-national-grid">
+
+            {nationalUsers.map(
+              (user) => (
+
+                <button
+                  type="button"
+                  key={user.id}
+                  className="selection-national-card"
+
+                  onClick={() =>
+                    setSelectedUser(user)
+                  }
+                >
+
+                  <UserAvatar
+                    user={user}
+                    size="large"
+                  />
+
+
+                  <strong>
+                    {user.name}
+                  </strong>
+
+
+                  <span>
+                    {user.role}
+                  </span>
+
+
+                  <small>
+                    {user.filterTeam}
+                  </small>
+
+                </button>
+
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        {/* =================================================
+            BOTÓN
+        ================================================= */}
+
+        <button
+          type="button"
+          className="selection-user-button"
+          disabled
+        >
+          Selecciona un usuario
+        </button>
+
+
+        <div className="selection-footer">
+          Prisa Media · Área de Innovación Digital
+        </div>
+
+      </div>
+
+    </div>
+  );
+
+}
+
+  /* =======================================================
+     LOADING
+     ======================================================= */
+
+  if (
+    loading
+  ) {
+
+    return (
+
+      <div className="dashboard-loading">
+
+        <div className="loading-spinner" />
+
+        <strong>
+          Cargando dashboard...
+        </strong>
+
+        <span>
+          Leyendo información de BS_PRISA.xlsx
+        </span>
+
+      </div>
+
+    );
+
+  }
+
+
+  /* =======================================================
+     ERROR
+     ======================================================= */
+
+  if (
+    error
+  ) {
+
+    return (
+
+      <div className="dashboard-error">
+
+        <div className="dashboard-error-card">
+
+          <div className="dashboard-error-icon">
+
+            <X
+              size={22}
+            />
+
+          </div>
+
+
+          <h2>
+            No se pudo cargar el dashboard
+          </h2>
+
+
+          <p>
+            {error}
+          </p>
+
+
+          <p>
+
+            Verifica que
+            <strong>
+              {" "}
+              BS_PRISA.xlsx
+            </strong>
+            {" "}
+            esté dentro de la carpeta
+            <strong>
+              {" "}
+              public
+            </strong>
+            {" "}
+            del proyecto.
+
+          </p>
+
+
+          <button
+            type="button"
+
+            onClick={() =>
+              window.location.reload()
+            }
+          >
+            Volver a intentar
+          </button>
+
+        </div>
+
+      </div>
+
+    );
+
+  }
+
+
+  /* =======================================================
+     RENDER
+     ======================================================= */
+
+  return (
+
+    <div
+      className={
+        `dashboard-app ${
+          mobileSidebarOpen
+            ? "sidebar-open"
+            : ""
+        }`
+      }
+    >
+
+      {/* ===================================================
+         SIDEBAR
+         =================================================== */}
+
+      <DashboardSidebar
+
+        activeSection={
+          activeSection
+        }
+
+        onSectionChange={
+          handleSectionChange
+        }
+
+
+        selectedUser={
+          selectedUser
+        }
+
+        onChangeUser={
+          handleChangeUser
+        }
+
+
+        selectedTeam={
+          selectedTeam
+        }
+
+        onTeamChange={
+          handleTeamChange
+        }
+
+
+        selectedStatus={
+          selectedStatus
+        }
+
+        onStatusChange={
+          setSelectedStatus
+        }
+
+
+        selectedRubro={
+          selectedRubro
+        }
+
+        onRubroChange={
+          handleRubroChange
+        }
+
+
+        brandCountsByRubro={
+          brandCountsByRubro
+        }
+
+      />
+
+
+      {/* ===================================================
+         OVERLAY MOBILE
+         =================================================== */}
+
+      {mobileSidebarOpen && (
+
+        <div
+          className="sidebar-mobile-overlay"
+
+          onClick={() =>
+            setMobileSidebarOpen(
+              false
+            )
+          }
+        />
+
+      )}
+
+
+      {/* ===================================================
+         MAIN
+         =================================================== */}
+
+      <main className="dashboard-main">
+
+        {/* =================================================
+           HEADER MOBILE
+           ================================================= */}
+
+        <div className="mobile-dashboard-header">
+
+          <button
+            type="button"
+            className="mobile-menu-button"
+
+            onClick={() =>
+              setMobileSidebarOpen(
+                true
+              )
+            }
+          >
+
+            <Menu
+              size={17}
+            />
+
+          </button>
+
+
+          <strong>
+            Dashboard Comercial
+          </strong>
+
+        </div>
+
+
+        {/* =================================================
+           TOPBAR
+           ================================================= */}
+
+        <DashboardTopbar
+
+          currentUser={
+            selectedUser
+          }
+
+          searchTerm={
+            searchTerm
+          }
+
+          onSearchChange={
+            setSearchTerm
+          }
+
+        />
+
+
+        {/* =================================================
+           CONTENT
+           ================================================= */}
+
+        <div className="dashboard-content">
+
+          {/* FILTROS ACTIVOS */}
+
+          <ActiveFilters
+            selectedTeam={
+              selectedTeam
+            }
+
+            selectedStatus={
+              selectedStatus
+            }
+
+            selectedRubro={
+              selectedRubro
+            }
+
+            onClear={
+              clearFilters
+            }
+          />
+
+
+          {/* =================================================
+             EQUIPO DE INNOVACIÓN
+             ================================================= */}
+
+          <InnovationTeamSection
+            selectedTeam={
+              selectedTeam
+            }
+          />
+
+
+          {/* =================================================
+             EQUIPOS NACIONALES
+             ================================================= */}
+
+          <NationalTeamSection
+
+            rows={
+              currentRows
+            }
+
+            selectedTeam={
+              selectedTeam
+            }
+
+          />
+
+
+          {/* =================================================
+             VISTA
+             ================================================= */}
+
+          {selectedRubro !==
+            "Todos" ? (
+
+            <RubroView
+
+              rubro={
+                selectedRubro
+              }
+
+              rows={
+                currentRows
+              }
+
+              selectedTeam={
+                selectedTeam
+              }
+
+              selectedStatus={
+                selectedStatus
+              }
+
+              onOpenProposal={
+                setSelectedProposal
+              }
+
+            />
+
+          ) : (
+
+            <SummaryView
+
+              rows={
+                currentRows
+              }
+
+              selectedTeam={
+                selectedTeam
+              }
+
+              selectedStatus={
+                selectedStatus
+              }
+
+              selectedRubro={
+                selectedRubro
+              }
+
+              onOpenProposal={
+                setSelectedProposal
+              }
+
+            />
+
+          )}
+
+        </div>
+
+      </main>
+
+
+      {/* ===================================================
+         MODAL
+         =================================================== */}
+
+      {selectedProposal && (
+
+        <ProposalModal
+
+          row={
+            selectedProposal
+          }
+
+          onClose={() =>
+            setSelectedProposal(
+              null
+            )
+          }
+
+        />
+
+      )}
+
+    </div>
+
+  );
+
+}
+
+
+/* =========================================================
+   FIN APP.JSX — PARTE 6/6
+   ========================================================= */
+
+
+/* =========================================================
+   FIN COMPLETO DE APP.JSX
+   ========================================================= */
