@@ -354,7 +354,7 @@ img {
     6px;
 
   font-size:
-    10px;
+    12px;
 
   font-weight:
     650;
@@ -458,7 +458,7 @@ img {
     #666b7b;
 
   font-size:
-    7px;
+    10px;
 
   font-weight:
     800;
@@ -504,7 +504,7 @@ img {
     none;
 
   font-size:
-    9px;
+    12px;
 
   cursor:
     pointer;
@@ -590,7 +590,7 @@ img {
     #666b7b;
 
   font-size:
-    7px;
+    8px;
 
   font-weight:
     800;
@@ -705,7 +705,7 @@ img {
     inherit;
 
   font-size:
-    9px;
+    12px;
 
   white-space:
     nowrap;
@@ -722,7 +722,7 @@ img {
     #666b7b;
 
   font-size:
-    8px;
+    10px;
 
   font-weight:
     700;
@@ -817,7 +817,7 @@ img {
     #dfe1e7;
 
   font-size:
-    9px;
+    12px;
 
   font-weight:
     700;
@@ -837,7 +837,7 @@ img {
     #666b7b;
 
   font-size:
-    7px;
+    10px;
 
   white-space:
     nowrap;
@@ -957,7 +957,7 @@ img {
     #d9dbe2;
 
   font-size:
-    8px;
+    10px;
 
   white-space:
     nowrap;
@@ -974,7 +974,7 @@ img {
     #666b7b;
 
   font-size:
-    7px;
+    10px;
 
   white-space:
     nowrap;
@@ -1058,7 +1058,7 @@ img {
     34px;
 
   font-size:
-    9px;
+    10px;
 }
 
 .avatar-large {
@@ -1069,7 +1069,7 @@ img {
     48px;
 
   font-size:
-    11px;
+    12px;
 }
 
 
@@ -1173,7 +1173,7 @@ img {
     #676b7b;
 
   font-size:
-    8px;
+    10px;
 
   font-weight:
     650;
@@ -1187,7 +1187,7 @@ img {
     #d6d8df;
 
   font-size:
-    9px;
+    12px;
 
   font-weight:
     650;
@@ -1282,7 +1282,7 @@ img {
     0;
 
   font-size:
-    9px;
+    12px;
 }
 
 .topbar-search input::placeholder {
@@ -1423,7 +1423,7 @@ img {
     #626777;
 
   font-size:
-    7px;
+    10px;
 
   white-space:
     nowrap;
@@ -1497,7 +1497,7 @@ img {
     #656a7a;
 
   font-size:
-    7px;
+    10px;
 
   font-weight:
     800;
@@ -1537,7 +1537,7 @@ img {
     #6d7181;
 
   font-size:
-    9px;
+    12px;
 
   line-height:
     1.5;
@@ -1599,7 +1599,7 @@ img {
     #5e6372;
 
   font-size:
-    6.5px;
+    10px;
 
   font-weight:
     800;
@@ -1635,7 +1635,7 @@ img {
     4px;
 
   font-size:
-    7px;
+    10px;
 
   font-weight:
     650;
@@ -1658,7 +1658,7 @@ img {
     4px;
 
   font-size:
-    7px;
+    10px;
 }
 
 .clear-filters-button:hover {
@@ -1819,7 +1819,7 @@ img {
     #777b8b;
 
   font-size:
-    7px;
+    8px;
 
   font-weight:
     700;
@@ -1842,7 +1842,7 @@ img {
     #e9ebef;
 
   font-size:
-    17px;
+    20px;
 
   font-weight:
     650;
@@ -1862,7 +1862,7 @@ img {
     #5e6372;
 
   font-size:
-    6.5px;
+    10px;
 
   line-height:
     1.3;
@@ -1929,7 +1929,7 @@ img {
     #5f6473;
 
   font-size:
-    6.5px;
+    10px;
 
   font-weight:
     800;
@@ -1946,7 +1946,7 @@ img {
     #dfe1e6;
 
   font-size:
-    11px;
+    14px;
 
   font-weight:
     650;
@@ -1960,7 +1960,7 @@ img {
     #666b7b;
 
   font-size:
-    7px;
+    10px;
 }
 
 
@@ -2034,7 +2034,7 @@ img {
     #e7e9ee;
 
   font-size:
-    15px;
+    18px;
 
   font-weight:
     650;
@@ -2048,7 +2048,7 @@ img {
     #666b7b;
 
   font-size:
-    7px;
+    10px;
 
   font-weight:
     650;
@@ -2141,7 +2141,7 @@ img {
     var(--pink);
 
   font-size:
-    7px;
+    10px;
 
   font-weight:
     700;
@@ -2158,7 +2158,7 @@ img {
     #696e7e;
 
   font-size:
-    7.5px;
+    8px;
 
   line-height:
     1.45;
@@ -2185,7 +2185,7 @@ img {
     4px;
 
   font-size:
-    6px;
+    10px;
 
   font-weight:
     800;
@@ -2270,7 +2270,7 @@ img {
     #d8dae1;
 
   font-size:
-    8px;
+    10px;
 
   font-weight:
     650;
@@ -2290,7 +2290,7 @@ img {
     #646979;
 
   font-size:
-    6.5px;
+    8px;
 
   white-space:
     nowrap;
@@ -2363,7 +2363,7 @@ img {
     #686d7c;
 
   font-size:
-    7px;
+    10px;
 
   font-weight:
     800;
@@ -2457,7 +2457,7 @@ img {
     #d9dbe2;
 
   font-size:
-    8px;
+    10px;
 
   font-weight:
     700;
@@ -2486,7 +2486,7 @@ img {
     #676c7b;
 
   font-size:
-    6.5px;
+    8px;
 
   white-space:
     nowrap;
@@ -2512,7 +2512,7 @@ img {
     3px;
 
   font-size:
-    6px;
+    10px;
 
   font-weight:
     700;
@@ -2594,7 +2594,7 @@ img {
     #7b7f8e;
 
   font-size:
-    7px;
+    10px;
 }
 
 .rubro-status-item strong {
@@ -2641,7 +2641,7 @@ img {
     #666b7a;
 
   font-size:
-    7px;
+    10px;
 }
 
 .rubro-national-chart
@@ -2695,7 +2695,7 @@ img {
     #e5e7ec;
 
   font-size:
-    7px;
+    8px;
 
   font-weight:
     700;
@@ -2723,7 +2723,7 @@ img {
     #7e8291;
 
   font-size:
-    7px;
+    8px;
 }
 
 .chart-tooltip > div b {
@@ -2731,7 +2731,7 @@ img {
     #dfe1e6;
 
   font-size:
-    7px;
+    8px;
 
   font-weight:
     700;
@@ -2832,7 +2832,7 @@ img {
     #eef0f4;
 
   font-size:
-    22px;
+    24px;
 
   font-weight:
     650;
@@ -2864,7 +2864,7 @@ img {
     4px;
 
   font-size:
-    7px;
+    10px;
 
   font-weight:
     700;
@@ -2936,7 +2936,7 @@ img {
     1px solid var(--border);
 
   font-size:
-    6.5px;
+    10px;
 
   font-weight:
     800;
@@ -2962,7 +2962,7 @@ img {
     1px solid var(--border-soft);
 
   font-size:
-    7.5px;
+    10px;
 
   transition:
     background 0.14s ease;
@@ -2991,7 +2991,7 @@ img {
     #d7d9e0;
 
   font-size:
-    7.5px;
+    12px;
 
   font-weight:
     650;
@@ -3013,7 +3013,7 @@ img {
     #878b9a;
 
   font-size:
-    7px;
+    10px;
 
   line-height:
     1.4;
@@ -3058,7 +3058,7 @@ img {
     25px;
 
   font-size:
-    7px;
+    8px;
 }
 
 .proposal-table-advisor span {
@@ -3072,7 +3072,7 @@ img {
     #9a9eab;
 
   font-size:
-    7px;
+    10px;
 
   line-height:
     1.3;
@@ -3112,7 +3112,7 @@ img {
     4px;
 
   font-size:
-    6.5px;
+    10px;
 
   font-weight:
     700;
@@ -3190,7 +3190,7 @@ img {
     5px;
 
   font-size:
-    7px;
+    8px;
 
   font-weight:
     800;
@@ -3235,7 +3235,7 @@ img {
     #646979;
 
   font-size:
-    6.5px;
+    10px;
 }
 
 .top-brand-item > strong:last-child {
@@ -3293,7 +3293,7 @@ img {
     #858996;
 
   font-size:
-    9px;
+    12px;
 }
 
 .empty-state span {
@@ -3304,7 +3304,7 @@ img {
     #5f6473;
 
   font-size:
-    7px;
+    10px;
 
   line-height:
     1.5;
@@ -3422,7 +3422,7 @@ img {
     #666b7a;
 
   font-size:
-    6.5px;
+    8px;
 
   font-weight:
     800;
@@ -3565,7 +3565,7 @@ img {
     #5e6372;
 
   font-size:
-    6.5px;
+    8px;
 
   font-weight:
     800;
@@ -3663,7 +3663,7 @@ img {
     #5e6372;
 
   font-size:
-    6.5px;
+    8px;
 
   font-weight:
     800;
@@ -3722,7 +3722,7 @@ img {
     5px;
 
   font-size:
-    7px;
+    8px;
 
   font-weight:
     700;
@@ -3774,7 +3774,7 @@ img {
     #d8dae1;
 
   font-size:
-    11px;
+    12px;
 
   font-weight:
     650;
@@ -3926,7 +3926,7 @@ img {
     #e5e7ec;
 
   font-size:
-    15px;
+    16px;
 
   font-weight:
     650;
@@ -4368,7 +4368,7 @@ img {
 
   .kpi-card-content > span {
     font-size:
-      18px;
+      8px;
   }
 
 
@@ -4492,6 +4492,27 @@ img {
       3px;
   }
 
+
+  .selection-innovation-card strong,
+  .selection-national-card strong {
+    font-size:
+      12px;
+  }
+
+
+  .selection-innovation-card > span,
+  .selection-national-card > span {
+    font-size:
+      10px;
+  }
+
+
+  .selection-innovation-card small,
+  .selection-national-card small {
+    font-size:
+      10px;
+  }
+
 }
 
 
@@ -4536,13 +4557,13 @@ img {
 
   .national-member-card strong {
     font-size:
-      12px;
+      14px;
   }
 
 
   .national-member-card span {
     font-size:
-      10px;
+      12px;
   }
 
 
@@ -4690,7 +4711,7 @@ img {
     #686d7c;
 
   font-size:
-    9px;
+    12px;
 
   text-align:
     center;
@@ -4747,7 +4768,7 @@ img {
     #d9dbe2;
 
   font-size:
-    8px;
+    10px;
 
   font-weight:
     800;
@@ -4817,7 +4838,7 @@ img {
 
   height: 48px;
 
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 
   color: var(--pink);
 
@@ -4832,7 +4853,7 @@ img {
 .selection-director-card strong {
   color: #e0e2e7;
 
-  font-size: 9px;
+  font-size: 12px;
 
   font-weight: 700;
 }
@@ -4847,7 +4868,7 @@ img {
 
   color: var(--pink);
 
-  font-size: 7px;
+  font-size: 10px;
 
   font-weight: 650;
 }
@@ -4870,7 +4891,7 @@ img {
 
   border-radius: 5px;
 
-  font-size: 6px;
+  font-size: 10px;
 }
 
 
@@ -4975,7 +4996,7 @@ img {
     #dfe1e7;
 
   font-size:
-    8.5px;
+    12px;
 
   font-weight:
     700;
@@ -4996,7 +5017,7 @@ img {
     var(--pink);
 
   font-size:
-    6.5px;
+    10px;
 
   font-weight:
     650;
@@ -5024,7 +5045,7 @@ img {
     5px;
 
   font-size:
-    6px;
+    10px;
 }
 
 
@@ -5111,7 +5132,7 @@ img {
     48px;
 
   margin-bottom:
-    8px;
+    10px;
 
   color:
     #3e9cf5;
@@ -5165,7 +5186,7 @@ img {
     #2999ef;
 
   font-size:
-    6.5px;
+    8px;
 
   font-weight:
     650;
@@ -5193,7 +5214,7 @@ img {
     5px;
 
   font-size:
-    6px;
+    8px;
 }
 
 
@@ -5221,7 +5242,7 @@ img {
     6px;
 
   font-size:
-    8px;
+    10px;
 
   font-weight:
     700;
@@ -5249,7 +5270,7 @@ img {
     #4d5260;
 
   font-size:
-    7px;
+    10px;
 
   text-align:
     center;
@@ -5339,3 +5360,27 @@ img {
 /* =========================================================
    FIN COMPLETO DE APP.CSS
    ========================================================= */  
+
+@media (
+  max-width: 600px
+) {
+
+  .selection-innovation-card strong,
+  .selection-national-card strong {
+    font-size:
+      12px;
+  }
+
+  .selection-innovation-card > span,
+  .selection-national-card > span {
+    font-size:
+      10px;
+  }
+
+  .selection-innovation-card small,
+  .selection-national-card small {
+    font-size:
+      10px;
+  }
+
+}
