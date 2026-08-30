@@ -6080,3 +6080,73 @@ img {
 .proposal-detail-advisor strong {
   font-size: 10px;
 }
+
+/* =========================================================
+   ADMINISTRADOR — ACCESO TOTAL
+   ========================================================= */
+
+.selection-admin-card {
+  position: fixed;
+  right: 18px;
+  bottom: 16px;
+
+  display: flex;
+  align-items: center;
+
+  width: 135px;
+  height: 46px;
+
+  padding: 6px 8px;
+
+  color: #dfe1e7;
+  background: #13161e;
+
+  border: 1px solid #292d38;
+  border-radius: 8px;
+
+  text-align: left;
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+
+  z-index: 20;
+}
+
+.selection-admin-card:hover {
+  transform: translateY(-1px);
+  background: #171a23;
+  border-color: rgba(230, 25, 122, 0.42);
+}
+
+.selection-admin-card .avatar {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+
+  margin-right: 7px;
+
+  color: var(--pink);
+  border-color: var(--pink);
+}
+
+.selection-admin-card div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.selection-admin-card strong {
+  color: #dfe1e7;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.selection-admin-card span {
+  margin-top: 2px;
+  color: var(--pink);
+  font-size: 7px;
+  font-weight: 600;
+}

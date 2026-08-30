@@ -186,6 +186,24 @@ const USERS = [
       `${IMAGE_PATH}sthef1HD.png`,
   },
 
+    {
+    id: "administrador",
+
+    name: "Administrador",
+
+    shortName: "Administrador",
+
+    initials: "AD",
+
+    role: "Administrador",
+
+    filterTeam: "",
+
+    canViewAll: true,
+    
+    image: "",
+  },
+
 
   /* =======================================================
      USUARIOS DE EQUIPOS NACIONALES
@@ -7667,6 +7685,44 @@ const nationalUsers = USERS.filter(
           disabled
         >
           Selecciona un usuario
+        </button>
+
+
+        {/* =================================================
+            ADMINISTRADOR
+        ================================================= */}
+
+        <button
+          type="button"
+          className="selection-admin-card"
+          onClick={() =>
+            setSelectedUser(
+              USERS.find(
+                (user) =>
+                  user.id === "administrador"
+              )
+            )
+          }
+        >
+          <UserAvatar
+            user={
+              USERS.find(
+                (user) =>
+                  user.id === "administrador"
+              )
+            }
+            size="small"
+          />
+
+          <div>
+            <strong>
+              Administrador
+            </strong>
+
+            <span>
+              Administrador
+            </span>
+          </div>
         </button>
 
 
