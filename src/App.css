@@ -2789,14 +2789,20 @@ img {
 
 .executive-proposal-table-header,
 .executive-proposal-row {
+
+  display:
+    grid;
+
   grid-template-columns:
-    minmax(125px, 1fr)
-    minmax(85px, 0.65fr)
-    minmax(170px, 1.45fr)
-    minmax(85px, 0.65fr)
+    minmax(150px, 1.15fr)
+    minmax(100px, 0.8fr)
+    minmax(190px, 1.45fr)
+    minmax(105px, 0.8fr)
     minmax(100px, 0.75fr)
-    minmax(155px, 1.1fr);
-  min-width: 800px;
+    minmax(165px, 1.05fr);
+
+  min-width:
+    900px;
 }
 
 .executive-proposal-row {
