@@ -5861,3 +5861,32 @@ img {
   }
 
 }
+
+/* =========================================================
+   AJUSTE FINAL — TABLA DE EJECUTIVOS
+   ========================================================= */
+
+.executive-proposal-table-header,
+.executive-proposal-row {
+  display: grid;
+
+  grid-template-columns:
+    160px
+    120px
+    minmax(180px, 1fr)
+    120px
+    110px
+    180px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.executive-proposal-table-header {
+  min-width: 0;
+}
+
+.executive-proposal-row {
+  min-width: 0;
+  width: 100%;
+}
