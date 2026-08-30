@@ -6801,41 +6801,6 @@ function ProposalModal({
 
           )}
 
-
-          {/* PRESENTACIÓN */}
-
-          {row.linkPresentacion && (
-
-            <div
-              style={{
-                marginTop: 14,
-              }}
-            >
-
-              <a
-                href={
-                  row.linkPresentacion
-                }
-
-                target="_blank"
-
-                rel="noreferrer"
-
-                className="proposal-presentation-link"
-              >
-
-                <Eye
-                  size={13}
-                />
-
-                Ver presentación
-
-              </a>
-
-            </div>
-
-          )}
-
         </div>
 
       </div>

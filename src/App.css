@@ -5890,3 +5890,193 @@ img {
   min-width: 0;
   width: 100%;
 }
+/* =========================================================
+   AJUSTE — DETALLE DE PROPUESTA
+   ========================================================= */
+
+.proposal-modal-header span {
+  font-size: 8px;
+}
+
+.proposal-modal-header h2 {
+  font-size: 18px;
+}
+
+.proposal-detail-item > span {
+  font-size: 8px;
+}
+
+.proposal-detail-item > strong {
+  font-size: 10px;
+}
+
+.proposal-detail-section > span {
+  font-size: 8px;
+}
+
+.proposal-detail-section p {
+  font-size: 10px;
+}
+
+.proposal-detail-advisor strong {
+  font-size: 10px;
+}
+
+.proposal-presentation-link {
+  font-size: 9px;
+}
+/* =========================================================
+   AJUSTE — PANTALLA DE USUARIOS
+   ========================================================= */
+
+.user-selection-content > h1 {
+  font-size: 32px;
+}
+
+.user-selection-subtitle {
+  font-size: 10px;
+}
+
+.selection-section-title strong {
+  font-size: 10px;
+}
+
+.selection-director-card strong {
+  font-size: 12px;
+}
+
+.selection-director-card > span {
+  font-size: 9px;
+}
+
+.selection-innovation-card strong {
+  font-size: 10px;
+}
+
+.selection-innovation-card > span {
+  font-size: 8px;
+}
+
+.selection-national-card strong {
+  font-size: 10px;
+}
+
+.selection-national-card > span {
+  font-size: 8px;
+}
+/* Ocultar botón inferior de selección */
+.selection-user-button {
+  display: none;
+}
+/* =========================================================
+   AJUSTE FINAL — PANTALLA DE USUARIOS
+   ========================================================= */
+
+/* Centrar toda la pantalla */
+.user-selection-content {
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Título un poco más grande */
+.user-selection-content > h1 {
+  font-size: 32px;
+}
+
+/* Subtítulo */
+.user-selection-subtitle {
+  font-size: 10px;
+}
+
+/* Títulos de las secciones */
+.selection-section-title strong {
+  font-size: 10px;
+}
+
+/* Jefa Tatiana */
+.selection-director-card strong {
+  font-size: 12px;
+}
+
+.selection-director-card > span {
+  font-size: 10px;
+}
+
+/* Equipo de Innovación Digital */
+.selection-innovation-card strong {
+  font-size: 12px;
+}
+
+.selection-innovation-card > span {
+  font-size: 10px;
+}
+
+/* Nacionales */
+.selection-national-card strong {
+  font-size: 12px;
+}
+
+.selection-national-card > span {
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   CENTRADO VERTICAL Y HORIZONTAL
+   ========================================================= */
+
+.user-selection-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  box-sizing: border-box;
+}
+
+.user-selection-content {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* =========================================================
+   QUITAR BOTÓN INFERIOR
+   ========================================================= */
+
+.selection-user-button {
+  display: none !important;
+}
+
+
+/* =========================================================
+   DETALLE DE PROPUESTA — UN POQUITO MÁS GRANDE
+   ========================================================= */
+
+.proposal-modal-header h2 {
+  font-size: 20px;
+}
+
+.proposal-detail-item > span {
+  font-size: 8px;
+}
+
+.proposal-detail-item > strong {
+  font-size: 10px;
+}
+
+.proposal-detail-section > span {
+  font-size: 8px;
+}
+
+.proposal-detail-section p {
+  font-size: 10px;
+}
+
+.proposal-detail-advisor strong {
+  font-size: 10px;
+}
