@@ -1,4 +1,7 @@
 /* =========================================================
+    APP.CSS
+   ========================================================= */
+/* =========================================================
    APP.CSS — PARTE 1/4
    DASHBOARD COMERCIAL PRISA MEDIA
    ========================================================= */
@@ -2516,6 +2519,399 @@ img {
 
   font-weight:
     700;
+}
+
+
+/* =========================================================
+   NACIONALES — EJECUTIVOS
+   ========================================================= */
+
+.national-team-block {
+  min-width: 0;
+}
+
+.national-member-card {
+  width: 100%;
+  cursor: pointer;
+}
+
+.national-member-card:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 2px;
+}
+
+.national-team-block.expanded .national-member-card {
+  border-color: rgba(230, 25, 122, 0.35);
+  background: var(--panel-2);
+}
+
+.national-executives-panel {
+  margin-top: 7px;
+  padding: 9px;
+  background: #101219;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.national-executives-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.national-executives-header span {
+  color: #666b7b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.national-executives-header strong {
+  color: var(--pink);
+  font-size: 10px;
+}
+
+.national-executives-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.national-executive-card {
+  display: grid;
+  grid-template-columns: 29px minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  gap: 7px;
+  padding: 7px;
+  color: #dfe1e7;
+  background: #151821;
+  border: 1px solid #282c38;
+  border-radius: 7px;
+  text-align: left;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.national-executive-card:hover {
+  transform: translateY(-1px);
+  background: #191c25;
+  border-color: rgba(230, 25, 122, 0.35);
+}
+
+.national-executive-avatar,
+.executive-detail-avatar,
+.executive-account-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #f0f1f5;
+  background: #202534;
+  border: 1px solid var(--pink);
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.national-executive-avatar {
+  width: 29px;
+  height: 29px;
+  font-size: 9px;
+}
+
+.national-executive-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.national-executive-info strong {
+  overflow: hidden;
+  color: #e0e2e7;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.national-executive-info span {
+  color: #777c8e;
+  font-size: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.national-executive-card small {
+  color: #8b8fa0;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.national-executives-empty {
+  padding: 8px 4px;
+  color: #777c8e;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   DETALLE DE EJECUTIVO
+   ========================================================= */
+
+.executive-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.executive-detail-back {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 5px;
+  padding: 6px 9px;
+  color: #a7aab6;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.executive-detail-back:hover {
+  color: #f0f1f5;
+  background: rgba(255, 255, 255, 0.035);
+  border-color: #363b49;
+}
+
+.executive-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  padding: 13px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.executive-detail-user {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+}
+
+.executive-detail-avatar {
+  width: 43px;
+  height: 43px;
+  font-size: 12px;
+}
+
+.executive-detail-user > div:last-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.executive-detail-user strong {
+  overflow: hidden;
+  color: #e9eaf0;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.executive-detail-user span {
+  color: #8b8fa0;
+  font-size: 10px;
+}
+
+.executive-detail-user small {
+  color: var(--pink);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.executive-detail-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(90px, 1fr));
+  gap: 8px;
+  min-width: 470px;
+}
+
+.executive-detail-metrics > div {
+  min-width: 0;
+  padding: 7px 8px;
+  background: #171a23;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.executive-detail-metrics span {
+  display: block;
+  overflow: hidden;
+  color: #777c8e;
+  font-size: 9px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.executive-detail-metrics strong {
+  display: block;
+  margin-top: 3px;
+  color: #f0f1f5;
+  font-size: 13px;
+}
+
+.executive-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 10px;
+  align-items: start;
+}
+
+.executive-proposals-panel {
+  min-width: 0;
+}
+
+.executive-proposal-table-header,
+.executive-proposal-row {
+  grid-template-columns:
+    minmax(125px, 1fr)
+    minmax(85px, 0.65fr)
+    minmax(170px, 1.45fr)
+    minmax(85px, 0.65fr)
+    minmax(100px, 0.75fr)
+    minmax(155px, 1.1fr);
+  min-width: 800px;
+}
+
+.executive-proposal-row {
+  display: grid;
+  min-height: 58px;
+  align-items: center;
+  padding: 5px 13px;
+  color: #969aa8;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border-soft);
+  border-radius: 0;
+  text-align: left;
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.executive-proposal-row:hover {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.executive-proposal-row > div {
+  min-width: 0;
+  padding-right: 8px;
+}
+
+.executive-proposal-row strong {
+  color: #d7d9e0;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.executive-proposal-text {
+  overflow: hidden;
+  color: #878b9a;
+  font-size: 9px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+.executive-account-card {
+  min-width: 0;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.executive-account-title {
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--border);
+}
+
+.executive-account-title strong {
+  color: #e8eaf0;
+  font-size: 11px;
+}
+
+.executive-account-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+  margin: 10px 0 8px;
+}
+
+.executive-account-brand strong {
+  overflow: hidden;
+  color: #f0f1f5;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.executive-account-avatar {
+  width: 27px;
+  height: 27px;
+  color: #8fe2d8;
+  border-color: #6dd3c7;
+  font-size: 9px;
+}
+
+.executive-account-card > .status-badge {
+  margin-bottom: 8px;
+}
+
+.executive-account-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.executive-account-item span {
+  color: #666b7b;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.executive-account-item strong {
+  color: #dfe1e7;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.executive-detail-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 
@@ -5381,6 +5777,81 @@ img {
   .selection-national-card small {
     font-size:
       10px;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — NACIONALES Y EJECUTIVO
+   ========================================================= */
+
+@media (
+  max-width: 900px
+) {
+
+  .executive-detail-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .executive-detail-metrics {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .executive-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .executive-account-card {
+    width: 100%;
+  }
+
+}
+
+
+@media (
+  max-width: 600px
+) {
+
+  .national-team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .national-executives-panel {
+    padding: 8px;
+  }
+
+  .national-executive-card {
+    grid-template-columns: 27px minmax(0, 1fr);
+  }
+
+  .national-executive-card small {
+    grid-column: 2;
+  }
+
+  .executive-detail-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .executive-detail-user strong {
+    font-size: 12px;
+  }
+
+}
+
+
+@media (
+  max-width: 420px
+) {
+
+  .national-team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .executive-detail-metrics {
+    grid-template-columns: 1fr;
   }
 
 }

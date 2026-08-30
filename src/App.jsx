@@ -1,3 +1,8 @@
+ {/* =================================================
+            JSX
+  ================================================= */}
+
+
 /* =========================================================
    APP.JSX
    DASHBOARD COMERCIAL - PRISA MEDIA
@@ -4298,12 +4303,6 @@ function InnovationTeamSection({
   selectedTeam,
 }) {
 
-  const showAll =
-    selectedTeam ===
-      "Todos" ||
-    !selectedTeam;
-
-
   /*
    * El director siempre aparece.
    */
@@ -4341,11 +4340,7 @@ function InnovationTeamSection({
         </div>
 
 
-        <span>
-          {showAll
-            ? "Todas las Nacionales"
-            : selectedTeam}
-        </span>
+        <span aria-hidden="true"></span>
 
       </div>
 
@@ -4450,19 +4445,23 @@ function InnovationTeamSection({
 function NationalTeamSection({
   rows = [],
   selectedTeam,
+  onOpenExecutive,
 }) {
 
-  /*
-   * Cuando se selecciona una Nacional,
-   * solamente mostramos SU líder.
-   *
-   * Para Todos mostramos las cinco.
-   */
+  const [
+    expandedNational,
+    setExpandedNational,
+  ] = useState(null);
 
+
+  /*
+   * Los usuarios con acceso total pueden ver las cinco Nacionales.
+   * Un líder nacional solamente recibe sus filas en `rows`, por lo
+   * que nunca podrá consultar ejecutivos de otra Nacional.
+   */
   const visibleTeams =
     selectedTeam &&
     selectedTeam !== "Todos"
-
       ? NATIONAL_TEAMS.filter(
           (team) =>
             nacionalMatches(
@@ -4470,8 +4469,49 @@ function NationalTeamSection({
               selectedTeam
             )
         )
-
       : NATIONAL_TEAMS;
+
+
+  useEffect(() => {
+    setExpandedNational(null);
+  }, [selectedTeam]);
+
+
+  function getExecutivesForNational(
+    national
+  ) {
+    const unique = new Map();
+
+    rows
+      .filter(
+        (row) =>
+          nacionalMatches(
+            row.nacional,
+            national
+          )
+      )
+      .forEach((row) => {
+        const name =
+          String(
+            row.ejecutivo ?? ""
+          ).trim();
+
+        const key =
+          normalizeText(name);
+
+        if (key && !unique.has(key)) {
+          unique.set(key, name);
+        }
+      });
+
+    return Array.from(unique.values()).sort(
+      (a, b) =>
+        normalizeText(a).localeCompare(
+          normalizeText(b),
+          "es"
+        )
+    );
+  }
 
 
   return (
@@ -4482,7 +4522,7 @@ function NationalTeamSection({
         <span />
 
         <strong>
-          EQUIPOS NACIONALES
+          NACIONALES
         </strong>
 
         <span />
@@ -4504,40 +4544,147 @@ function NationalTeamSection({
                   )
               );
 
+            const executives =
+              getExecutivesForNational(
+                team.national
+              );
+
+            const isExpanded =
+              expandedNational ===
+              team.national;
 
             return (
               <div
-                className="national-member-card"
+                className={
+                  `national-team-block ${
+                    isExpanded
+                      ? "expanded"
+                      : ""
+                  }`
+                }
                 key={
                   team.national
                 }
               >
 
-                <UserAvatar
-                  user={
-                    findUserByName(
-                      team.name
+                <button
+                  type="button"
+                  className="national-member-card"
+                  onClick={() =>
+                    setExpandedNational(
+                      isExpanded
+                        ? null
+                        : team.national
                     )
                   }
-                  size="medium"
-                />
+                  aria-expanded={
+                    isExpanded
+                  }
+                >
+
+                  <UserAvatar
+                    user={
+                      findUserByName(
+                        team.name
+                      )
+                    }
+                    size="medium"
+                  />
 
 
-                <strong>
-                  {team.name}
-                </strong>
+                  <strong>
+                    {team.name}
+                  </strong>
 
-                <span>
-                  {team.role}
-                </span>
+                  <span>
+                    {team.role}
+                  </span>
 
-                <small>
-                  {teamRows.length} propuestas
-                </small>
+                  <small>
+                    {teamRows.length} propuestas
+                  </small>
+
+                </button>
+
+
+                {isExpanded && (
+                  <div className="national-executives-panel">
+
+                    <div className="national-executives-header">
+                      <span>
+                        EJECUTIVOS
+                      </span>
+
+                      <strong>
+                        {executives.length}
+                      </strong>
+                    </div>
+
+
+                    {executives.length > 0 ? (
+                      <div className="national-executives-grid">
+
+                        {executives.map(
+                          (executive) => {
+                            const executiveRows =
+                              teamRows.filter(
+                                (row) =>
+                                  normalizeText(
+                                    row.ejecutivo
+                                  ) ===
+                                  normalizeText(
+                                    executive
+                                  )
+                              );
+
+                            return (
+                              <button
+                                type="button"
+                                className="national-executive-card"
+                                key={
+                                  executive
+                                }
+                                onClick={() =>
+                                  onOpenExecutive(
+                                    executive
+                                  )
+                                }
+                              >
+                                <div className="national-executive-avatar">
+                                  {getInitials(
+                                    executive
+                                  )}
+                                </div>
+
+                                <div className="national-executive-info">
+                                  <strong>
+                                    {executive}
+                                  </strong>
+                                  <span>
+                                    Ejecutivo(a) Comercial
+                                  </span>
+                                </div>
+
+                                <small>
+                                  {executiveRows.length} propuestas
+                                </small>
+                              </button>
+                            );
+                          }
+                        )}
+
+                      </div>
+                    ) : (
+                      <div className="national-executives-empty">
+                        No hay ejecutivos registrados en esta Nacional.
+                      </div>
+                    )}
+
+                  </div>
+                )}
 
               </div>
             );
-
           }
         )}
 
@@ -4546,6 +4693,312 @@ function NationalTeamSection({
     </section>
   );
 
+}
+
+
+/* =========================================================
+   DETALLE DE EJECUTIVO
+   ========================================================= */
+
+function ExecutiveDetail({
+  executiveName,
+  rows = [],
+  onBack,
+  onOpenProposal,
+}) {
+
+  const executiveRows =
+    rows.filter(
+      (row) =>
+        normalizeText(
+          row.ejecutivo
+        ) ===
+        normalizeText(
+          executiveName
+        )
+    );
+
+  if (executiveRows.length === 0) {
+    return (
+      <div className="dashboard-panel executive-detail-empty">
+        <button
+          type="button"
+          className="executive-detail-back"
+          onClick={onBack}
+        >
+          <ChevronLeft size={15} />
+          Volver a Nacionales
+        </button>
+
+        <strong>
+          No hay información para este ejecutivo.
+        </strong>
+      </div>
+    );
+  }
+
+
+  const brands =
+    getUniqueBrands(
+      executiveRows
+    );
+
+  const activeRows =
+    executiveRows.filter(
+      (row) =>
+        row.estado !== "cerrada"
+    );
+
+  const totalValue =
+    executiveRows.reduce(
+      (sum, row) =>
+        sum +
+        toNumber(
+          row.valorPropuesta
+        ),
+      0
+    );
+
+  const selectedAccount =
+    executiveRows[0];
+
+  const accountAdvisor =
+    getAdvisorData(
+      selectedAccount?.asesor
+    );
+
+  return (
+    <section className="executive-detail-section">
+
+      <button
+        type="button"
+        className="executive-detail-back"
+        onClick={onBack}
+      >
+        <ChevronLeft size={15} />
+        Volver a Nacionales
+      </button>
+
+
+      <div className="executive-detail-header">
+
+        <div className="executive-detail-user">
+          <div className="executive-detail-avatar">
+            {getInitials(
+              executiveName
+            )}
+          </div>
+
+          <div>
+            <strong>
+              {executiveName}
+            </strong>
+            <span>
+              Ejecutivo(a) Comercial
+            </span>
+            <small>
+              {selectedAccount?.nacional || ""}
+            </small>
+          </div>
+        </div>
+
+
+        <div className="executive-detail-metrics">
+          <div>
+            <span>Marcas totales</span>
+            <strong>{brands.size}</strong>
+          </div>
+
+          <div>
+            <span>Propuestas activas</span>
+            <strong>{activeRows.length}</strong>
+          </div>
+
+          <div>
+            <span>Solicitudes</span>
+            <strong>{executiveRows.length}</strong>
+          </div>
+
+          <div>
+            <span>Valor gestionado</span>
+            <strong>{formatMoneyShort(totalValue)}</strong>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div className="executive-detail-layout">
+
+        <div className="dashboard-panel executive-proposals-panel">
+
+          <div className="dashboard-panel-header">
+            <div>
+              <span>
+                EJECUTIVO
+              </span>
+              <h3>
+                Marcas y cuentas asignadas
+              </h3>
+            </div>
+
+            <span>
+              {executiveRows.length} propuestas
+            </span>
+          </div>
+
+
+          <div className="proposal-table">
+
+            <div className="proposal-table-header executive-proposal-table-header">
+              <div>MARCA</div>
+              <div>SECTOR</div>
+              <div>PROPUESTA</div>
+              <div>ESTADO</div>
+              <div>VALOR</div>
+              <div>ASESOR</div>
+            </div>
+
+
+            <div className="proposal-table-body">
+              {executiveRows.map(
+                (row) => {
+                  const advisor =
+                    getAdvisorData(
+                      row.asesor
+                    );
+
+                  return (
+                    <button
+                      type="button"
+                      className="executive-proposal-row"
+                      key={row.id}
+                      onClick={() =>
+                        onOpenProposal(row)
+                      }
+                    >
+                      <div>
+                        <strong>
+                          {row.cuenta || "—"}
+                        </strong>
+                      </div>
+
+                      <div>
+                        {row.rubro || "—"}
+                      </div>
+
+                      <div className="executive-proposal-text">
+                        {row.necesidad ||
+                          row.oportunidad ||
+                          "—"}
+                      </div>
+
+                      <div>
+                        <StatusBadge
+                          estado={row.estado}
+                        />
+                      </div>
+
+                      <div>
+                        <strong>
+                          {formatMoneyShort(
+                            row.valorPropuesta
+                          )}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <div className="proposal-table-advisor">
+                          <Avatar
+                            name={advisor.name}
+                            initials={advisor.initials}
+                            image={advisor.image}
+                            size="small"
+                          />
+                          <span>
+                            {advisor.name}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                }
+              )}
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <aside className="executive-account-card">
+          <div className="executive-account-title">
+            <strong>
+              Resumen de cuenta
+            </strong>
+          </div>
+
+          <div className="executive-account-brand">
+            <div className="executive-account-avatar">
+              {getInitials(
+                selectedAccount?.cuenta
+              )}
+            </div>
+            <strong>
+              {selectedAccount?.cuenta || "Sin cuenta"}
+            </strong>
+          </div>
+
+          <StatusBadge
+            estado={
+              selectedAccount?.estado
+            }
+          />
+
+          <div className="executive-account-item">
+            <span>Necesidad principal</span>
+            <strong>
+              {selectedAccount?.necesidad ||
+                selectedAccount?.oportunidad ||
+                "Sin información"}
+            </strong>
+          </div>
+
+          <div className="executive-account-item">
+            <span>Realizado por (Innovación Digital)</span>
+            <strong>
+              {accountAdvisor.name}
+            </strong>
+          </div>
+
+          <div className="executive-account-item">
+            <span>Valor de la propuesta</span>
+            <strong>
+              {formatCurrency(
+                selectedAccount?.valorPropuesta
+              )}
+            </strong>
+          </div>
+
+          <div className="executive-account-item">
+            <span>Prioridad</span>
+            <strong>
+              {selectedAccount?.prioridad || "—"}
+            </strong>
+          </div>
+
+          <div className="executive-account-item">
+            <span>Mes</span>
+            <strong>
+              {selectedAccount?.mes || "—"}
+            </strong>
+          </div>
+        </aside>
+
+      </div>
+
+    </section>
+  );
 }
 
 
@@ -6500,6 +6953,16 @@ export default function App() {
 
 
   /* =======================================================
+     EJECUTIVO SELECCIONADO
+     ======================================================= */
+
+  const [
+    selectedExecutive,
+    setSelectedExecutive,
+  ] = useState(null);
+
+
+  /* =======================================================
      SIDEBAR MOBILE
      ======================================================= */
 
@@ -6644,6 +7107,7 @@ export default function App() {
     );
 
     setSearchTerm("");
+    setSelectedExecutive(null);
 
   }, [
     selectedUser,
@@ -6903,6 +7367,8 @@ export default function App() {
       team
     );
 
+    setSelectedExecutive(null);
+
 
     /*
      * Al cambiar Nacional,
@@ -7096,9 +7562,6 @@ const nationalUsers = USERS.filter(
               </span>
 
 
-              <small>
-                Todas las nacionales
-              </small>
 
             </button>
 
@@ -7157,9 +7620,6 @@ const nationalUsers = USERS.filter(
                   </span>
 
 
-                  <small>
-                    Todas las nacionales
-                  </small>
 
                 </button>
 
@@ -7182,7 +7642,7 @@ const nationalUsers = USERS.filter(
             <span></span>
 
             <strong>
-              EQUIPOS NACIONALES
+              NACIONALES
             </strong>
 
             <span></span>
@@ -7221,9 +7681,6 @@ const nationalUsers = USERS.filter(
                   </span>
 
 
-                  <small>
-                    {user.filterTeam}
-                  </small>
 
                 </button>
 
@@ -7562,6 +8019,10 @@ const nationalUsers = USERS.filter(
               selectedTeam
             }
 
+            onOpenExecutive={
+              setSelectedExecutive
+            }
+
           />
 
 
@@ -7569,7 +8030,29 @@ const nationalUsers = USERS.filter(
              VISTA
              ================================================= */}
 
-          {selectedRubro !==
+          {selectedExecutive ? (
+
+            <ExecutiveDetail
+              executiveName={
+                selectedExecutive
+              }
+
+              rows={
+                currentRows
+              }
+
+              onBack={() =>
+                setSelectedExecutive(
+                  null
+                )
+              }
+
+              onOpenProposal={
+                setSelectedProposal
+              }
+            />
+
+          ) : selectedRubro !==
             "Todos" ? (
 
             <RubroView
@@ -7663,6 +8146,3 @@ const nationalUsers = USERS.filter(
    ========================================================= */
 
 
-/* =========================================================
-   FIN COMPLETO DE APP.JSX
-   ========================================================= */
