@@ -80,241 +80,229 @@ const IMAGE_PATH = "/images/";
 /* =========================================================
    USUARIOS
    ========================================================= */
-
+const DB_USER_IDS = {
+  "administrador": 1,
+  "tatiana-garcia": 2,
+  "glen-orillo": 3,
+  "juan-pablo": 4,
+  "jonathan-velasquez": 5,
+  "sthefanie-botello": 6,
+  "diana-milena": 7,
+  "juan-sebastian": 8,
+  "tatiana-pelaez": 9,
+  "ivonne-adriana": 10,
+  "william-ocampo": 11,
+};
 const USERS = [
 
-  /* =======================================================
-     USUARIOS CON ACCESO TOTAL
-     ======================================================= */
+ /* =======================================================
+   USUARIOS CON ACCESO TOTAL
+   ======================================================= */
 
-  {
-    id: "tatiana-garcia",
+{
+  id: "tatiana-garcia",
+  dbId: 2,
 
-    name: "Tatiana García Calderón",
+  name: "Tatiana García Calderón",
+  shortName: "Tatiana García",
+  initials: "TG",
 
-    shortName: "Tatiana García",
+  role: "Gerente comercial nacional",
 
-    initials: "TG",
+  filterTeam: "",
+  canViewAll: true,
 
-    role: "Gerente comercial nacional",
+  image:
+    `${IMAGE_PATH}TatianaGarciaHD.png`,
+},
 
-    filterTeam: "",
 
-    canViewAll: true,
+{
+  id: "glen-orillo",
+  dbId: 3,
 
-    image:
-  `${IMAGE_PATH}TatianaGarciaHD.png`,
-  },
+  name: "Glen Orillo Starke",
+  shortName: "Glen",
+  initials: "GO",
 
+  role: "Director Innovación Digital",
 
-  {
-    id: "glen-orillo",
+  filterTeam: "",
+  canViewAll: true,
 
-    name: "Glen Orillo Starke",
+  image:
+    `${IMAGE_PATH}GlenHD.png`,
+},
 
-    shortName: "Glen",
 
-    initials: "GO",
+{
+  id: "juan-pablo",
+  dbId: 4,
 
-    role: "Director Innovación Digital",
+  name: "Juan Pablo Godoy",
+  shortName: "Juan Pablo",
+  initials: "JG",
 
-    filterTeam: "",
+  role: "Encargado de N1 y N3",
 
-    canViewAll: true,
+  filterTeam: "",
+  canViewAll: true,
 
-    image:
-      `${IMAGE_PATH}GlenHD.png`,
-  },
+  image:
+    `${IMAGE_PATH}JuanPabloHD.png`,
+},
 
 
-  {
-    id: "juan-pablo",
+{
+  id: "jonathan",
+  dbId: 5,
 
-    name: "Juan Pablo Godoy",
+  name: "Jonathan Velásquez",
+  shortName: "Jonathan",
+  initials: "JV",
 
-    shortName: "Juan Pablo",
+  role: "Encargado de N2 y N4",
 
-    initials: "JG",
+  filterTeam: "",
+  canViewAll: true,
 
-    role: "Encargado de N1 y N3",
+  image:
+    `${IMAGE_PATH}JonathanHD.png`,
+},
 
-    filterTeam: "",
 
-    canViewAll: true,
+{
+  id: "sthefanie",
+  dbId: 6,
 
-    image:
-      `${IMAGE_PATH}JuanPabloHD.png`,
-  },
+  name: "Sthefanie Botello",
+  shortName: "Sthefanie",
+  initials: "SB",
 
+  role: "Encargada de N5",
 
-  {
-    id: "jonathan",
+  filterTeam: "",
+  canViewAll: true,
 
-    name: "Jonathan Velásquez",
+  image:
+    `${IMAGE_PATH}sthef1HD.png`,
+},
 
-    shortName: "Jonathan",
 
-    initials: "JV",
+/* =======================================================
+   USUARIO ADMINISTRADOR
+   ======================================================= */
 
-    role: "Encargado de N2 y N4",
+{
+  id: "administrador",
+  dbId: 1,
 
-    filterTeam: "",
+  name: "Administrador",
+  shortName: "Administrador",
+  initials: "AD",
 
-    canViewAll: true,
+  role: "Administrador",
 
-    image:
-      `${IMAGE_PATH}JonathanHD.png`,
-  },
+  filterTeam: "",
+  canViewAll: true,
 
+  image: "",
+},
 
-  {
-    id: "sthefanie",
 
-    name: "Sthefanie Botello",
+/* =======================================================
+   USUARIOS DE EQUIPOS NACIONALES
+   ======================================================= */
 
-    shortName: "Sthefanie",
+{
+  id: "diana",
+  dbId: 7,
 
-    initials: "SB",
+  name: "Diana Milena Contreras Rodriguez",
+  shortName: "Diana Milena",
+  initials: "DM",
 
-    role: "Encargada de N5",
+  role: "Líder Nacional 1",
 
-    filterTeam: "",
+  filterTeam: "Nacional 1",
+  canViewAll: false,
 
-    canViewAll: true,
+  image:
+    `${IMAGE_PATH}DianaMilenaContreras.png`,
+},
 
-    image:
-      `${IMAGE_PATH}sthef1HD.png`,
-  },
 
-    {
-    id: "administrador",
+{
+  id: "juan-sebastian",
+  dbId: 8,
 
-    name: "Administrador",
+  name: "Juan Sebastian Abella Quintero",
+  shortName: "Juan Sebastian",
+  initials: "JS",
 
-    shortName: "Administrador",
+  role: "Líder Nacional 2",
 
-    initials: "AD",
+  filterTeam: "Nacional 2",
+  canViewAll: false,
 
-    role: "Administrador",
+  image:
+    `${IMAGE_PATH}JuanSebastianAbellaQuintero.png`,
+},
 
-    filterTeam: "",
 
-    canViewAll: true,
-    
-    image: "",
-  },
+{
+  id: "tatiana-pelaez",
+  dbId: 9,
 
+  name: "Tatiana Pelaez Copete",
+  shortName: "Tatiana Pelaez",
+  initials: "TP",
 
-  /* =======================================================
-     USUARIOS DE EQUIPOS NACIONALES
-     ======================================================= */
+  role: "Líder Nacional 3",
 
-  {
-    id: "diana",
+  filterTeam: "Nacional 3",
+  canViewAll: false,
 
-    name:
-      "Diana Milena Contreras Rodriguez",
+  image:
+    `${IMAGE_PATH}TatianaPelaezCopete.png`,
+},
 
-    shortName: "Diana Milena",
 
-    initials: "DM",
+{
+  id: "ivonne",
+  dbId: 10,
 
-    role: "Líder Nacional 1",
+  name: "Ivonne Adriana Moriones Alvarez",
+  shortName: "Ivonne Adriana",
+  initials: "IA",
 
-    filterTeam: "Nacional 1",
+  role: "Líder Nacional 4",
 
-    canViewAll: false,
+  filterTeam: "Nacional 4",
+  canViewAll: false,
 
-    image:
-      `${IMAGE_PATH}DianaMilenaContreras.png`,
-  },
+  image:
+    `${IMAGE_PATH}IvonneAdrianaMorionesAlvarez.png`,
+},
 
 
-  {
-    id: "juan-sebastian",
+{
+  id: "william",
+  dbId: 11,
 
-    name:
-      "Juan Sebastian Abella Quintero",
+  name: "William Ocampo Arguello",
+  shortName: "William",
+  initials: "WO",
 
-    shortName: "Juan Sebastian",
+  role: "Líder Nacional 5",
 
-    initials: "JS",
+  filterTeam: "Nacional 5",
+  canViewAll: false,
 
-    role: "Líder Nacional 2",
-
-    filterTeam: "Nacional 2",
-
-    canViewAll: false,
-
-    image:
-      `${IMAGE_PATH}JuanSebastianAbellaQuintero.png`,
-  },
-
-
-  {
-    id: "tatiana-pelaez",
-
-    name:
-      "Tatiana Pelaez Copete",
-
-    shortName: "Tatiana Pelaez",
-
-    initials: "TP",
-
-    role: "Líder Nacional 3",
-
-    filterTeam: "Nacional 3",
-
-    canViewAll: false,
-
-    image:
-      `${IMAGE_PATH}TatianaPelaezCopete.png`,
-  },
-
-
-  {
-    id: "ivonne",
-
-    name:
-      "Ivonne Adriana Moriones Alvarez",
-
-    shortName: "Ivonne Adriana",
-
-    initials: "IA",
-
-    role: "Líder Nacional 4",
-
-    filterTeam: "Nacional 4",
-
-    canViewAll: false,
-
-    image:
-      `${IMAGE_PATH}IvonneAdrianaMorionesAlvarez.png`,
-  },
-
-
-  {
-    id: "william",
-
-    name:
-      "William Ocampo Arguello",
-
-    shortName: "William",
-
-    initials: "WO",
-
-    role: "Líder Nacional 5",
-
-    filterTeam: "Nacional 5",
-
-    canViewAll: false,
-
-    image:
-      `${IMAGE_PATH}WilliamOcampoArguello.png`,
-  },
-
+  image:
+    `${IMAGE_PATH}WilliamOcampoArguello.png`,
+},
 ];
-
 
 /* =========================================================
    EQUIPO DE INNOVACIÓN DIGITAL
@@ -6861,11 +6849,25 @@ export default function App() {
      USUARIO
      ======================================================= */
 
-  const [
-  selectedUser,
-  setSelectedUser,
-] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
+const [authenticatedUser, setAuthenticatedUser] = useState(null);
+
+const [loginPassword, setLoginPassword] = useState("");
+
+const [loginError, setLoginError] = useState("");
+
+const [loginLoading, setLoginLoading] = useState(false);
+
+const [showLogin, setShowLogin] = useState(false);
+
+const [showChangePassword, setShowChangePassword] = useState(false);
+
+const [newPassword, setNewPassword] = useState("");
+
+const [confirmPassword, setConfirmPassword] = useState("");
+
+const [changePasswordError, setChangePasswordError] = useState("");
 
   /* =======================================================
      NAVEGACIÓN
@@ -7096,6 +7098,128 @@ export default function App() {
     selectedUser,
   ]);
 
+/* =======================================================
+   AUTENTICACIÓN
+   ======================================================= */
+
+async function handleLogin() {
+  if (!selectedUser) {
+    return;
+  }
+
+  setLoginError("");
+  setLoginLoading(true);
+
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usuario_id: selectedUser.dbId,
+          password: loginPassword,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!data.login) {
+      setLoginError(
+        data.mensaje || "Contraseña incorrecta"
+      );
+      return;
+    }
+
+    setAuthenticatedUser(data.usuario);
+
+    setLoginPassword("");
+    setLoginError("");
+    setShowLogin(false);
+
+    if (data.debe_cambiar_password) {
+      setShowChangePassword(true);
+    }
+
+  } catch (error) {
+    console.error(error);
+
+    setLoginError(
+      "No fue posible conectar con el servidor."
+    );
+
+  } finally {
+    setLoginLoading(false);
+  }
+}
+
+  /* =======================================================
+     CAMBIO DE CONTRASEÑA
+     ======================================================= */
+
+  async function handleChangePassword() {
+    setChangePasswordError("");
+
+    if (!authenticatedUser) {
+      setChangePasswordError("No hay un usuario autenticado.");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(newPassword)) {
+      setChangePasswordError("La contraseña debe tener exactamente 6 dígitos.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setChangePasswordError("Las contraseñas no coinciden.");
+      return;
+    }
+
+    try {
+      const usuarioId =
+        authenticatedUser.id ??
+        authenticatedUser.usuario_id ??
+        selectedUser?.dbId;
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/cambiar-password",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            usuario_id: usuarioId,
+            nueva_password: newPassword,
+          }),
+        }
+      );
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.ok === false || data.login === false) {
+        setChangePasswordError(
+          data.mensaje ||
+            data.detail ||
+            "No fue posible actualizar la contraseña."
+        );
+        return;
+      }
+
+      setNewPassword("");
+      setConfirmPassword("");
+      setChangePasswordError("");
+      setShowChangePassword(false);
+    } catch (error) {
+      console.error(error);
+      setChangePasswordError(
+        "No fue posible conectar con el servidor."
+      );
+    }
+  }
 
   /* =======================================================
      FILAS BASE SEGÚN USUARIO
@@ -7432,314 +7556,158 @@ export default function App() {
    SELECCIÓN INICIAL DE USUARIO
    ======================================================= */
 
-if (!selectedUser) {
+  if (!selectedUser) {
+    const normalizeName = (name = "") =>
+      name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toLowerCase();
 
-  const normalizeName = (name = "") =>
-  name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLowerCase();
+    const tatiana = USERS.find((user) =>
+      normalizeName(user.name).includes("tatiana garcia calderon")
+    );
 
+    const innovationNames = [
+      "glen orillo starke",
+      "juan pablo godoy",
+      "jonathan velasquez",
+      "sthefanie botello",
+    ];
 
-const tatiana = USERS.find(
-  (user) =>
-    normalizeName(user.name).includes(
-      "tatiana garcia calderon"
-    )
-);
+    const nationalNames = [
+      "diana milena contreras rodriguez",
+      "juan sebastian abella quintero",
+      "tatiana pelaez copete",
+      "ivonne adriana moriones alvarez",
+      "william ocampo arguello",
+    ];
 
+    const innovationUsers = USERS.filter((user) =>
+      innovationNames.includes(normalizeName(user.name))
+    );
 
-const innovationNames = [
-  "glen orillo starke",
-  "juan pablo godoy",
-  "jonathan velasquez",
-  "sthefanie botello",
-];
+    const nationalUsers = USERS.filter((user) =>
+      nationalNames.includes(normalizeName(user.name))
+    );
 
+    const administrador = USERS.find(
+      (user) => user.id === "administrador"
+    );
 
-const nationalNames = [
-  "diana milena contreras rodriguez",
-  "juan sebastian abella quintero",
-  "tatiana pelaez copete",
-  "ivonne adriana moriones alvarez",
-  "william ocampo arguello",
-];
+    const openLogin = (user) => {
+      if (!user) return;
+      setSelectedUser(user);
+      setLoginPassword("");
+      setLoginError("");
+      setShowLogin(true);
+      setShowChangePassword(false);
+      setNewPassword("");
+      setConfirmPassword("");
+      setChangePasswordError("");
+    };
 
+    return (
+      <div className="user-selection-screen">
+        <div className="user-selection-content">
+          <h1>Dashboard comercial</h1>
 
-const innovationUsers = USERS.filter(
-  (user) =>
-    innovationNames.includes(
-      normalizeName(user.name)
-    )
-);
+          <p className="user-selection-subtitle">
+            Selecciona tu usuario para acceder al dashboard
+          </p>
 
+          <div className="selection-section">
+            <div className="selection-section-title">
+              <span></span>
+              <strong>DIRECCIÓN COMERCIAL</strong>
+              <span></span>
+            </div>
 
-const nationalUsers = USERS.filter(
-  (user) =>
-    nationalNames.includes(
-      normalizeName(user.name)
-    )
-);
-
-  return (
-    <div className="user-selection-screen">
-
-      <div className="user-selection-content">
-
-        {/* =================================================
-            TÍTULO
-        ================================================= */}
-
-        <h1>
-          Dashboard comercial
-        </h1>
-
-        <p className="user-selection-subtitle">
-          Selecciona tu usuario para acceder al dashboard
-        </p>
-
-
-        {/* =================================================
-            DIRECCIÓN COMERCIAL
-        ================================================= */}
-
-        <div className="selection-section">
-
-          <div className="selection-section-title">
-
-            <span></span>
-
-            <strong>
-              DIRECCIÓN COMERCIAL
-            </strong>
-
-            <span></span>
-
+            {tatiana && (
+              <button
+                type="button"
+                className="selection-director-card"
+                onClick={() => openLogin(tatiana)}
+              >
+                <UserAvatar user={tatiana} size="large" />
+                <strong>{tatiana.name}</strong>
+                <span>{tatiana.role}</span>
+              </button>
+            )}
           </div>
 
+          <div className="selection-section">
+            <div className="selection-section-title">
+              <span></span>
+              <strong>ÁREA DE INNOVACIÓN DIGITAL</strong>
+              <span></span>
+            </div>
 
-          {tatiana && (
-
-            <button
-              type="button"
-              className="selection-director-card"
-              onClick={() =>
-                setSelectedUser(tatiana)
-              }
-            >
-
-              <UserAvatar
-                user={tatiana}
-                size="large"
-              />
-
-
-              <strong>
-                {tatiana.name}
-              </strong>
-
-
-              <span>
-                {tatiana.role}
-              </span>
-
-
-
-            </button>
-
-          )}
-
-        </div>
-
-
-        {/* =================================================
-            ÁREA DE INNOVACIÓN DIGITAL
-        ================================================= */}
-
-        <div className="selection-section">
-
-          <div className="selection-section-title">
-
-            <span></span>
-
-            <strong>
-              ÁREA DE INNOVACIÓN DIGITAL
-            </strong>
-
-            <span></span>
-
-          </div>
-
-
-          <div className="selection-innovation-grid">
-
-            {innovationUsers.map(
-              (user) => (
-
+            <div className="selection-innovation-grid">
+              {innovationUsers.map((user) => (
                 <button
                   type="button"
                   key={user.id}
                   className="selection-innovation-card"
-
-                  onClick={() =>
-                    setSelectedUser(user)
-                  }
+                  onClick={() => openLogin(user)}
                 >
-
-                  <UserAvatar
-                    user={user}
-                    size="large"
-                  />
-
-
-                  <strong>
-                    {user.name}
-                  </strong>
-
-
-                  <span>
-                    {user.role}
-                  </span>
-
-
-
+                  <UserAvatar user={user} size="large" />
+                  <strong>{user.name}</strong>
+                  <span>{user.role}</span>
                 </button>
-
-              )
-            )}
-
+              ))}
+            </div>
           </div>
 
-        </div>
+          <div className="selection-section">
+            <div className="selection-section-title">
+              <span></span>
+              <strong>NACIONALES</strong>
+              <span></span>
+            </div>
 
-
-        {/* =================================================
-            EQUIPOS NACIONALES
-        ================================================= */}
-
-        <div className="selection-section">
-
-          <div className="selection-section-title">
-
-            <span></span>
-
-            <strong>
-              NACIONALES
-            </strong>
-
-            <span></span>
-
-          </div>
-
-
-          <div className="selection-national-grid">
-
-            {nationalUsers.map(
-              (user) => (
-
+            <div className="selection-national-grid">
+              {nationalUsers.map((user) => (
                 <button
                   type="button"
                   key={user.id}
                   className="selection-national-card"
-
-                  onClick={() =>
-                    setSelectedUser(user)
-                  }
+                  onClick={() => openLogin(user)}
                 >
-
-                  <UserAvatar
-                    user={user}
-                    size="large"
-                  />
-
-
-                  <strong>
-                    {user.name}
-                  </strong>
-
-
-                  <span>
-                    {user.role}
-                  </span>
-
-
-
+                  <UserAvatar user={user} size="large" />
+                  <strong>{user.name}</strong>
+                  <span>{user.role}</span>
                 </button>
-
-              )
-            )}
-
+              ))}
+            </div>
           </div>
 
-        </div>
+          {administrador && (
+            <button
+              type="button"
+              className="selection-admin-card"
+              onClick={() => openLogin(administrador)}
+              aria-label="Ingresar como Administrador"
+            >
+              <UserAvatar user={administrador} size="small" />
+              <div>
+                <strong>Administrador</strong>
+                <span>Acceso total</span>
+              </div>
+            </button>
+          )}
 
-
-        {/* =================================================
-            BOTÓN
-        ================================================= */}
-
-        <button
-          type="button"
-          className="selection-user-button"
-          disabled
-        >
-          Selecciona un usuario
-        </button>
-
-
-        {/* =================================================
-            ADMINISTRADOR
-        ================================================= */}
-
-        <button
-          type="button"
-          className="selection-admin-card"
-          onClick={() =>
-            setSelectedUser(
-              USERS.find(
-                (user) =>
-                  user.id === "administrador"
-              )
-            )
-          }
-        >
-          <UserAvatar
-            user={
-              USERS.find(
-                (user) =>
-                  user.id === "administrador"
-              )
-            }
-            size="small"
-          />
-
-          <div>
-            <strong>
-              Administrador
-            </strong>
-
-            <span>
-              Administrador
-            </span>
+          <div className="selection-footer">
+            Prisa Media · Área de Innovación Digital
           </div>
-        </button>
-
-
-        <div className="selection-footer">
-          Prisa Media · Área de Innovación Digital
         </div>
-
       </div>
+    );
+  }
 
-    </div>
-  );
-
-}
-
-  /* =======================================================
-     LOADING
-     ======================================================= */
+/* =======================================================
+   LOADING
+   ======================================================= */
 
   if (
     loading
@@ -8132,6 +8100,165 @@ const nationalUsers = USERS.filter(
 
       </main>
 
+
+      {/* ===================================================
+         AUTENTICACIÓN
+         =================================================== */}
+
+      {showLogin && selectedUser && (
+        <div
+          className="auth-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="login-title"
+        >
+          <div className="login-card">
+            <UserAvatar user={selectedUser} size="medium" />
+
+            <h2 id="login-title">Ingresar</h2>
+            <p>{selectedUser.name}</p>
+
+            <label htmlFor="login-password">
+              Contraseña de 6 dígitos
+            </label>
+
+            <input
+              id="login-password"
+              type="password"
+              inputMode="numeric"
+              autoComplete="current-password"
+              maxLength={6}
+              value={loginPassword}
+              onChange={(event) =>
+                setLoginPassword(
+                  event.target.value.replace(/\D/g, "").slice(0, 6)
+                )
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleLogin();
+                }
+              }}
+              placeholder="••••••"
+              autoFocus
+            />
+
+            {loginError && (
+              <div className="login-error">{loginError}</div>
+            )}
+
+            <button
+              type="button"
+              className="login-button"
+              onClick={handleLogin}
+              disabled={
+                loginLoading || !/^\d{6}$/.test(loginPassword)
+              }
+            >
+              {loginLoading ? "Ingresando..." : "Ingresar"}
+            </button>
+
+            <button
+              type="button"
+              className="login-back-button"
+              onClick={() => {
+                setShowLogin(false);
+                setLoginPassword("");
+                setLoginError("");
+                setSelectedUser(null);
+              }}
+              disabled={loginLoading}
+            >
+              Volver
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showChangePassword && authenticatedUser && (
+        <div
+          className="auth-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="change-password-title"
+        >
+          <div className="change-password-card">
+            <UserAvatar
+              user={selectedUser}
+              size="medium"
+            />
+
+            <h2 id="change-password-title">
+              Actualizar contraseña
+            </h2>
+
+            <p>
+              Por seguridad, crea una nueva contraseña de 6 dígitos.
+            </p>
+
+            <label htmlFor="new-password">
+              Nueva contraseña
+            </label>
+            <input
+              id="new-password"
+              type="password"
+              inputMode="numeric"
+              autoComplete="new-password"
+              maxLength={6}
+              value={newPassword}
+              onChange={(event) =>
+                setNewPassword(
+                  event.target.value.replace(/\D/g, "").slice(0, 6)
+                )
+              }
+              placeholder="••••••"
+              autoFocus
+            />
+
+            <label htmlFor="confirm-password">
+              Confirmar contraseña
+            </label>
+            <input
+              id="confirm-password"
+              type="password"
+              inputMode="numeric"
+              autoComplete="new-password"
+              maxLength={6}
+              value={confirmPassword}
+              onChange={(event) =>
+                setConfirmPassword(
+                  event.target.value.replace(/\D/g, "").slice(0, 6)
+                )
+              }
+              placeholder="••••••"
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleChangePassword();
+                }
+              }}
+            />
+
+            {changePasswordError && (
+              <div className="login-error">
+                {changePasswordError}
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="login-button"
+              onClick={handleChangePassword}
+              disabled={
+                !/^\d{6}$/.test(newPassword) ||
+                !/^\d{6}$/.test(confirmPassword) ||
+                newPassword !== confirmPassword
+              }
+            >
+              Guardar contraseña
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ===================================================
          MODAL

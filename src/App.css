@@ -5621,46 +5621,6 @@ img {
 
 
 /* =========================================================
-   BOTÓN SELECCIONAR
-   ========================================================= */
-
-.selection-user-button {
-  width:
-    145px;
-
-  height:
-    32px;
-
-  margin-top:
-    17px;
-
-  color:
-    #f1f2f5;
-
-  background:
-    #7b1036;
-
-  border-radius:
-    6px;
-
-  font-size:
-    10px;
-
-  font-weight:
-    700;
-}
-
-
-.selection-user-button:disabled {
-  opacity:
-    1;
-
-  cursor:
-    default;
-}
-
-
-/* =========================================================
    FOOTER
    ========================================================= */
 
@@ -5964,10 +5924,6 @@ img {
 .selection-national-card > span {
   font-size: 8px;
 }
-/* Ocultar botón inferior de selección */
-.selection-user-button {
-  display: none;
-}
 /* =========================================================
    AJUSTE FINAL — PANTALLA DE USUARIOS
    ========================================================= */
@@ -6041,15 +5997,6 @@ img {
 .user-selection-content {
   margin-left: auto;
   margin-right: auto;
-}
-
-
-/* =========================================================
-   QUITAR BOTÓN INFERIOR
-   ========================================================= */
-
-.selection-user-button {
-  display: none !important;
 }
 
 
@@ -6149,4 +6096,168 @@ img {
   color: var(--pink);
   font-size: 7px;
   font-weight: 600;
+}
+
+/* =========================================================
+   LOGIN Y ACTUALIZACIÓN DE CONTRASEÑA
+   ========================================================= */
+
+.login-card,
+.change-password-card {
+  width: min(380px, 100%);
+  margin: auto;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #13161e;
+  border: 1px solid #292d38;
+  border-radius: 10px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+}
+
+.login-card h2,
+.change-password-card h2 {
+  margin: 0 0 4px;
+  color: #f0f1f4;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.login-card p {
+  margin: 0 0 10px;
+  color: #777c8e;
+  font-size: 11px;
+  text-align: center;
+}
+
+.login-card label,
+.change-password-card label {
+  margin-top: 5px;
+  color: #d9dbe2;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.login-card input,
+.change-password-card input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  color: #f0f1f4;
+  background: #0e1016;
+  border: 1px solid #303543;
+  border-radius: 7px;
+  outline: none;
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  text-align: center;
+}
+
+.login-card input:focus,
+.change-password-card input:focus {
+  border-color: rgba(230, 25, 122, 0.55);
+  box-shadow: 0 0 0 2px rgba(230, 25, 122, 0.08);
+}
+
+.login-card input::placeholder,
+.change-password-card input::placeholder {
+  color: #555a69;
+}
+
+.login-error {
+  margin-top: 3px;
+  color: #ef668e;
+  font-size: 10px;
+  text-align: center;
+}
+
+.login-button {
+  width: 100%;
+  height: 38px;
+  margin-top: 8px;
+  color: #fff;
+  background: #e6197a;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.login-button:hover:not(:disabled) {
+  background: #c91469;
+}
+
+.login-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.login-back-button {
+  color: #777c8e;
+  background: transparent;
+  font-size: 10px;
+}
+
+.login-back-button:hover {
+  color: #d9dbe2;
+}
+
+
+/* =========================================================
+   CAPA DE AUTENTICACION
+   ========================================================= */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(7, 8, 12, 0.78);
+  backdrop-filter: blur(5px);
+  box-sizing: border-box;
+}
+
+.auth-overlay .login-card,
+.auth-overlay .change-password-card {
+  position: relative;
+  box-sizing: border-box;
+  align-items: stretch;
+}
+
+.auth-overlay .login-card > .avatar,
+.auth-overlay .change-password-card > .avatar {
+  align-self: center;
+}
+
+.auth-overlay .login-card p,
+.auth-overlay .change-password-card p {
+  margin: 0 0 8px;
+}
+
+.auth-overlay .login-back-button {
+  width: 100%;
+  min-height: 32px;
+  border: 0;
+  cursor: pointer;
+}
+
+.auth-overlay .login-back-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 520px) {
+  .auth-overlay {
+    padding: 14px;
+  }
+
+  .auth-overlay .login-card,
+  .auth-overlay .change-password-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 22px 18px;
+  }
 }
