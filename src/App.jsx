@@ -7009,7 +7009,7 @@ async function handleLogin() {
 
   try {
     const response = await fetch(
-      "http://127.0.0.1:8000/login",
+      "https://dashboard-comercial-q77m.onrender.com/login",
       {
         method: "POST",
         headers: {
@@ -7082,7 +7082,7 @@ async function handleLogin() {
         selectedUser?.dbId;
 
       const response = await fetch(
-        "http://127.0.0.1:8000/cambiar-password",
+        "https://dashboard-comercial-q77m.onrender.com/cambiar-password",
         {
           method: "POST",
           headers: {
