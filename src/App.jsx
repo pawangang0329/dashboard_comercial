@@ -3708,10 +3708,11 @@ function KpiCard({
   label,
   value,
   sublabel,
+  className = "",
 }) {
 
   return (
-    <div className="kpi-card">
+    <div className={`kpi-card ${className}`}>
 
       <div className="kpi-card-icon">
 
@@ -5426,70 +5427,31 @@ function SummaryView({
       <div className="summary-kpi-grid">
 
         <KpiCard
-          icon={
-            Users
-          }
-
-          label="Marcas activas"
-
-          value={
-            summary.brands
-          }
-
-          sublabel="Marcas únicas"
+          icon={FileText}
+          label="Propuestas en seguimiento"
+          value={summary.followUp}
+          sublabel="Actividades en curso"
+          className="summary-status-card summary-status-followup"
         />
 
-
         <KpiCard
-          icon={
-            FileText
-          }
-
-          label="Propuestas desarrolladas"
-
-          value={
-            summary.proposals
-          }
-
-          sublabel="Registros del Excel"
+          icon={CheckCircle2}
+          label="Propuestas cerradas"
+          value={summary.closed}
+          sublabel="Propuestas finalizadas / vendidas"
+          className="summary-status-card summary-status-closed"
         />
 
-
         <KpiCard
-          icon={
-            CheckCircle2
-          }
-
-          label="Valor propuestas cerradas"
-
+          icon={Lightbulb}
+          label="Oportunidad de propuesta"
           value={
-            formatMoneyShort(
-              summary.closedValue
-            )
+            statusData.find(
+              (item) => item.key === "oportunidad"
+            )?.value ?? 0
           }
-
-          sublabel={
-            `${summary.closed} cerradas`
-          }
-        />
-
-
-        <KpiCard
-          icon={
-            TrendingUp
-          }
-
-          label="Valor propuestas en seguimiento"
-
-          value={
-            formatMoneyShort(
-              summary.followUpValue
-            )
-          }
-
-          sublabel={
-            `${summary.followUp} en seguimiento`
-          }
+          sublabel="Cuentas por desarrollar"
+          className="summary-status-card summary-status-opportunity"
         />
 
       </div>
