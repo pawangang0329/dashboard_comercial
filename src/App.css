@@ -6367,3 +6367,206 @@ img {
     padding: 22px 18px;
   }
 }
+/* =========================================================
+   TARJETAS DE VALOR - DEBAJO DE LAS GRÁFICAS
+   ========================================================= */
+
+.summary-value-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+
+
+.summary-value-card {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+
+  min-width: 0;
+  min-height: 116px;
+
+  gap: 14px;
+  padding: 20px;
+
+  background: var(--panel);
+
+  border: 1px solid var(--border);
+  border-radius: 15px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   BARRA LATERAL
+   ========================================================= */
+
+.summary-value-followup {
+  border-left: 4px solid var(--pink);
+}
+
+.summary-value-closed {
+  border-left: 4px solid var(--green);
+}
+
+
+/* =========================================================
+   ICONOS
+   ========================================================= */
+
+.summary-value-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 10px;
+}
+
+
+.summary-value-followup .summary-value-icon {
+  color: var(--pink);
+  background: var(--pink-soft);
+
+  border: 1px solid rgba(230, 25, 122, 0.16);
+}
+
+
+.summary-value-closed .summary-value-icon {
+  color: var(--green);
+  background: var(--green-soft);
+
+  border: 1px solid rgba(49, 189, 109, 0.16);
+}
+
+
+/* =========================================================
+   CONTENIDO
+   ========================================================= */
+
+.summary-value-content {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns: 1fr auto;
+
+  column-gap: 24px;
+  row-gap: 4px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* TÍTULO */
+
+.summary-value-content > strong {
+  grid-column: 1;
+
+  color: #e9ebef;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  line-height: 1.25;
+}
+
+
+/* DESCRIPCIÓN */
+
+.summary-value-content > span {
+  grid-column: 1;
+
+  color: #8b8fa0;
+
+  font-size: 12px;
+
+  line-height: 1.3;
+}
+
+
+/* VALOR PRINCIPAL */
+
+.summary-value-main {
+  grid-column: 1;
+
+  color: #f1f2f5;
+
+  font-size: 25px;
+  font-weight: 700;
+
+  line-height: 1.15;
+
+  margin-top: 2px;
+}
+
+
+/* DATOS DE LA DERECHA */
+
+.summary-value-meta {
+  grid-column: 2;
+
+  grid-row: 1 / span 3;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: flex-start;
+
+  gap: 4px;
+
+  color: #8b8fa0;
+
+  font-size: 12px;
+
+  line-height: 1.3;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .summary-value-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .summary-value-card {
+    min-height: auto;
+    padding: 16px;
+  }
+
+  .summary-value-content {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-value-meta {
+    grid-column: 1;
+    grid-row: auto;
+
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+}

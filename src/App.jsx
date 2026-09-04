@@ -5722,6 +5722,107 @@ function SummaryView({
 
       </div>
 
+            {/* =================================================
+         KPIs DE VALOR
+         ================================================= */}
+
+      <div className="summary-value-kpi-grid">
+
+        <div className="summary-value-card summary-value-followup">
+
+          <div className="summary-value-icon">
+            <FileText
+              size={20}
+              strokeWidth={1.8}
+            />
+          </div>
+
+          <div className="summary-value-content">
+
+            <strong>
+              Propuestas en seguimiento
+            </strong>
+
+            <span>
+              Valor total estimado
+            </span>
+
+            <div className="summary-value-main">
+              {formatMoneyShort(
+                summary.followUpValue
+              )}
+            </div>
+
+            <div className="summary-value-meta">
+              <span>
+                {summary.followUp} propuestas
+              </span>
+
+              <span>
+                {summary.totalValue > 0
+                  ? Math.round(
+                      (summary.followUpValue /
+                        summary.totalValue) *
+                        100
+                    )
+                  : 0}
+                % del total
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div className="summary-value-card summary-value-closed">
+
+          <div className="summary-value-icon">
+            <CheckCircle2
+              size={20}
+              strokeWidth={1.8}
+            />
+          </div>
+
+          <div className="summary-value-content">
+
+            <strong>
+              Propuestas cerradas
+            </strong>
+
+            <span>
+              Valor total vendido
+            </span>
+
+            <div className="summary-value-main">
+              {formatMoneyShort(
+                summary.closedValue
+              )}
+            </div>
+
+            <div className="summary-value-meta">
+              <span>
+                {summary.closed} propuestas
+              </span>
+
+              <span>
+                {summary.totalValue > 0
+                  ? Math.round(
+                      (summary.closedValue /
+                        summary.totalValue) *
+                        100
+                    )
+                  : 0}
+                % del total
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
 
       {/* =================================================
          TOP MARCAS
