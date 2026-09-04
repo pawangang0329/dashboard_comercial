@@ -1113,9 +1113,9 @@ function formatMoneyShort(value) {
     1000000000
   ) {
 
-    return `$${(
+    return `COP $${(
       amount / 1000000000
-    ).toFixed(1)} B`;
+    ).toFixed(1)} mil millones`;
 
   }
 
@@ -1125,9 +1125,9 @@ function formatMoneyShort(value) {
     1000000
   ) {
 
-    return `$${(
+    return `COP $${(
       amount / 1000000
-    ).toFixed(1)} M`;
+    ).toFixed(1)} millones`;
 
   }
 
@@ -1137,9 +1137,9 @@ function formatMoneyShort(value) {
     1000
   ) {
 
-    return `$${(
+    return `COP $${(
       amount / 1000
-    ).toFixed(1)} K`;
+    ).toFixed(1)} mil`;
 
   }
 
@@ -1149,7 +1149,6 @@ function formatMoneyShort(value) {
   );
 
 }
-
 
 /* =========================================================
    FORMATEAR FECHA
