@@ -1317,7 +1317,7 @@ function getUserImage(name) {
     normalized.includes("juan sebastian")
   ) {
 
-    return `${IMAGE_PATH}JuanSebastianAbellaQuintero.png`;
+    return `${IMAGE_PATH}JuanSebastianAbella.png`;
 
   }
 
@@ -1326,7 +1326,7 @@ function getUserImage(name) {
     normalized.includes("tatiana pelaez")
   ) {
 
-    return `${IMAGE_PATH}TatianaPelaezCopete.png`;
+    return `${IMAGE_PATH}TatianaPelaez.png`;
 
   }
 
@@ -1344,7 +1344,7 @@ function getUserImage(name) {
     normalized.includes("william")
   ) {
 
-    return `${IMAGE_PATH}WilliamOcampoArguello.png`;
+    return `${IMAGE_PATH}WilliamOcampo.png`;
 
   }
 
