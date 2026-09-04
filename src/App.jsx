@@ -246,7 +246,7 @@ const USERS = [
   canViewAll: false,
 
   image:
-    `${IMAGE_PATH}JuanSebastianAbellaQuintero.png`,
+     `${IMAGE_PATH}JuanSebastianAbella.png`,
 },
 
 
@@ -264,7 +264,7 @@ const USERS = [
   canViewAll: false,
 
   image:
-    `${IMAGE_PATH}TatianaPelaezCopete.png`,
+    `${IMAGE_PATH}TatianaPelaez.png`,
 },
 
 
@@ -300,7 +300,7 @@ const USERS = [
   canViewAll: false,
 
   image:
-    `${IMAGE_PATH}WilliamOcampoArguello.png`,
+    `${IMAGE_PATH}WilliamOcampo.png`,
 },
 ];
 
@@ -1267,94 +1267,140 @@ function getUserImage(name) {
     normalizeText(name);
 
 
+  /* =========================
+     EQUIPO INNOVACIÓN DIGITAL
+     ========================= */
+
   if (
     normalized.includes("glen")
   ) {
-
     return `${IMAGE_PATH}GlenHD.png`;
-
   }
-
 
   if (
     normalized.includes("juan pablo")
   ) {
-
     return `${IMAGE_PATH}JuanPabloHD.png`;
-
   }
-
 
   if (
     normalized.includes("jonathan")
   ) {
-
     return `${IMAGE_PATH}JonathanHD.png`;
-
   }
-
 
   if (
     normalized.includes("sthefanie") ||
     normalized.includes("stefanie")
   ) {
-
     return `${IMAGE_PATH}sthef1HD.png`;
-
   }
 
+
+  /* =========================
+     LÍDERES NACIONALES
+     ========================= */
 
   if (
-    normalized.includes("diana")
+    normalized.includes("diana milena")
   ) {
-
     return `${IMAGE_PATH}DianaMilenaContreras.png`;
-
   }
-
 
   if (
     normalized.includes("juan sebastian")
   ) {
-
     return `${IMAGE_PATH}JuanSebastianAbella.png`;
-
   }
-
 
   if (
     normalized.includes("tatiana pelaez")
   ) {
-
     return `${IMAGE_PATH}TatianaPelaez.png`;
-
   }
-
 
   if (
     normalized.includes("ivonne")
   ) {
-
     return `${IMAGE_PATH}IvonneAdrianaMorionesAlvarez.png`;
-
   }
-
 
   if (
     normalized.includes("william")
   ) {
-
     return `${IMAGE_PATH}WilliamOcampo.png`;
-
   }
-
 
   if (
     normalized.includes("tatiana garcia")
   ) {
-
     return `${IMAGE_PATH}TatianaGarciaHD.png`;
+  }
 
+
+  /* =========================
+     EJECUTIVOS NACIONALES
+     ========================= */
+
+  if (
+    normalized.includes("ana maria")
+  ) {
+    return `${IMAGE_PATH}AnaMariaCastañeda.png`;
+  }
+
+  if (
+  normalized.includes("carol")
+) {
+  return `${IMAGE_PATH}CarolBeltran.png`;
+}
+
+  if (
+    normalized.includes("carolina diaz")
+  ) {
+    return `${IMAGE_PATH}CarolinaDiaz.png`;
+  }
+
+  if (
+  normalized.includes("diana") &&
+  normalized.includes("rodriguez")
+) {
+  return `${IMAGE_PATH}DianaAndreaRodriguez.png`;
+}
+
+  if (
+    normalized.includes("gina tinjaca")
+  ) {
+    return `${IMAGE_PATH}GinaTinjaca.png`;
+  }
+
+  if (
+    normalized.includes("helen fajardo")
+  ) {
+    return `${IMAGE_PATH}HelenFajardo.png`;
+  }
+
+  if (
+    normalized.includes("luisa escobar")
+  ) {
+    return `${IMAGE_PATH}LuisaEscobar.png`;
+  }
+
+  if (
+    normalized.includes("luz karime")
+  ) {
+    return `${IMAGE_PATH}LuzKarimeHernandez.png`;
+  }
+
+  if (
+    normalized.includes("nicole hincapie")
+  ) {
+    return `${IMAGE_PATH}NicoleHincapie.png`;
+  }
+
+  if (
+    normalized.includes("raul herrera")
+  ) {
+    return `${IMAGE_PATH}RaulHerrera.png`;
   }
 
 
@@ -4554,11 +4600,12 @@ function NationalTeamSection({
                                   )
                                 }
                               >
-                                <div className="national-executive-avatar">
-                                  {getInitials(
-                                    executive
-                                  )}
-                                </div>
+                                <Avatar
+                                  name={executive}
+                                  initials={getInitials(executive)}
+                                  image={getUserImage(executive)}
+                                  size="medium"
+                                />
 
                                 <div className="national-executive-info">
                                   <strong>
