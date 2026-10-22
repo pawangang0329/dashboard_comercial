@@ -184,6 +184,9 @@ const USERS = [
   filterTeam: "",
   canViewAll: true,
 
+  // Entra directo al dashboard, sin pedir contraseña
+  noPassword: true,
+
   image:
     `${IMAGE_PATH}sthef1HD.png`,
 },
@@ -7604,6 +7607,17 @@ async function handleLogin() {
     const openLogin = (user) => {
       if (!user) return;
       setSelectedUser(user);
+
+      // Usuarios sin contraseña: entran directo, sin ventana de login
+      if (user.noPassword) {
+        setAuthenticatedUser({
+          id: user.dbId,
+          nombre: user.name,
+        });
+        setShowLogin(false);
+        return;
+      }
+
       setLoginPassword("");
       setLoginError("");
       setShowLogin(true);
