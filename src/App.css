@@ -2126,6 +2126,539 @@ img {
 
 
 /* =========================================================
+   PROPUESTAS POR MES Y SEMANA
+   ========================================================= */
+
+.period-panel {
+  margin-top:
+    10px;
+}
+
+.dashboard-panel-header .period-legend {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    6px;
+
+  margin:
+    0;
+
+  color:
+    var(--muted);
+
+  font-size:
+    10px;
+
+  font-weight:
+    600;
+
+  letter-spacing:
+    0;
+}
+
+.period-dot {
+  display:
+    inline-block;
+
+  width:
+    8px;
+
+  height:
+    8px;
+
+  margin-left:
+    6px;
+
+  border-radius:
+    2px;
+}
+
+.period-dot-requested,
+.period-bar-requested {
+  background:
+    var(--pink);
+}
+
+.period-dot-delivered,
+.period-bar-delivered {
+  background:
+    var(--blue);
+}
+
+.period-body {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    12px;
+
+  padding:
+    12px 14px 14px;
+}
+
+.period-months {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    6px;
+}
+
+.period-month-chip {
+  height:
+    28px;
+
+  padding:
+    0 11px;
+
+  color:
+    var(--text-soft);
+
+  font-size:
+    11px;
+
+  font-weight:
+    600;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    6px;
+
+  cursor:
+    pointer;
+}
+
+.period-month-chip:hover {
+  color:
+    var(--text);
+}
+
+.period-month-chip.active {
+  color:
+    #fff;
+
+  background:
+    var(--pink-soft);
+
+  border-color:
+    var(--pink);
+}
+
+.period-totals {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap:
+    8px;
+}
+
+.period-total {
+  display:
+    flex;
+
+  align-items:
+    baseline;
+
+  gap:
+    8px;
+
+  padding:
+    10px 12px;
+
+  background:
+    var(--panel-2);
+
+  border:
+    1px solid var(--border-soft);
+
+  border-left:
+    3px solid var(--pink);
+
+  border-radius:
+    7px;
+}
+
+.period-total-delivered {
+  border-left-color:
+    var(--blue);
+}
+
+.period-total strong {
+  color:
+    var(--text);
+
+  font-size:
+    22px;
+
+  font-weight:
+    700;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.period-total span {
+  color:
+    var(--muted);
+
+  font-size:
+    11px;
+}
+
+.period-rows {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    4px;
+}
+
+.period-row {
+  display:
+    grid;
+
+  grid-template-columns:
+    130px minmax(0, 1fr);
+
+  align-items:
+    center;
+
+  gap:
+    12px;
+
+  width:
+    100%;
+
+  padding:
+    8px 10px;
+
+  text-align:
+    left;
+
+  background:
+    transparent;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    7px;
+
+  cursor:
+    pointer;
+}
+
+.period-row:hover {
+  background:
+    rgba(255, 255, 255, 0.03);
+}
+
+.period-row.active {
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border-color:
+    var(--border);
+}
+
+.period-row-label {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    2px;
+}
+
+.period-row-label strong {
+  color:
+    #d6d8df;
+
+  font-size:
+    12px;
+
+  font-weight:
+    650;
+}
+
+.period-row-label span {
+  color:
+    var(--muted);
+
+  font-size:
+    10px;
+}
+
+.period-row-bars {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    4px;
+}
+
+.period-bar-line {
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(0, 1fr) 28px;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+}
+
+.period-bar-track {
+  height:
+    8px;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  border-radius:
+    4px;
+
+  overflow:
+    hidden;
+}
+
+.period-bar {
+  height:
+    100%;
+
+  border-radius:
+    4px;
+
+  transition:
+    width 0.25s ease;
+}
+
+.period-bar-line b {
+  color:
+    var(--text-soft);
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+
+  text-align:
+    right;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.period-hint {
+  margin:
+    0;
+
+  color:
+    var(--muted);
+
+  font-size:
+    11px;
+}
+
+.period-list {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  max-height:
+    360px;
+
+  overflow-y:
+    auto;
+
+  border:
+    1px solid var(--border-soft);
+
+  border-radius:
+    7px;
+}
+
+.period-list-item {
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(0, 1fr) auto auto;
+
+  align-items:
+    center;
+
+  gap:
+    12px;
+
+  width:
+    100%;
+
+  padding:
+    9px 12px;
+
+  text-align:
+    left;
+
+  background:
+    transparent;
+
+  border:
+    0;
+
+  border-bottom:
+    1px solid var(--border-soft);
+
+  cursor:
+    pointer;
+}
+
+.period-list-item:last-child {
+  border-bottom:
+    0;
+}
+
+.period-list-item:hover {
+  background:
+    rgba(255, 255, 255, 0.03);
+}
+
+.period-list-info {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  min-width:
+    0;
+
+  gap:
+    2px;
+}
+
+.period-list-info strong {
+  overflow:
+    hidden;
+
+  color:
+    #d6d8df;
+
+  font-size:
+    12px;
+
+  font-weight:
+    650;
+
+  white-space:
+    nowrap;
+
+  text-overflow:
+    ellipsis;
+}
+
+.period-list-info span {
+  color:
+    var(--muted);
+
+  font-size:
+    10px;
+}
+
+.period-list-dates {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    2px;
+
+  color:
+    var(--muted-2);
+
+  font-size:
+    10px;
+
+  white-space:
+    nowrap;
+}
+
+.period-list-dates .requested {
+  color:
+    var(--pink);
+}
+
+.period-list-dates .delivered {
+  color:
+    var(--blue);
+}
+
+@media (max-width: 640px) {
+
+  .dashboard-panel-header .period-legend {
+    display:
+      none;
+  }
+
+  .period-row {
+    grid-template-columns:
+      88px minmax(0, 1fr);
+
+    gap:
+      8px;
+  }
+
+  .period-list-item {
+    grid-template-columns:
+      minmax(0, 1fr) auto;
+  }
+
+  .period-list-item > :last-child {
+    grid-column:
+      1 / -1;
+
+    justify-self:
+      start;
+  }
+
+}
+
+
+/* =========================================================
    GRIDS DE ESTADÍSTICAS
    ========================================================= */
 

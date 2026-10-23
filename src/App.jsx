@@ -1222,6 +1222,174 @@ function formatDate(value) {
 
 
 /* =========================================================
+   FECHAS PARA PERIODOS (MES / SEMANA)
+   ========================================================= */
+
+const MONTH_NAMES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+const MONTH_SHORT = [
+  "ene", "feb", "mar", "abr", "may", "jun",
+  "jul", "ago", "sep", "oct", "nov", "dic",
+];
+
+
+/*
+ * Convierte el valor de una celda de fecha
+ * en un Date a medianoche (hora local).
+ * Acepta Date, número serial de Excel
+ * y textos tipo "dd/mm/aaaa".
+ */
+
+function toDay(value) {
+
+  if (!value) {
+    return null;
+  }
+
+  let date = null;
+
+  if (value instanceof Date) {
+
+    date = value;
+
+  } else if (typeof value === "number") {
+
+    const parsed = XLSX.SSF.parse_date_code(value);
+
+    if (parsed) {
+      date = new Date(parsed.y, parsed.m - 1, parsed.d);
+    }
+
+  } else {
+
+    const text = String(value).trim();
+
+    const match = text.match(
+      /^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})$/
+    );
+
+    if (match) {
+
+      const year =
+        match[3].length === 2
+          ? 2000 + Number(match[3])
+          : Number(match[3]);
+
+      date = new Date(year, Number(match[2]) - 1, Number(match[1]));
+
+    } else {
+
+      date = new Date(text);
+
+    }
+
+  }
+
+  if (!date || Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+
+}
+
+
+function getMonthKey(date) {
+
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+}
+
+
+function getMonthLabel(monthKey) {
+
+  const [year, month] = monthKey.split("-").map(Number);
+
+  return `${MONTH_NAMES[month - 1]} ${year}`;
+
+}
+
+
+/*
+ * Semanas de lunes a domingo,
+ * recortadas a los días del mes.
+ */
+
+function getWeeksOfMonth(monthKey) {
+
+  const [year, month] = monthKey.split("-").map(Number);
+
+  const lastDay = new Date(year, month, 0).getDate();
+
+  const weeks = [];
+
+  let day = 1;
+
+  while (day <= lastDay) {
+
+    const start = new Date(year, month - 1, day);
+
+    // getDay(): 0 = domingo. Días que faltan para el domingo.
+    const daysToSunday = (7 - start.getDay()) % 7;
+
+    const endDay = Math.min(day + daysToSunday, lastDay);
+
+    const end = new Date(year, month - 1, endDay);
+
+    weeks.push({
+      key: `${monthKey}-w${weeks.length + 1}`,
+      label: `Semana ${weeks.length + 1}`,
+      range:
+        day === endDay
+          ? `${day} ${MONTH_SHORT[month - 1]}`
+          : `${day} – ${endDay} ${MONTH_SHORT[month - 1]}`,
+      start,
+      end,
+    });
+
+    day = endDay + 1;
+
+  }
+
+  return weeks;
+
+}
+
+
+function isInRange(date, start, end) {
+
+  return (
+    date !== null &&
+    date.getTime() >= start.getTime() &&
+    date.getTime() <= end.getTime()
+  );
+
+}
+
+
+function countInRange(datedRows, start, end) {
+
+  let solicitadas = 0;
+  let entregadas = 0;
+
+  datedRows.forEach((item) => {
+    if (isInRange(item.solicitud, start, end)) solicitadas++;
+    if (isInRange(item.entrega, start, end)) entregadas++;
+  });
+
+  return { solicitadas, entregadas };
+
+}
+
+
+/* =========================================================
    OBTENER INICIALES
    ========================================================= */
 
@@ -5400,6 +5568,371 @@ function ActiveFilters({
    RESUMEN GENERAL
    ========================================================= */
 
+/* =========================================================
+   PROPUESTAS POR MES Y SEMANA
+   ========================================================= */
+
+/*
+ * Una propuesta cuenta como "solicitada" en el periodo
+ * si su FECHA SOLICITUD cae dentro del rango, y como
+ * "entregada" si su FECHA DE ENTREGA cae dentro del rango.
+ */
+
+function PeriodSection({
+  rows,
+  onOpenProposal,
+}) {
+
+  const datedRows = useMemo(
+    () =>
+      rows
+        .map((row) => ({
+          row,
+          solicitud: toDay(row.fechaSolicitud),
+          entrega: toDay(row.fechaEntrega),
+        }))
+        .filter((item) => item.solicitud || item.entrega),
+    [rows]
+  );
+
+  const undatedCount = rows.length - datedRows.length;
+
+
+  /* Meses con al menos una fecha, en orden cronológico */
+
+  const months = useMemo(() => {
+
+    const counts = {};
+
+    datedRows.forEach((item) => {
+
+      [item.solicitud, item.entrega].forEach((date) => {
+        if (date) {
+          counts[getMonthKey(date)] = true;
+        }
+      });
+
+    });
+
+    return Object.keys(counts).sort();
+
+  }, [datedRows]);
+
+
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedWeek, setSelectedWeek] = useState(null);
+
+
+  /* Si el mes elegido ya no existe con los filtros, usamos el más reciente */
+
+  const activeMonth =
+    selectedMonth === "Todos" || months.includes(selectedMonth)
+      ? selectedMonth
+      : months[months.length - 1] || "Todos";
+
+
+  /* Filas del gráfico: meses (vista "Todos") o semanas del mes */
+
+  const periods = useMemo(() => {
+
+    if (activeMonth === "Todos") {
+
+      return months.map((monthKey) => {
+
+        const [year, month] = monthKey.split("-").map(Number);
+
+        const start = new Date(year, month - 1, 1);
+        const end = new Date(year, month, 0);
+
+        return {
+          key: monthKey,
+          label: getMonthLabel(monthKey),
+          range: "",
+          start,
+          end,
+          ...countInRange(datedRows, start, end),
+        };
+
+      });
+
+    }
+
+    return getWeeksOfMonth(activeMonth).map((week) => ({
+      ...week,
+      ...countInRange(datedRows, week.start, week.end),
+    }));
+
+  }, [activeMonth, months, datedRows]);
+
+
+  const maxCount = Math.max(
+    1,
+    ...periods.map((period) =>
+      Math.max(period.solicitadas, period.entregadas)
+    )
+  );
+
+
+  const monthTotals = periods.reduce(
+    (totals, period) => ({
+      solicitadas: totals.solicitadas + period.solicitadas,
+      entregadas: totals.entregadas + period.entregadas,
+    }),
+    { solicitadas: 0, entregadas: 0 }
+  );
+
+
+  const activeWeek =
+    periods.find((period) => period.key === selectedWeek) || null;
+
+
+  /* Propuestas del periodo elegido (semana, o el mes completo) */
+
+  const periodProposals = useMemo(() => {
+
+    if (activeMonth === "Todos" && !activeWeek) {
+      return [];
+    }
+
+    const range =
+      activeWeek ||
+      {
+        start: periods[0]?.start,
+        end: periods[periods.length - 1]?.end,
+      };
+
+    if (!range.start) {
+      return [];
+    }
+
+    return datedRows
+      .filter(
+        (item) =>
+          isInRange(item.solicitud, range.start, range.end) ||
+          isInRange(item.entrega, range.start, range.end)
+      )
+      .map((item) => ({
+        ...item,
+        solicitadaEnPeriodo: isInRange(item.solicitud, range.start, range.end),
+        entregadaEnPeriodo: isInRange(item.entrega, range.start, range.end),
+      }))
+      .sort(
+        (a, b) =>
+          (a.solicitud || a.entrega).getTime() -
+          (b.solicitud || b.entrega).getTime()
+      );
+
+  }, [activeMonth, activeWeek, periods, datedRows]);
+
+
+  function handleMonthChange(monthKey) {
+    setSelectedMonth(monthKey);
+    setSelectedWeek(null);
+  }
+
+
+  function handlePeriodClick(period) {
+
+    if (activeMonth === "Todos") {
+      handleMonthChange(period.key);
+      return;
+    }
+
+    setSelectedWeek(
+      selectedWeek === period.key ? null : period.key
+    );
+
+  }
+
+
+  return (
+    <div className="dashboard-panel period-panel">
+
+      <div className="dashboard-panel-header">
+
+        <div>
+          <span>PERIODO</span>
+          <h3>Propuestas por mes y semana</h3>
+        </div>
+
+        <div className="period-legend">
+          <i className="period-dot period-dot-requested" />
+          Solicitadas
+          <i className="period-dot period-dot-delivered" />
+          Entregadas
+        </div>
+
+      </div>
+
+
+      {months.length === 0 ? (
+
+        <div className="empty-state">
+          <span>No hay propuestas con fecha para mostrar.</span>
+        </div>
+
+      ) : (
+
+        <div className="period-body">
+
+          {/* MESES */}
+
+          <div className="period-months">
+
+            <button
+              type="button"
+              className={`period-month-chip ${activeMonth === "Todos" ? "active" : ""}`}
+              onClick={() => handleMonthChange("Todos")}
+            >
+              Todos
+            </button>
+
+            {months.map((monthKey) => (
+              <button
+                type="button"
+                key={monthKey}
+                className={`period-month-chip ${activeMonth === monthKey ? "active" : ""}`}
+                onClick={() => handleMonthChange(monthKey)}
+              >
+                {getMonthLabel(monthKey)}
+              </button>
+            ))}
+
+          </div>
+
+
+          {/* TOTALES */}
+
+          <div className="period-totals">
+
+            <div className="period-total period-total-requested">
+              <strong>{monthTotals.solicitadas}</strong>
+              <span>
+                Solicitadas
+                {activeMonth === "Todos" ? "" : ` en ${getMonthLabel(activeMonth)}`}
+              </span>
+            </div>
+
+            <div className="period-total period-total-delivered">
+              <strong>{monthTotals.entregadas}</strong>
+              <span>
+                Entregadas
+                {activeMonth === "Todos" ? "" : ` en ${getMonthLabel(activeMonth)}`}
+              </span>
+            </div>
+
+          </div>
+
+
+          {/* MESES O SEMANAS */}
+
+          <div className="period-rows">
+
+            {periods.map((period) => (
+
+              <button
+                type="button"
+                key={period.key}
+                className={`period-row ${activeWeek?.key === period.key ? "active" : ""}`}
+                onClick={() => handlePeriodClick(period)}
+              >
+
+                <div className="period-row-label">
+                  <strong>{period.label}</strong>
+                  {period.range && <span>{period.range}</span>}
+                </div>
+
+                <div className="period-row-bars">
+
+                  <div className="period-bar-line">
+                    <div className="period-bar-track">
+                      <div
+                        className="period-bar period-bar-requested"
+                        style={{ width: `${(period.solicitadas / maxCount) * 100}%` }}
+                      />
+                    </div>
+                    <b>{period.solicitadas}</b>
+                  </div>
+
+                  <div className="period-bar-line">
+                    <div className="period-bar-track">
+                      <div
+                        className="period-bar period-bar-delivered"
+                        style={{ width: `${(period.entregadas / maxCount) * 100}%` }}
+                      />
+                    </div>
+                    <b>{period.entregadas}</b>
+                  </div>
+
+                </div>
+
+              </button>
+
+            ))}
+
+          </div>
+
+
+          <p className="period-hint">
+            {activeMonth === "Todos"
+              ? "Toca un mes para verlo semana a semana."
+              : activeWeek
+                ? `Propuestas de la ${activeWeek.label.toLowerCase()} (${activeWeek.range}). Toca otra vez para ver el mes completo.`
+                : `Propuestas de ${getMonthLabel(activeMonth)}. Toca una semana para ver solo esa semana.`}
+            {undatedCount > 0 &&
+              ` ${undatedCount} propuestas no tienen fecha en el Excel y no se cuentan.`}
+          </p>
+
+
+          {/* LISTA DE PROPUESTAS DEL PERIODO */}
+
+          {periodProposals.length > 0 && (
+
+            <div className="period-list">
+
+              {periodProposals.map((item) => (
+
+                <button
+                  type="button"
+                  key={item.row.id}
+                  className="period-list-item"
+                  onClick={() => onOpenProposal(item.row)}
+                >
+
+                  <div className="period-list-info">
+                    <strong>{item.row.cuenta || "Sin cuenta"}</strong>
+                    <span>{item.row.ejecutivo || "—"}</span>
+                  </div>
+
+                  <div className="period-list-dates">
+                    <span className={item.solicitadaEnPeriodo ? "requested" : ""}>
+                      Solicitud {formatDate(item.solicitud)}
+                    </span>
+                    <span className={item.entregadaEnPeriodo ? "delivered" : ""}>
+                      Entrega {formatDate(item.entrega)}
+                    </span>
+                  </div>
+
+                  <StatusBadge estado={item.row.estado} />
+
+                </button>
+
+              ))}
+
+            </div>
+
+          )}
+
+        </div>
+
+      )}
+
+    </div>
+  );
+
+}
+
+
 function SummaryView({
   rows,
   selectedTeam,
@@ -5533,6 +6066,16 @@ function SummaryView({
         />
 
       </div>
+
+
+      {/* =================================================
+         PROPUESTAS POR MES Y SEMANA
+         ================================================= */}
+
+      <PeriodSection
+        rows={rows}
+        onOpenProposal={onOpenProposal}
+      />
 
 
       {/* =================================================
