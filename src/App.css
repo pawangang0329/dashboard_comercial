@@ -2177,16 +2177,22 @@ img {
     2px;
 }
 
-.period-dot-requested,
-.period-bar-requested {
+.period-dot-seguimiento,
+.period-bar-seguimiento {
   background:
     var(--pink);
 }
 
-.period-dot-delivered,
-.period-bar-delivered {
+.period-dot-cerrada,
+.period-bar-cerrada {
   background:
-    var(--blue);
+    var(--green);
+}
+
+.period-dot-oportunidad,
+.period-bar-oportunidad {
+  background:
+    var(--amber);
 }
 
 .period-body {
@@ -2264,7 +2270,7 @@ img {
     grid;
 
   grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+    repeat(auto-fit, minmax(150px, 1fr));
 
   gap:
     8px;
@@ -2296,14 +2302,24 @@ img {
     7px;
 }
 
-.period-total-delivered {
-  border-left-color:
-    var(--blue);
-}
-
-.period-total-undated {
+.period-total-all {
   border-left-color:
     var(--muted);
+}
+
+.period-total-seguimiento {
+  border-left-color:
+    var(--pink);
+}
+
+.period-total-cerrada {
+  border-left-color:
+    var(--green);
+}
+
+.period-total-oportunidad {
+  border-left-color:
+    var(--amber);
 }
 
 .period-total strong {
@@ -2385,6 +2401,16 @@ img {
 
   border-color:
     var(--border);
+}
+
+.period-row.static {
+  cursor:
+    default;
+}
+
+.period-row.static:hover {
+  background:
+    transparent;
 }
 
 .period-row-label {
@@ -2620,16 +2646,6 @@ img {
 
   white-space:
     nowrap;
-}
-
-.period-list-dates .requested {
-  color:
-    var(--pink);
-}
-
-.period-list-dates .delivered {
-  color:
-    var(--blue);
 }
 
 @media (max-width: 640px) {

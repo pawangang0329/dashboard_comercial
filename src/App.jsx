@@ -1375,21 +1375,6 @@ function isInRange(date, start, end) {
 }
 
 
-function countInRange(datedRows, start, end) {
-
-  let solicitadas = 0;
-  let entregadas = 0;
-
-  datedRows.forEach((item) => {
-    if (isInRange(item.solicitud, start, end)) solicitadas++;
-    if (isInRange(item.entrega, start, end)) entregadas++;
-  });
-
-  return { solicitadas, entregadas };
-
-}
-
-
 /* =========================================================
    OBTENER INICIALES
    ========================================================= */
@@ -5691,59 +5676,78 @@ function ActiveFilters({
    ========================================================= */
 
 /*
- * Una propuesta cuenta como "solicitada" en el periodo
- * si su FECHA SOLICITUD cae dentro del rango, y como
- * "entregada" si su FECHA DE ENTREGA cae dentro del rango.
+ * Cada propuesta se cuenta una sola vez, en el periodo
+ * de su FECHA SOLICITUD (o de su FECHA DE ENTREGA si no
+ * tiene solicitud), y las barras la separan por estado.
  */
+
+const PERIOD_STATUSES = [
+  "seguimiento",
+  "cerrada",
+  "oportunidad",
+];
+
+
+function countByStatus(items) {
+
+  const counts = { total: items.length };
+
+  PERIOD_STATUSES.forEach((status) => {
+    counts[status] = 0;
+  });
+
+  items.forEach((item) => {
+    if (counts[item.row.estado] !== undefined) {
+      counts[item.row.estado]++;
+    }
+  });
+
+  return counts;
+
+}
+
 
 function PeriodSection({
   rows,
   onOpenProposal,
 }) {
 
-  const datedRows = useMemo(
+  const items = useMemo(
     () =>
-      rows
-        .map((row) => ({
+      rows.map((row) => {
+
+        const solicitud = toDay(row.fechaSolicitud);
+        const entrega = toDay(row.fechaEntrega);
+
+        return {
           row,
-          solicitud: toDay(row.fechaSolicitud),
-          entrega: toDay(row.fechaEntrega),
-        }))
-        .filter((item) => item.solicitud || item.entrega),
+          solicitud,
+          entrega,
+          fecha: solicitud || entrega,
+        };
+
+      }),
     [rows]
   );
 
-  /* Propuestas sin fecha de solicitud ni de entrega */
+  const datedRows = useMemo(
+    () => items.filter((item) => item.fecha),
+    [items]
+  );
 
   const undatedRows = useMemo(
-    () =>
-      rows
-        .filter(
-          (row) => !toDay(row.fechaSolicitud) && !toDay(row.fechaEntrega)
-        )
-        .map((row) => ({ row, solicitud: null, entrega: null })),
-    [rows]
+    () => items.filter((item) => !item.fecha),
+    [items]
   );
 
-  /* Meses con al menos una fecha, en orden cronológico */
 
-  const months = useMemo(() => {
+  /* Meses con propuestas, en orden cronológico */
 
-    const counts = {};
-
-    datedRows.forEach((item) => {
-
-      [item.solicitud, item.entrega].forEach((date) => {
-        if (date) {
-          counts[getMonthKey(date)] = true;
-        }
-      });
-
-    });
-
-    return Object.keys(counts).sort();
-
-  }, [datedRows]);
+  const months = useMemo(
+    () =>
+      [...new Set(datedRows.map((item) => getMonthKey(item.fecha)))].sort(),
+    [datedRows]
+  );
 
 
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -5762,58 +5766,70 @@ function PeriodSection({
   const showingUndated = activeMonth === "SinFecha";
 
 
-  /* Filas del gráfico: meses (vista "Todos") o semanas del mes */
+  /* Filas del gráfico: meses ("Todos"), semanas del mes o "Sin fecha" */
 
   const periods = useMemo(() => {
 
     if (activeMonth === "SinFecha") {
-      return [];
-    }
 
-    if (activeMonth === "Todos") {
-
-      return months.map((monthKey) => {
-
-        const [year, month] = monthKey.split("-").map(Number);
-
-        const start = new Date(year, month - 1, 1);
-        const end = new Date(year, month, 0);
-
-        return {
-          key: monthKey,
-          label: getMonthLabel(monthKey),
+      return [
+        {
+          key: "SinFecha",
+          label: "Sin fecha",
           range: "",
-          start,
-          end,
-          ...countInRange(datedRows, start, end),
-        };
-
-      });
+          items: undatedRows,
+        },
+      ];
 
     }
 
-    return getWeeksOfMonth(activeMonth).map((week) => ({
-      ...week,
-      ...countInRange(datedRows, week.start, week.end),
+    const ranges =
+      activeMonth === "Todos"
+        ? months.map((monthKey) => {
+
+            const [year, month] = monthKey.split("-").map(Number);
+
+            return {
+              key: monthKey,
+              label: getMonthLabel(monthKey),
+              range: "",
+              start: new Date(year, month - 1, 1),
+              end: new Date(year, month, 0),
+            };
+
+          })
+        : getWeeksOfMonth(activeMonth);
+
+    return ranges.map((period) => ({
+      ...period,
+      items: datedRows
+        .filter((item) => isInRange(item.fecha, period.start, period.end))
+        .sort((a, b) => a.fecha.getTime() - b.fecha.getTime()),
     }));
 
-  }, [activeMonth, months, datedRows]);
+  }, [activeMonth, months, datedRows, undatedRows]);
+
+
+  const periodCounts = periods.map((period) => countByStatus(period.items));
+
+
+  /* Solo mostramos los estados que aparecen en esta vista */
+
+  const visibleStatuses = PERIOD_STATUSES.filter((status) =>
+    periodCounts.some((counts) => counts[status] > 0)
+  );
 
 
   const maxCount = Math.max(
     1,
-    ...periods.map((period) =>
-      Math.max(period.solicitadas, period.entregadas)
+    ...periodCounts.flatMap((counts) =>
+      visibleStatuses.map((status) => counts[status])
     )
   );
 
 
-  const monthTotals = periods.reduce(
-    (totals, period) => ({
-      solicitadas: totals.solicitadas + period.solicitadas,
-      entregadas: totals.entregadas + period.entregadas,
-    }),
-    { solicitadas: 0, entregadas: 0 }
+  const totals = countByStatus(
+    periods.flatMap((period) => period.items)
   );
 
 
@@ -5823,45 +5839,12 @@ function PeriodSection({
 
   /* Propuestas del periodo elegido (semana, o el mes completo) */
 
-  const periodProposals = useMemo(() => {
-
-    if (activeMonth === "SinFecha") {
-      return undatedRows;
-    }
-
-    if (activeMonth === "Todos" && !activeWeek) {
-      return [];
-    }
-
-    const range =
-      activeWeek ||
-      {
-        start: periods[0]?.start,
-        end: periods[periods.length - 1]?.end,
-      };
-
-    if (!range.start) {
-      return [];
-    }
-
-    return datedRows
-      .filter(
-        (item) =>
-          isInRange(item.solicitud, range.start, range.end) ||
-          isInRange(item.entrega, range.start, range.end)
-      )
-      .map((item) => ({
-        ...item,
-        solicitadaEnPeriodo: isInRange(item.solicitud, range.start, range.end),
-        entregadaEnPeriodo: isInRange(item.entrega, range.start, range.end),
-      }))
-      .sort(
-        (a, b) =>
-          (a.solicitud || a.entrega).getTime() -
-          (b.solicitud || b.entrega).getTime()
-      );
-
-  }, [activeMonth, activeWeek, periods, datedRows, undatedRows]);
+  const periodProposals =
+    activeWeek
+      ? activeWeek.items
+      : activeMonth === "Todos"
+        ? []
+        : periods.flatMap((period) => period.items);
 
 
   function handleMonthChange(monthKey) {
@@ -5871,6 +5854,10 @@ function PeriodSection({
 
 
   function handlePeriodClick(period) {
+
+    if (showingUndated) {
+      return;
+    }
 
     if (activeMonth === "Todos") {
       handleMonthChange(period.key);
@@ -5884,6 +5871,14 @@ function PeriodSection({
   }
 
 
+  const periodName =
+    showingUndated
+      ? "sin fecha"
+      : activeMonth === "Todos"
+        ? ""
+        : `en ${getMonthLabel(activeMonth)}`;
+
+
   return (
     <div className="dashboard-panel period-panel">
 
@@ -5895,10 +5890,12 @@ function PeriodSection({
         </div>
 
         <div className="period-legend">
-          <i className="period-dot period-dot-requested" />
-          Solicitadas
-          <i className="period-dot period-dot-delivered" />
-          Entregadas
+          {PERIOD_STATUSES.map((status) => (
+            <React.Fragment key={status}>
+              <i className={`period-dot period-dot-${status}`} />
+              {ESTADO_META[status].label}
+            </React.Fragment>
+          ))}
         </div>
 
       </div>
@@ -5952,81 +5949,60 @@ function PeriodSection({
 
           {/* TOTALES */}
 
-          {showingUndated ? (
-
-            <div className="period-totals">
-              <div className="period-total period-total-undated">
-                <strong>{undatedRows.length}</strong>
-                <span>Propuestas sin fecha</span>
-              </div>
-            </div>
-
-          ) : (
-
           <div className="period-totals">
 
-            <div className="period-total period-total-requested">
-              <strong>{monthTotals.solicitadas}</strong>
-              <span>
-                Solicitadas
-                {activeMonth === "Todos" ? "" : ` en ${getMonthLabel(activeMonth)}`}
-              </span>
+            <div className="period-total period-total-all">
+              <strong>{totals.total}</strong>
+              <span>Propuestas {periodName}</span>
             </div>
 
-            <div className="period-total period-total-delivered">
-              <strong>{monthTotals.entregadas}</strong>
-              <span>
-                Entregadas
-                {activeMonth === "Todos" ? "" : ` en ${getMonthLabel(activeMonth)}`}
-              </span>
-            </div>
+            {visibleStatuses.map((status) => (
+              <div
+                key={status}
+                className={`period-total period-total-${status}`}
+              >
+                <strong>{totals[status]}</strong>
+                <span>{ESTADO_META[status].label}</span>
+              </div>
+            ))}
 
           </div>
 
-          )}
 
-
-          {/* MESES O SEMANAS */}
-
-          {periods.length > 0 && (
+          {/* MESES, SEMANAS O SIN FECHA */}
 
           <div className="period-rows">
 
-            {periods.map((period) => (
+            {periods.map((period, index) => (
 
               <button
                 type="button"
                 key={period.key}
-                className={`period-row ${activeWeek?.key === period.key ? "active" : ""}`}
+                className={`period-row ${activeWeek?.key === period.key ? "active" : ""} ${showingUndated ? "static" : ""}`}
                 onClick={() => handlePeriodClick(period)}
               >
 
                 <div className="period-row-label">
                   <strong>{period.label}</strong>
-                  {period.range && <span>{period.range}</span>}
+                  <span>
+                    {period.range ? `${period.range} · ` : ""}
+                    {periodCounts[index].total} propuestas
+                  </span>
                 </div>
 
                 <div className="period-row-bars">
 
-                  <div className="period-bar-line">
-                    <div className="period-bar-track">
-                      <div
-                        className="period-bar period-bar-requested"
-                        style={{ width: `${(period.solicitadas / maxCount) * 100}%` }}
-                      />
+                  {visibleStatuses.map((status) => (
+                    <div className="period-bar-line" key={status}>
+                      <div className="period-bar-track">
+                        <div
+                          className={`period-bar period-bar-${status}`}
+                          style={{ width: `${(periodCounts[index][status] / maxCount) * 100}%` }}
+                        />
+                      </div>
+                      <b>{periodCounts[index][status]}</b>
                     </div>
-                    <b>{period.solicitadas}</b>
-                  </div>
-
-                  <div className="period-bar-line">
-                    <div className="period-bar-track">
-                      <div
-                        className="period-bar period-bar-delivered"
-                        style={{ width: `${(period.entregadas / maxCount) * 100}%` }}
-                      />
-                    </div>
-                    <b>{period.entregadas}</b>
-                  </div>
+                  ))}
 
                 </div>
 
@@ -6036,17 +6012,15 @@ function PeriodSection({
 
           </div>
 
-          )}
-
 
           <p className="period-hint">
             {showingUndated
               ? "Propuestas que no tienen fecha de solicitud ni de entrega."
               : activeMonth === "Todos"
-              ? "Toca un mes para verlo semana a semana."
-              : activeWeek
-                ? `Propuestas de la ${activeWeek.label.toLowerCase()} (${activeWeek.range}). Toca otra vez para ver el mes completo.`
-                : `Propuestas de ${getMonthLabel(activeMonth)}. Toca una semana para ver solo esa semana.`}
+                ? "Cada propuesta se cuenta en el mes de su fecha de solicitud. Toca un mes para verlo semana a semana."
+                : activeWeek
+                  ? `Propuestas de la ${activeWeek.label.toLowerCase()} (${activeWeek.range}). Toca otra vez para ver el mes completo.`
+                  : `Propuestas de ${getMonthLabel(activeMonth)}. Toca una semana para ver solo esa semana.`}
           </p>
 
 
@@ -6071,12 +6045,8 @@ function PeriodSection({
                   </div>
 
                   <div className="period-list-dates">
-                    <span className={item.solicitadaEnPeriodo ? "requested" : ""}>
-                      Solicitud {formatDate(item.solicitud)}
-                    </span>
-                    <span className={item.entregadaEnPeriodo ? "delivered" : ""}>
-                      Entrega {formatDate(item.entrega)}
-                    </span>
+                    <span>Solicitud {formatDate(item.solicitud)}</span>
+                    <span>Entrega {formatDate(item.entrega)}</span>
                   </div>
 
                   <StatusBadge estado={item.row.estado} />
