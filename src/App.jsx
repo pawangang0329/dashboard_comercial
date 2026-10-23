@@ -5246,7 +5246,7 @@ function ExecutiveDetail({
               <div>SECTOR</div>
               <div>PROPUESTA</div>
               <div>ESTADO</div>
-              <div>VALOR</div>
+              <div>VALOR DE LA PROPUESTA</div>
               <div>ASESOR</div>
             </div>
 
@@ -5555,7 +5555,7 @@ function ProposalTable({
           </div>
 
           <div>
-            VALOR
+            VALOR DE LA PROPUESTA
           </div>
 
           <div>
@@ -6456,7 +6456,7 @@ function FranchiseView({
               <div>FRANQUICIA</div>
               <div>SECTOR</div>
               <div>ESTADO</div>
-              <div>VALOR</div>
+              <div>VALOR DE LA PROPUESTA</div>
               <div>LINK PRESENTACIÓN</div>
             </div>
 
