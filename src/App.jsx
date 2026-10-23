@@ -5932,7 +5932,7 @@ function PeriodSection({
                 className={`period-month-chip ${showingUndated ? "active" : ""}`}
                 onClick={() => handleMonthChange("SinFecha")}
               >
-                Sin fecha ({undatedRows.length})
+                Sin fecha
               </button>
             )}
 
@@ -6041,7 +6041,7 @@ function PeriodSection({
 
           <p className="period-hint">
             {showingUndated
-              ? "Propuestas que no tienen fecha de solicitud ni de entrega en el Excel."
+              ? "Propuestas que no tienen fecha de solicitud ni de entrega."
               : activeMonth === "Todos"
               ? "Toca un mes para verlo semana a semana."
               : activeWeek
