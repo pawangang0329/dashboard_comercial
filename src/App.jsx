@@ -5713,6 +5713,18 @@ function PeriodSection({
     [rows]
   );
 
+  /* Propuestas sin fecha de solicitud ni de entrega */
+
+  const undatedRows = useMemo(
+    () =>
+      rows
+        .filter(
+          (row) => !toDay(row.fechaSolicitud) && !toDay(row.fechaEntrega)
+        )
+        .map((row) => ({ row, solicitud: null, entrega: null })),
+    [rows]
+  );
+
   /* Meses con al menos una fecha, en orden cronológico */
 
   const months = useMemo(() => {
@@ -5741,14 +5753,22 @@ function PeriodSection({
   /* Si el mes elegido ya no existe con los filtros, usamos el más reciente */
 
   const activeMonth =
-    selectedMonth === "Todos" || months.includes(selectedMonth)
+    selectedMonth === "Todos" ||
+    (selectedMonth === "SinFecha" && undatedRows.length > 0) ||
+    months.includes(selectedMonth)
       ? selectedMonth
       : months[months.length - 1] || "Todos";
+
+  const showingUndated = activeMonth === "SinFecha";
 
 
   /* Filas del gráfico: meses (vista "Todos") o semanas del mes */
 
   const periods = useMemo(() => {
+
+    if (activeMonth === "SinFecha") {
+      return [];
+    }
 
     if (activeMonth === "Todos") {
 
@@ -5805,6 +5825,10 @@ function PeriodSection({
 
   const periodProposals = useMemo(() => {
 
+    if (activeMonth === "SinFecha") {
+      return undatedRows;
+    }
+
     if (activeMonth === "Todos" && !activeWeek) {
       return [];
     }
@@ -5837,7 +5861,7 @@ function PeriodSection({
           (b.solicitud || b.entrega).getTime()
       );
 
-  }, [activeMonth, activeWeek, periods, datedRows]);
+  }, [activeMonth, activeWeek, periods, datedRows, undatedRows]);
 
 
   function handleMonthChange(monthKey) {
@@ -5880,10 +5904,10 @@ function PeriodSection({
       </div>
 
 
-      {months.length === 0 ? (
+      {months.length === 0 && undatedRows.length === 0 ? (
 
         <div className="empty-state">
-          <span>No hay propuestas con fecha para mostrar.</span>
+          <span>No hay propuestas para mostrar.</span>
         </div>
 
       ) : (
@@ -5902,6 +5926,16 @@ function PeriodSection({
               Todos
             </button>
 
+            {undatedRows.length > 0 && (
+              <button
+                type="button"
+                className={`period-month-chip ${showingUndated ? "active" : ""}`}
+                onClick={() => handleMonthChange("SinFecha")}
+              >
+                Sin fecha ({undatedRows.length})
+              </button>
+            )}
+
             {months.map((monthKey) => (
               <button
                 type="button"
@@ -5917,6 +5951,17 @@ function PeriodSection({
 
 
           {/* TOTALES */}
+
+          {showingUndated ? (
+
+            <div className="period-totals">
+              <div className="period-total period-total-undated">
+                <strong>{undatedRows.length}</strong>
+                <span>Propuestas sin fecha</span>
+              </div>
+            </div>
+
+          ) : (
 
           <div className="period-totals">
 
@@ -5938,8 +5983,12 @@ function PeriodSection({
 
           </div>
 
+          )}
+
 
           {/* MESES O SEMANAS */}
+
+          {periods.length > 0 && (
 
           <div className="period-rows">
 
@@ -5987,9 +6036,13 @@ function PeriodSection({
 
           </div>
 
+          )}
+
 
           <p className="period-hint">
-            {activeMonth === "Todos"
+            {showingUndated
+              ? "Propuestas que no tienen fecha de solicitud ni de entrega en el Excel."
+              : activeMonth === "Todos"
               ? "Toca un mes para verlo semana a semana."
               : activeWeek
                 ? `Propuestas de la ${activeWeek.label.toLowerCase()} (${activeWeek.range}). Toca otra vez para ver el mes completo.`

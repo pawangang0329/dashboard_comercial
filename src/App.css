@@ -2301,6 +2301,11 @@ img {
     var(--blue);
 }
 
+.period-total-undated {
+  border-left-color:
+    var(--muted);
+}
+
 .period-total strong {
   color:
     var(--text);
