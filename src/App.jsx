@@ -2461,6 +2461,145 @@ function getRowHyperlink(worksheet, rowNum, linkColumns) {
 
 
 /* =========================================================
+   PROPUESTAS ELABORADAS
+   ========================================================= */
+
+/*
+ * Una fila cuenta como propuesta elaborada si tiene
+ * fecha, link de presentación o valor de la propuesta.
+ * Las cuentas que solo tienen la necesidad escrita
+ * (sin nada de eso) no se muestran en el dashboard.
+ */
+
+function isProposalElaborated(row) {
+
+  return Boolean(
+    toDay(row.fechaSolicitud) ||
+    toDay(row.fechaEntrega) ||
+    row.linkPresentacion ||
+    row.linkUrl ||
+    Number(row.valorPropuesta) > 0
+  );
+
+}
+
+
+/* =========================================================
+   FRANQUICIAS
+   ========================================================= */
+
+/*
+ * Textos que aparecen después de "FRANQUICIA"
+ * pero que son formatos, no el nombre de una franquicia.
+ */
+
+const FRANCHISE_NOISE =
+  /^(ia|ia generativa|nfc|shoppable|ra|realidad aumentada|prisa|paq\b|formato|chat|nota|video|pre roll|amplificacion)/;
+
+
+/*
+ * Saca el nombre de la franquicia de un texto como
+ * "PROPUESTA DIGITAL - FRANQUICIA EL RADAR DE VILLAR + PAQ DE IA".
+ * Devuelve null si el texto no menciona franquicias.
+ */
+
+function extractFranchiseNames(value) {
+
+  const text = String(value ?? "")
+    .replace(/\.(pptx?|xlsx?|pdf|docx?)$/i, "")
+    .replace(/[_\s]+/g, " ")
+    .trim();
+
+  const match = text.match(/franquicias?\b(.*)$/i);
+
+  if (!match) {
+    return null;
+  }
+
+  // "FRANQUICIA, CHAT CON IA..." no dice cuál franquicia
+  if (/^\s*,/.test(match[1])) {
+    return [];
+  }
+
+  const rest = match[1]
+    .replace(/^[\s\-–:.]+/, "")
+    .split(/\s*\+\s*|\s+-\s+|,/)[0]
+    .replace(/^(de|a)\s+/i, "")
+    .replace(/^en\s+(?=se lo)/i, "")
+    .replace(/[.\s]+$/, "")
+    .trim();
+
+  if (!rest || /^(para|por)\b/i.test(rest)) {
+    return [];
+  }
+
+  return rest
+    .split(/\s+y\s+|\s*&\s*/i)
+    .map((name) => name.trim().toUpperCase())
+    .filter((name) => name && !FRANCHISE_NOISE.test(normalizeText(name)));
+
+}
+
+
+function getFranchiseInfo(row) {
+
+  const sources = [
+    row.necesidad1,
+    row.necesidad2,
+    row.necesidad3,
+    row.planAccion1,
+    row.planAccion2,
+    row.planAccion3,
+    row.cuenta,
+  ];
+
+  let mentioned = false;
+
+  const names = [];
+
+  const addNames = (found) => {
+
+    found.forEach((name) => {
+      if (!names.some((existing) => normalizeText(existing) === normalizeText(name))) {
+        names.push(name);
+      }
+    });
+
+  };
+
+  sources.forEach((source) => {
+
+    const found = extractFranchiseNames(source);
+
+    if (found) {
+      mentioned = true;
+      addNames(found);
+    }
+
+  });
+
+  // El nombre del archivo solo se usa si el texto no dice cuál franquicia
+  const fromLink = extractFranchiseNames(row.linkPresentacion);
+
+  if (fromLink) {
+
+    mentioned = true;
+
+    if (names.length === 0) {
+      addNames(fromLink);
+    }
+
+  }
+
+  return {
+    tieneFranquicia: mentioned,
+    franquicias: names,
+  };
+
+}
+
+
+/* =========================================================
    CARGAR EXCEL
    ========================================================= */
 
@@ -2689,12 +2828,15 @@ async function loadExcelData() {
   );
 
 
-  return uniqueRows.map(
-    (row, index) => ({
-      ...row,
-      id: index,
-    })
-  );
+  return uniqueRows
+    .filter(isProposalElaborated)
+    .map(
+      (row, index) => ({
+        ...row,
+        id: index,
+        ...getFranchiseInfo(row),
+      })
+    );
 
 }
 
@@ -4132,6 +4274,40 @@ function DashboardSidebar({
 
           <span>
             Resumen
+          </span>
+
+        </button>
+
+
+        <button
+          type="button"
+          className={
+            `sidebar-nav-item ${
+              activeSection ===
+              "franquicias"
+                ? "active"
+                : ""
+            }`
+          }
+          onClick={() => {
+
+            onRubroChange(
+              "Todos"
+            );
+
+            onSectionChange(
+              "franquicias"
+            );
+
+          }}
+        >
+
+          <Tag
+            size={15}
+          />
+
+          <span>
+            Franquicias
           </span>
 
         </button>
@@ -6071,6 +6247,309 @@ function PeriodSection({
 }
 
 
+/* =========================================================
+   VISTA DE FRANQUICIAS
+   ========================================================= */
+
+/*
+ * Propuestas en las que se ofreció una franquicia.
+ * Siguen apareciendo también en su sector.
+ */
+
+const NO_FRANCHISE_NAME = "Sin especificar";
+
+
+function FranchiseView({
+  rows,
+  onOpenProposal,
+}) {
+
+  const franchiseRows = useMemo(
+    () => rows.filter((row) => row.tieneFranquicia),
+    [rows]
+  );
+
+
+  /* Franquicias ordenadas de la más ofrecida a la menos */
+
+  const franchises = useMemo(() => {
+
+    const counts = {};
+
+    franchiseRows.forEach((row) => {
+
+      const names =
+        row.franquicias.length > 0
+          ? row.franquicias
+          : [NO_FRANCHISE_NAME];
+
+      names.forEach((name) => {
+        counts[name] = (counts[name] || 0) + 1;
+      });
+
+    });
+
+    return Object.entries(counts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => {
+
+        if (a.name === NO_FRANCHISE_NAME) return 1;
+        if (b.name === NO_FRANCHISE_NAME) return -1;
+
+        return b.count - a.count || a.name.localeCompare(b.name);
+
+      });
+
+  }, [franchiseRows]);
+
+
+  const [selectedFranchise, setSelectedFranchise] = useState("Todas");
+
+
+  const activeFranchise =
+    franchises.some((item) => item.name === selectedFranchise)
+      ? selectedFranchise
+      : "Todas";
+
+
+  const visibleRows =
+    activeFranchise === "Todas"
+      ? franchiseRows
+      : franchiseRows.filter((row) =>
+          activeFranchise === NO_FRANCHISE_NAME
+            ? row.franquicias.length === 0
+            : row.franquicias.includes(activeFranchise)
+        );
+
+
+  const totalValue = franchiseRows.reduce(
+    (sum, row) => sum + (Number(row.valorPropuesta) || 0),
+    0
+  );
+
+
+  const namedFranchises = franchises.filter(
+    (item) => item.name !== NO_FRANCHISE_NAME
+  );
+
+
+  return (
+    <div className="dashboard-page">
+
+      <div className="dashboard-page-header">
+
+        <div>
+
+          <span className="eyebrow">
+            FRANQUICIAS
+          </span>
+
+          <h1>
+            Propuestas con franquicias
+          </h1>
+
+          <p>
+            Propuestas en las que se ofreció una franquicia.
+            También aparecen en su sector económico.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      {/* KPIs */}
+
+      <div className="summary-kpi-grid">
+
+        <KpiCard
+          icon={FileText}
+          label="Propuestas con franquicia"
+          value={franchiseRows.length}
+          sublabel={`De ${rows.length} propuestas en total`}
+          className="summary-status-card summary-status-followup"
+        />
+
+        <KpiCard
+          icon={Tag}
+          label="Franquicias ofrecidas"
+          value={namedFranchises.length}
+          sublabel={
+            namedFranchises[0]
+              ? `La más ofrecida: ${namedFranchises[0].name}`
+              : "—"
+          }
+          className="summary-status-card summary-status-opportunity"
+        />
+
+        <KpiCard
+          icon={DollarSign}
+          label="Valor de las propuestas"
+          value={formatMoneyShort(totalValue)}
+          sublabel="Suma del valor de la propuesta"
+          className="summary-status-card summary-status-closed"
+        />
+
+      </div>
+
+
+      {franchiseRows.length === 0 ? (
+
+        <div className="dashboard-panel franchise-panel">
+          <div className="empty-state">
+            <span>No hay propuestas con franquicia para mostrar.</span>
+          </div>
+        </div>
+
+      ) : (
+
+        <div className="dashboard-panel franchise-panel">
+
+          <div className="dashboard-panel-header">
+
+            <div>
+              <span>FRANQUICIAS</span>
+              <h3>¿Qué franquicia se ofreció?</h3>
+            </div>
+
+            <span>
+              {visibleRows.length} propuestas
+            </span>
+
+          </div>
+
+
+          {/* FILTRO POR FRANQUICIA */}
+
+          <div className="franchise-chips">
+
+            <button
+              type="button"
+              className={`period-month-chip ${activeFranchise === "Todas" ? "active" : ""}`}
+              onClick={() => setSelectedFranchise("Todas")}
+            >
+              Todas
+              <b>{franchiseRows.length}</b>
+            </button>
+
+            {franchises.map((item) => (
+              <button
+                type="button"
+                key={item.name}
+                className={`period-month-chip ${activeFranchise === item.name ? "active" : ""}`}
+                onClick={() => setSelectedFranchise(item.name)}
+              >
+                {item.name}
+                <b>{item.count}</b>
+              </button>
+            ))}
+
+          </div>
+
+
+          {/* LISTA */}
+
+          <div className="franchise-table">
+
+            <div className="franchise-table-header">
+              <div>MARCA</div>
+              <div>FRANQUICIA</div>
+              <div>SECTOR</div>
+              <div>ESTADO</div>
+              <div>VALOR</div>
+              <div>LINK PRESENTACIÓN</div>
+            </div>
+
+            {visibleRows.map((row) => (
+
+              <div
+                key={row.id}
+                className="franchise-table-row"
+                role="button"
+                tabIndex={0}
+                onClick={() => onOpenProposal(row)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    onOpenProposal(row);
+                  }
+                }}
+              >
+
+                <div className="franchise-account">
+                  <strong>{row.cuenta || "Sin cuenta"}</strong>
+                  <span>
+                    {row.ejecutivo || "—"}
+                    {row.nacional ? ` · ${row.nacional}` : ""}
+                  </span>
+                </div>
+
+                <div className="franchise-tags">
+                  {(row.franquicias.length > 0
+                    ? row.franquicias
+                    : [NO_FRANCHISE_NAME]
+                  ).map((name) => (
+                    <span
+                      key={name}
+                      className={`franchise-tag ${name === NO_FRANCHISE_NAME ? "muted" : ""}`}
+                    >
+                      {name}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="franchise-sector">
+                  {row.rubro || "—"}
+                </div>
+
+                <div>
+                  <StatusBadge estado={row.estado} />
+                </div>
+
+                <div>
+                  <strong>
+                    {formatMoneyShort(row.valorPropuesta)}
+                  </strong>
+                </div>
+
+                <div>
+                  {row.linkUrl ? (
+                    <a
+                      className="proposal-table-link"
+                      href={row.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={row.linkPresentacion || row.linkUrl}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <ExternalLink size={12} />
+                      <span>
+                        {row.linkPresentacion &&
+                        !/^https?:\/\//i.test(row.linkPresentacion)
+                          ? row.linkPresentacion
+                          : "Abrir presentación"}
+                      </span>
+                    </a>
+                  ) : (
+                    "—"
+                  )}
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      )}
+
+    </div>
+  );
+
+}
+
+
 function SummaryView({
   rows,
   selectedTeam,
@@ -7419,6 +7898,27 @@ function ProposalModal({
           </div>
 
 
+          {/* FRANQUICIA */}
+
+          {row.tieneFranquicia && (
+
+            <div className="proposal-detail-section">
+
+              <span>
+                FRANQUICIA
+              </span>
+
+              <p>
+                {row.franquicias.length > 0
+                  ? row.franquicias.join(" · ")
+                  : NO_FRANCHISE_NAME}
+              </p>
+
+            </div>
+
+          )}
+
+
           {/* OPORTUNIDAD */}
 
           {row.oportunidad && (
@@ -8284,6 +8784,22 @@ async function handleLogin() {
 
     if (
       section ===
+      "franquicias"
+    ) {
+
+      setSelectedExecutive(
+        null
+      );
+
+      setMobileSidebarOpen(
+        false
+      );
+
+    }
+
+
+    if (
+      section ===
       "resumen"
     ) {
 
@@ -8811,6 +9327,21 @@ async function handleLogin() {
               onOpenProposal={
                 setSelectedProposal
               }
+            />
+
+          ) : activeSection ===
+            "franquicias" ? (
+
+            <FranchiseView
+
+              rows={
+                currentRows
+              }
+
+              onOpenProposal={
+                setSelectedProposal
+              }
+
             />
 
           ) : selectedRubro !==

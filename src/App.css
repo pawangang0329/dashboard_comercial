@@ -2680,6 +2680,227 @@ img {
 
 
 /* =========================================================
+   FRANQUICIAS
+   ========================================================= */
+
+.franchise-panel {
+  margin-top:
+    10px;
+}
+
+.franchise-chips {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    6px;
+
+  padding:
+    12px 14px;
+
+  border-bottom:
+    1px solid var(--border-soft);
+}
+
+.franchise-chips .period-month-chip {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    7px;
+}
+
+.franchise-chips .period-month-chip b {
+  color:
+    var(--muted);
+
+  font-size:
+    10px;
+
+  font-weight:
+    700;
+}
+
+.franchise-chips .period-month-chip.active b {
+  color:
+    #fff;
+}
+
+.franchise-table {
+  width:
+    100%;
+
+  overflow-x:
+    auto;
+}
+
+.franchise-table-header,
+.franchise-table-row {
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(170px, 1.3fr)
+    minmax(180px, 1.4fr)
+    minmax(110px, 0.8fr)
+    minmax(105px, 0.7fr)
+    minmax(100px, 0.7fr)
+    minmax(150px, 1fr);
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  min-width:
+    880px;
+
+  padding:
+    0 14px;
+}
+
+.franchise-table-header {
+  min-height:
+    34px;
+
+  color:
+    #5f6473;
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    0.08em;
+
+  border-bottom:
+    1px solid var(--border-soft);
+}
+
+.franchise-table-row {
+  min-height:
+    54px;
+
+  padding-top:
+    8px;
+
+  padding-bottom:
+    8px;
+
+  border-bottom:
+    1px solid var(--border-soft);
+
+  cursor:
+    pointer;
+}
+
+.franchise-table-row:last-child {
+  border-bottom:
+    0;
+}
+
+.franchise-table-row:hover {
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.franchise-table-row > div {
+  min-width:
+    0;
+}
+
+.franchise-table-row strong {
+  color:
+    #d6d8df;
+
+  font-size:
+    12px;
+
+  font-weight:
+    650;
+}
+
+.franchise-account {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    2px;
+}
+
+.franchise-account strong {
+  overflow:
+    hidden;
+
+  white-space:
+    nowrap;
+
+  text-overflow:
+    ellipsis;
+}
+
+.franchise-account span,
+.franchise-sector {
+  color:
+    var(--muted);
+
+  font-size:
+    11px;
+}
+
+.franchise-tags {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    4px;
+}
+
+.franchise-tag {
+  padding:
+    3px 7px;
+
+  color:
+    #f3a6c9;
+
+  font-size:
+    10px;
+
+  font-weight:
+    700;
+
+  background:
+    var(--pink-soft);
+
+  border-radius:
+    5px;
+}
+
+.franchise-tag.muted {
+  color:
+    var(--muted);
+
+  background:
+    rgba(255, 255, 255, 0.04);
+}
+
+
+/* =========================================================
    GRIDS DE ESTADÍSTICAS
    ========================================================= */
 
