@@ -74,7 +74,7 @@ import {
    CONFIGURACIÓN GENERAL
    ========================================================= */
 
-const EXCEL_FILE = "/Plantilla_Tablero_Comercial_PRISA_con_RUBRO.xlsx";
+const EXCEL_FILE = "/Plantilla_Tablero_Comercial_PRISA_23del10_con_RUBRO.xlsx";
 
 const IMAGE_PATH = "/images/";
 
@@ -8458,7 +8458,7 @@ async function handleLogin() {
         </strong>
 
         <span>
-          Leyendo información de Plantilla_Tablero_Comercial_PRISA_con_RUBRO.xlsx
+          Leyendo información de Plantilla_Tablero_Comercial_PRISA_23del10_con_RUBRO.xlsx
         </span>
 
       </div>
@@ -8506,7 +8506,7 @@ async function handleLogin() {
             Verifica que
             <strong>
               {" "}
-              Plantilla_Tablero_Comercial_PRISA_con_RUBRO.xlsx
+              Plantilla_Tablero_Comercial_PRISA_23del10_con_RUBRO.xlsx
             </strong>
             {" "}
             esté dentro de la carpeta
