@@ -6199,7 +6199,7 @@ function SummaryView({
               (item) => item.key === "oportunidad"
             )?.value ?? 0
           }
-          sublabel="Propuestas que se deben ajustar"
+          sublabel="Estado: Por mejorar"
           className="summary-status-card summary-status-opportunity"
         />
 
