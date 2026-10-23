@@ -5713,9 +5713,6 @@ function PeriodSection({
     [rows]
   );
 
-  const undatedCount = rows.length - datedRows.length;
-
-
   /* Meses con al menos una fecha, en orden cronológico */
 
   const months = useMemo(() => {
@@ -5997,8 +5994,6 @@ function PeriodSection({
               : activeWeek
                 ? `Propuestas de la ${activeWeek.label.toLowerCase()} (${activeWeek.range}). Toca otra vez para ver el mes completo.`
                 : `Propuestas de ${getMonthLabel(activeMonth)}. Toca una semana para ver solo esa semana.`}
-            {undatedCount > 0 &&
-              ` ${undatedCount} propuestas no tienen fecha en el Excel y no se cuentan.`}
           </p>
 
 
