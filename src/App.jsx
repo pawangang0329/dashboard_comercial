@@ -50,6 +50,7 @@ import {
   Menu,
   X,
   TrendingUp,
+  LogOut,
 } from "lucide-react";
 
 import {
@@ -4142,6 +4143,7 @@ function DashboardTopbar({
   currentUser,
   searchTerm,
   onSearchChange,
+  onLogout,
 }) {
 
   return (
@@ -4247,6 +4249,24 @@ function DashboardTopbar({
           </div>
 
         </div>
+
+
+        <button
+          type="button"
+          className="topbar-logout-button"
+          title="Cambiar usuario"
+          onClick={onLogout}
+        >
+
+          <LogOut
+            size={14}
+          />
+
+          <span>
+            Cambiar usuario
+          </span>
+
+        </button>
 
       </div>
 
@@ -7462,6 +7482,30 @@ async function handleLogin() {
 
 
   /* =======================================================
+     CERRAR SESIÓN / VOLVER A LA SELECCIÓN DE USUARIO
+     ======================================================= */
+
+  function handleLogout() {
+
+    setSelectedUser(null);
+    setAuthenticatedUser(null);
+
+    setShowLogin(false);
+    setLoginPassword("");
+    setLoginError("");
+
+    setShowChangePassword(false);
+    setNewPassword("");
+    setConfirmPassword("");
+    setChangePasswordError("");
+
+    setSearchTerm("");
+    setMobileSidebarOpen(false);
+
+  }
+
+
+  /* =======================================================
      CAMBIAR NACIONAL
      ======================================================= */
 
@@ -7961,6 +8005,20 @@ async function handleLogin() {
             Dashboard Comercial
           </strong>
 
+
+          <button
+            type="button"
+            className="mobile-logout-button"
+            title="Cambiar usuario"
+            onClick={handleLogout}
+          >
+
+            <LogOut
+              size={15}
+            />
+
+          </button>
+
         </div>
 
 
@@ -7980,6 +8038,10 @@ async function handleLogin() {
 
           onSearchChange={
             setSearchTerm
+          }
+
+          onLogout={
+            handleLogout
           }
 
         />
