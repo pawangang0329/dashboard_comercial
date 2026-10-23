@@ -698,7 +698,7 @@ const ESTADO_META = {
   oportunidad: {
 
     label:
-      "Oportunidad",
+      "Por mejorar",
 
     color:
       COLORS.amber,
@@ -3001,6 +3001,8 @@ function filterRows({
 
           if (
             target ===
+            "por mejorar" ||
+            target ===
             "oportunidad"
           ) {
 
@@ -3479,7 +3481,7 @@ function getAvailableStatuses(
       ) {
 
         states.add(
-          "Oportunidad"
+          "Por mejorar"
         );
 
       }
@@ -3679,7 +3681,7 @@ function calculateStatusData(
     {
 
       name:
-        "Oportunidad",
+        "Por mejorar",
 
       key:
         "oportunidad",
@@ -4249,8 +4251,8 @@ function DashboardSidebar({
                 Cerrada
               </option>
 
-              <option value="Oportunidad">
-                Oportunidad
+              <option value="Por mejorar">
+                Por mejorar
               </option>
 
             </select>
@@ -6191,13 +6193,13 @@ function SummaryView({
 
         <KpiCard
           icon={Lightbulb}
-          label="Oportunidad de propuesta"
+          label="Propuestas por mejorar"
           value={
             statusData.find(
               (item) => item.key === "oportunidad"
             )?.value ?? 0
           }
-          sublabel="Cuentas por desarrollar"
+          sublabel="Propuestas que se deben ajustar"
           className="summary-status-card summary-status-opportunity"
         />
 
