@@ -51,6 +51,7 @@ import {
   X,
   TrendingUp,
   LogOut,
+  ExternalLink,
 } from "lucide-react";
 
 import {
@@ -2421,6 +2422,60 @@ function inferNacionalFromRow(
 
 
 /* =========================================================
+   HIPERVÍNCULOS DE LA COLUMNA "LINK DE PRESENTACIÓN"
+   ========================================================= */
+
+function getLinkColumns(worksheet) {
+
+  if (!worksheet["!ref"]) {
+    return [];
+  }
+
+  const range = XLSX.utils.decode_range(worksheet["!ref"]);
+
+  const columns = [];
+
+  for (let col = range.s.c; col <= range.e.c; col++) {
+
+    const cell =
+      worksheet[XLSX.utils.encode_cell({ r: range.s.r, c: col })];
+
+    if (cell && normalizeText(cell.v).includes("link")) {
+      columns.push(col);
+    }
+
+  }
+
+  return columns;
+
+}
+
+
+function getRowHyperlink(worksheet, rowNum, linkColumns) {
+
+  if (rowNum === undefined) {
+    return "";
+  }
+
+  for (const col of linkColumns) {
+
+    const cell =
+      worksheet[XLSX.utils.encode_cell({ r: rowNum, c: col })];
+
+    const target = cell?.l?.Target;
+
+    if (target && /^https?:\/\//i.test(target)) {
+      return target.replace(/&amp;/g, "&");
+    }
+
+  }
+
+  return "";
+
+}
+
+
+/* =========================================================
    CARGAR EXCEL
    ========================================================= */
 
@@ -2506,6 +2561,12 @@ async function loadExcelData() {
         );
 
 
+      const linkColumns =
+        getLinkColumns(
+          worksheet
+        );
+
+
       rawRows.forEach(
         (
           row,
@@ -2530,6 +2591,23 @@ async function loadExcelData() {
               `${sheetIndex}-${rowIndex}`,
               rowNacional
             );
+
+
+          /*
+           * El link real de la presentación está
+           * en el hipervínculo de la celda; el
+           * texto visible es el nombre del archivo.
+           */
+
+          normalized.linkUrl =
+            getRowHyperlink(
+              worksheet,
+              row.__rowNum__,
+              linkColumns
+            ) ||
+            (/^https?:\/\//i.test(normalized.linkPresentacion)
+              ? normalized.linkPresentacion
+              : "");
 
 
           /*
@@ -5321,6 +5399,10 @@ function ProposalTable({
             ASESOR
           </div>
 
+          <div>
+            LINK PRESENTACIÓN
+          </div>
+
         </div>
 
 
@@ -5443,6 +5525,42 @@ function ProposalTable({
                       </span>
 
                     </div>
+
+                  </div>
+
+
+                  {/* LINK PRESENTACIÓN */}
+
+                  <div>
+
+                    {row.linkUrl ? (
+
+                      <a
+                        className="proposal-table-link"
+                        href={row.linkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={row.linkPresentacion || row.linkUrl}
+                      >
+
+                        <ExternalLink
+                          size={12}
+                        />
+
+                        <span>
+                          {row.linkPresentacion &&
+                          !/^https?:\/\//i.test(row.linkPresentacion)
+                            ? row.linkPresentacion
+                            : "Abrir presentación"}
+                        </span>
+
+                      </a>
+
+                    ) : (
+
+                      "—"
+
+                    )}
 
                   </div>
 

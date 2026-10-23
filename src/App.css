@@ -3994,6 +3994,7 @@ img {
    * ESTADO
    * VALOR
    * ASESOR
+   * LINK PRESENTACIÓN
    */
 
   grid-template-columns:
@@ -4003,10 +4004,55 @@ img {
     minmax(170px, 1.5fr)
     minmax(80px, 0.65fr)
     minmax(95px, 0.8fr)
-    minmax(155px, 1.15fr);
+    minmax(155px, 1.15fr)
+    minmax(150px, 1.1fr);
 
   min-width:
-    900px;
+    1060px;
+}
+
+.proposal-table-link {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  max-width:
+    100%;
+
+  gap:
+    5px;
+
+  color:
+    var(--blue);
+
+  font-size:
+    10px;
+
+  text-decoration:
+    none;
+}
+
+.proposal-table-link:hover {
+  text-decoration:
+    underline;
+}
+
+.proposal-table-link svg {
+  flex-shrink:
+    0;
+}
+
+.proposal-table-link span {
+  overflow:
+    hidden;
+
+  white-space:
+    nowrap;
+
+  text-overflow:
+    ellipsis;
 }
 
 .proposal-table-header {
