@@ -74,7 +74,7 @@ import {
    CONFIGURACIÓN GENERAL
    ========================================================= */
 
-const EXCEL_FILE = "/Plantilla_Tablero_Comercial_PRISA_23del10_con_RUBRO.xlsx";
+const EXCEL_FILE = "/Tablero_Comercial_PRISA_26del10_con_RUBRO.xlsx";
 
 const IMAGE_PATH = "/images/";
 
@@ -5469,10 +5469,46 @@ function CustomTooltip({
    TABLA DE PROPUESTAS
    ========================================================= */
 
+const TABLE_STATUS_FILTERS = [
+  {
+    id: "todas",
+    label: "Todas",
+  },
+  {
+    id: "cerrada",
+    label: "Cerradas",
+  },
+  {
+    id: "seguimiento",
+    label: "En seguimiento",
+  },
+  {
+    id: "oportunidad",
+    label: "Por mejorar",
+  },
+];
+
+
 function ProposalTable({
   rows = [],
   onOpenProposal,
 }) {
+
+  const [
+    statusFilter,
+    setStatusFilter,
+  ] = useState("todas");
+
+
+  const visibleRows =
+    statusFilter === "todas"
+      ? rows
+      : rows.filter(
+          (row) =>
+            row.estado ===
+            statusFilter
+        );
+
 
   if (
     rows.length === 0
@@ -5524,8 +5560,67 @@ function ProposalTable({
 
 
         <span>
-          {rows.length} propuestas
+          {visibleRows.length} propuestas
         </span>
+
+      </div>
+
+
+      {/* FILTROS POR ESTADO */}
+
+      <div className="proposal-status-filters">
+
+        {TABLE_STATUS_FILTERS.map(
+          (filter) => {
+
+            const meta =
+              ESTADO_META[
+                filter.id
+              ];
+
+            const count =
+              filter.id === "todas"
+                ? rows.length
+                : rows.filter(
+                    (row) =>
+                      row.estado ===
+                      filter.id
+                  ).length;
+
+
+            return (
+              <button
+                key={filter.id}
+                type="button"
+                className={`proposal-status-filter ${
+                  statusFilter ===
+                  filter.id
+                    ? "active"
+                    : ""
+                }`}
+                style={{
+                  "--filter-color":
+                    meta?.color ||
+                    COLORS.text,
+                }}
+                onClick={() =>
+                  setStatusFilter(
+                    filter.id
+                  )
+                }
+              >
+
+                {filter.label}
+
+                <b>
+                  {count}
+                </b>
+
+              </button>
+            );
+
+          }
+        )}
 
       </div>
 
@@ -5571,7 +5666,15 @@ function ProposalTable({
 
         <div className="proposal-table-body">
 
-          {rows.map(
+          {visibleRows.length === 0 && (
+
+            <div className="proposal-status-empty">
+              No hay propuestas con este estado.
+            </div>
+
+          )}
+
+          {visibleRows.map(
             (row) => {
 
               const advisor =
@@ -8994,7 +9097,7 @@ async function handleLogin() {
         </strong>
 
         <span>
-          Leyendo información de Plantilla_Tablero_Comercial_PRISA_23del10_con_RUBRO.xlsx
+          Leyendo información de Tablero_Comercial_PRISA_26del10_con_RUBRO.xlsx
         </span>
 
       </div>
@@ -9042,7 +9145,7 @@ async function handleLogin() {
             Verifica que
             <strong>
               {" "}
-              Plantilla_Tablero_Comercial_PRISA_23del10_con_RUBRO.xlsx
+              Tablero_Comercial_PRISA_26del10_con_RUBRO.xlsx
             </strong>
             {" "}
             esté dentro de la carpeta
