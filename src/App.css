@@ -7525,3 +7525,20 @@ img {
   font-size: 12px;
   text-align: center;
 }
+
+
+/* =========================================================
+   KPI GENERAL CON DOS TARJETAS (seguimiento y cerradas)
+   ========================================================= */
+
+.summary-kpi-grid.summary-kpi-grid-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 480px) {
+
+  .summary-kpi-grid.summary-kpi-grid-two {
+    grid-template-columns: 1fr;
+  }
+
+}

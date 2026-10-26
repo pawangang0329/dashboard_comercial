@@ -39,7 +39,6 @@ import {
   LayoutGrid,
   FileText,
   CheckCircle2,
-  Lightbulb,
   DollarSign,
   Users,
   Tag,
@@ -74,7 +73,7 @@ import {
    CONFIGURACIÓN GENERAL
    ========================================================= */
 
-const EXCEL_FILE = "/Tablero_Comercial_PRISA_26del10_con_RUBRO.xlsx";
+const EXCEL_FILE = "/Tablero_Comercial_PRISA_Libro_con_RUBRO.xlsx";
 
 const IMAGE_PATH = "/images/";
 
@@ -694,20 +693,6 @@ const ESTADO_META = {
 
     soft:
       COLORS.greenSoft,
-
-  },
-
-
-  oportunidad: {
-
-    label:
-      "Por mejorar",
-
-    color:
-      COLORS.amber,
-
-    soft:
-      COLORS.amberSoft,
 
   },
 
@@ -1834,18 +1819,13 @@ function normalizeEstado(value) {
   }
 
 
-  if (
-    text.includes(
-      "oportunidad"
-    )
-  ) {
+  /*
+   * El Excel solo maneja En seguimiento y Cerrada.
+   * Cualquier otro valor (o vacío) se toma como
+   * en seguimiento.
+   */
 
-    return "oportunidad";
-
-  }
-
-
-  return "oportunidad";
+  return "seguimiento";
 
 }
 
@@ -3206,21 +3186,6 @@ function filterRows({
           }
 
 
-          if (
-            target ===
-            "por mejorar" ||
-            target ===
-            "oportunidad"
-          ) {
-
-            return (
-              estado ===
-              "oportunidad"
-            );
-
-          }
-
-
           return true;
 
         }
@@ -3681,18 +3646,6 @@ function getAvailableStatuses(
 
       }
 
-
-      if (
-        row.estado ===
-        "oportunidad"
-      ) {
-
-        states.add(
-          "Por mejorar"
-        );
-
-      }
-
     }
   );
 
@@ -3824,9 +3777,6 @@ function calculateStatusData(
     cerrada:
       0,
 
-    oportunidad:
-      0,
-
   };
 
 
@@ -3881,23 +3831,6 @@ function calculateStatusData(
 
       color:
         COLORS.green,
-
-    },
-
-
-    {
-
-      name:
-        "Por mejorar",
-
-      key:
-        "oportunidad",
-
-      value:
-        counts.oportunidad,
-
-      color:
-        COLORS.amber,
 
     },
 
@@ -4490,10 +4423,6 @@ function DashboardSidebar({
 
               <option value="Cerrada">
                 Cerrada
-              </option>
-
-              <option value="Por mejorar">
-                Por mejorar
               </option>
 
             </select>
@@ -5547,10 +5476,6 @@ const TABLE_STATUS_FILTERS = [
     id: "seguimiento",
     label: "En seguimiento",
   },
-  {
-    id: "oportunidad",
-    label: "Por mejorar",
-  },
 ];
 
 
@@ -6030,7 +5955,6 @@ function ActiveFilters({
 const PERIOD_STATUSES = [
   "seguimiento",
   "cerrada",
-  "oportunidad",
 ];
 
 
@@ -6820,7 +6744,7 @@ function SummaryView({
          KPIs
          ================================================= */}
 
-      <div className="summary-kpi-grid">
+      <div className="summary-kpi-grid summary-kpi-grid-two">
 
         <KpiCard
           icon={FileText}
@@ -6836,18 +6760,6 @@ function SummaryView({
           value={summary.closed}
           sublabel="Propuestas finalizadas / vendidas"
           className="summary-status-card summary-status-closed"
-        />
-
-        <KpiCard
-          icon={Lightbulb}
-          label="Propuestas por mejorar"
-          value={
-            statusData.find(
-              (item) => item.key === "oportunidad"
-            )?.value ?? 0
-          }
-          sublabel="Estado: Por mejorar"
-          className="summary-status-card summary-status-opportunity"
         />
 
       </div>
@@ -9162,7 +9074,7 @@ async function handleLogin() {
         </strong>
 
         <span>
-          Leyendo información de Tablero_Comercial_PRISA_26del10_con_RUBRO.xlsx
+          Leyendo información de Tablero_Comercial_PRISA_Libro_con_RUBRO.xlsx
         </span>
 
       </div>
@@ -9210,7 +9122,7 @@ async function handleLogin() {
             Verifica que
             <strong>
               {" "}
-              Tablero_Comercial_PRISA_26del10_con_RUBRO.xlsx
+              Tablero_Comercial_PRISA_Libro_con_RUBRO.xlsx
             </strong>
             {" "}
             esté dentro de la carpeta
