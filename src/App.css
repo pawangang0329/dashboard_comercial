@@ -7542,3 +7542,184 @@ img {
   }
 
 }
+
+
+/* =========================================================
+   BOTONES ATRÁS E INICIO
+   =========================================================
+   Arriba a la izquierda, siempre en el mismo lugar.
+   Área de clic de 36 px, ícono + texto y foco visible
+   para quien navega con teclado.
+   ========================================================= */
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar-navigation {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.topbar-nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 12px 0 9px;
+  color: #c9ccd5;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+}
+
+.topbar-nav-button:hover:not(:disabled) {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.topbar-nav-button:disabled {
+  color: #4e5261;
+  background: transparent;
+  cursor: default;
+}
+
+.topbar-nav-button:focus-visible,
+[role="button"]:focus-visible,
+.proposal-link-button:focus-visible,
+.proposal-table-link:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.topbar-title {
+  min-width: 0;
+}
+
+.topbar-title strong {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mobile-dashboard-header > strong {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* En celular solo íconos; el texto sigue disponible para lectores de pantalla */
+@media (max-width: 800px) {
+
+  .topbar-nav-button {
+    padding: 0;
+  }
+
+  .topbar-nav-button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+}
+
+
+/* =========================================================
+   LINK DE LA PRESENTACIÓN EN TODAS LAS VISTAS
+   ========================================================= */
+
+.proposal-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding: 10px 14px;
+  color: var(--blue);
+  text-decoration: none;
+  background: rgba(59, 142, 240, 0.1);
+  border: 1px solid rgba(59, 142, 240, 0.35);
+  border-radius: 8px;
+}
+
+.proposal-link-button:hover {
+  background: rgba(59, 142, 240, 0.18);
+}
+
+.proposal-link-button svg {
+  flex-shrink: 0;
+}
+
+.proposal-link-button span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.proposal-link-button strong {
+  color: var(--blue);
+  font-size: 12px;
+}
+
+.proposal-link-button small {
+  overflow: hidden;
+  color: #8b8fa3;
+  font-size: 10px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.proposal-link-missing {
+  color: #666b7b;
+  font-size: 11px;
+}
+
+.executive-proposal-table-header,
+.executive-proposal-row {
+  grid-template-columns:
+    150px
+    110px
+    minmax(160px, 1fr)
+    115px
+    105px
+    160px
+    170px;
+}
+
+.period-list-item {
+  grid-template-columns:
+    minmax(0, 1fr) auto auto minmax(0, 200px);
+}
+
+.period-list-link {
+  min-width: 0;
+}
+
+@media (max-width: 700px) {
+
+  .period-list-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .period-list-link {
+    grid-column: 1 / -1;
+  }
+
+}

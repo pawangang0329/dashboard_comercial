@@ -12,6 +12,7 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
 } from "react";
 
 import * as XLSX from "xlsx";
@@ -4547,6 +4548,8 @@ function DashboardTopbar({
   searchTerm,
   onSearchChange,
   onLogout,
+  navigation,
+  locationLabel,
 }) {
 
   return (
@@ -4554,18 +4557,20 @@ function DashboardTopbar({
 
       <div className="topbar-left">
 
+        {navigation}
+
         <div className="topbar-title">
 
           <span>
-            PRISA MEDIA
+            Dashboard Comercial
           </span>
 
           <ChevronRight
             size={12}
           />
 
-          <strong>
-            Dashboard Comercial
+          <strong aria-current="page">
+            {locationLabel}
           </strong>
 
         </div>
@@ -5242,6 +5247,7 @@ function ExecutiveDetail({
               <div>ESTADO</div>
               <div>VALOR DE LA PROPUESTA</div>
               <div>ASESOR</div>
+              <div>LINK PRESENTACIÓN</div>
             </div>
 
 
@@ -5254,13 +5260,12 @@ function ExecutiveDetail({
                     );
 
                   return (
-                    <button
-                      type="button"
+                    <div
                       className="executive-proposal-row"
                       key={row.id}
-                      onClick={() =>
+                      {...getRowOpenProps(() =>
                         onOpenProposal(row)
-                      }
+                      )}
                     >
                       <div>
                         <strong>
@@ -5305,7 +5310,11 @@ function ExecutiveDetail({
                           </span>
                         </div>
                       </div>
-                    </button>
+
+                      <div>
+                        <ProposalLink row={row} />
+                      </div>
+                    </div>
                   );
                 }
               )}
@@ -5377,6 +5386,14 @@ function ExecutiveDetail({
             <strong>
               {selectedAccount?.mes || "—"}
             </strong>
+          </div>
+
+          <div className="executive-account-item">
+            <span>Presentación</span>
+            <ProposalLink
+              row={selectedAccount}
+              variant="button"
+            />
           </div>
         </aside>
 
@@ -5455,6 +5472,120 @@ function CustomTooltip({
 
     </div>
   );
+
+}
+
+
+/* =========================================================
+   LINK DE LA PRESENTACIÓN
+   =========================================================
+   Se usa en todo lugar donde aparece una propuesta.
+   - "inline": dentro de tablas y listas.
+   - "button": botón destacado en el detalle.
+   El clic no abre el detalle de la fila que lo contiene.
+   ========================================================= */
+
+function getPresentationLabel(row) {
+
+  return row?.linkPresentacion &&
+    !/^https?:\/\//i.test(row.linkPresentacion)
+    ? row.linkPresentacion
+    : "Abrir presentación";
+
+}
+
+
+function ProposalLink({
+  row,
+  variant = "inline",
+}) {
+
+  if (!row?.linkUrl) {
+
+    return variant === "button" ? (
+      <span className="proposal-link-missing">
+        Esta propuesta no tiene presentación enlazada
+      </span>
+    ) : (
+      "—"
+    );
+
+  }
+
+
+  const isButton =
+    variant === "button";
+
+
+  return (
+    <a
+      className={
+        isButton
+          ? "proposal-link-button"
+          : "proposal-table-link"
+      }
+      href={row.linkUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={`Abrir en otra pestaña: ${getPresentationLabel(row)}`}
+      onClick={(event) =>
+        event.stopPropagation()
+      }
+      onKeyDown={(event) =>
+        event.stopPropagation()
+      }
+    >
+
+      <ExternalLink
+        size={isButton ? 15 : 12}
+      />
+
+      {isButton ? (
+
+        <span>
+          <strong>
+            Abrir presentación
+          </strong>
+          <small>
+            {getPresentationLabel(row)}
+          </small>
+        </span>
+
+      ) : (
+
+        <span>
+          {getPresentationLabel(row)}
+        </span>
+
+      )}
+
+    </a>
+  );
+
+}
+
+
+/*
+ * Filas que se pueden abrir con clic o teclado
+ * (Enter / Espacio) y que pueden contener links.
+ */
+
+function getRowOpenProps(onOpen) {
+
+  return {
+    role: "button",
+    tabIndex: 0,
+    onClick: onOpen,
+    onKeyDown: (event) => {
+      if (
+        event.key === "Enter" ||
+        event.key === " "
+      ) {
+        event.preventDefault();
+        onOpen();
+      }
+    },
+  };
 
 }
 
@@ -5789,34 +5920,9 @@ function ProposalTable({
 
                   <div>
 
-                    {row.linkUrl ? (
-
-                      <a
-                        className="proposal-table-link"
-                        href={row.linkUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={row.linkPresentacion || row.linkUrl}
-                      >
-
-                        <ExternalLink
-                          size={12}
-                        />
-
-                        <span>
-                          {row.linkPresentacion &&
-                          !/^https?:\/\//i.test(row.linkPresentacion)
-                            ? row.linkPresentacion
-                            : "Abrir presentación"}
-                        </span>
-
-                      </a>
-
-                    ) : (
-
-                      "—"
-
-                    )}
+                    <ProposalLink
+                      row={row}
+                    />
 
                   </div>
 
@@ -6302,11 +6408,12 @@ function PeriodSection({
 
               {periodProposals.map((item) => (
 
-                <button
-                  type="button"
+                <div
                   key={item.row.id}
                   className="period-list-item"
-                  onClick={() => onOpenProposal(item.row)}
+                  {...getRowOpenProps(() =>
+                    onOpenProposal(item.row)
+                  )}
                 >
 
                   <div className="period-list-info">
@@ -6321,7 +6428,11 @@ function PeriodSection({
 
                   <StatusBadge estado={item.row.estado} />
 
-                </button>
+                  <div className="period-list-link">
+                    <ProposalLink row={item.row} />
+                  </div>
+
+                </div>
 
               ))}
 
@@ -6604,26 +6715,7 @@ function FranchiseView({
                 </div>
 
                 <div>
-                  {row.linkUrl ? (
-                    <a
-                      className="proposal-table-link"
-                      href={row.linkUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={row.linkPresentacion || row.linkUrl}
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      <ExternalLink size={12} />
-                      <span>
-                        {row.linkPresentacion &&
-                        !/^https?:\/\//i.test(row.linkPresentacion)
-                          ? row.linkPresentacion
-                          : "Abrir presentación"}
-                      </span>
-                    </a>
-                  ) : (
-                    "—"
-                  )}
+                  <ProposalLink row={row} />
                 </div>
 
               </div>
@@ -7756,6 +7848,28 @@ function ProposalModal({
   onClose,
 }) {
 
+  useEffect(() => {
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    return () =>
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+
+  }, [onClose]);
+
+
   if (!row) {
     return null;
   }
@@ -7961,6 +8075,22 @@ function ProposalModal({
           </div>
 
 
+          {/* PRESENTACIÓN */}
+
+          <div className="proposal-detail-section">
+
+            <span>
+              PRESENTACIÓN
+            </span>
+
+            <ProposalLink
+              row={row}
+              variant="button"
+            />
+
+          </div>
+
+
           {/* NECESIDAD */}
 
           <div className="proposal-detail-section">
@@ -8117,6 +8247,149 @@ function ProposalModal({
 
 
 /* =========================================================
+   HISTORIAL DE NAVEGACIÓN
+   =========================================================
+   Cada pantalla (Resumen, Franquicias, un sector o un
+   ejecutivo) se guarda en el historial del navegador.
+   Así el botón "Atrás" del dashboard, el del navegador,
+   el botón lateral del mouse y Alt + ← hacen lo mismo.
+   ========================================================= */
+
+const HISTORY_EVENT =
+  "dashboard-history-change";
+
+
+function subscribeToHistory(callback) {
+
+  window.addEventListener(
+    "popstate",
+    callback
+  );
+
+  window.addEventListener(
+    HISTORY_EVENT,
+    callback
+  );
+
+  return () => {
+
+    window.removeEventListener(
+      "popstate",
+      callback
+    );
+
+    window.removeEventListener(
+      HISTORY_EVENT,
+      callback
+    );
+
+  };
+
+}
+
+
+function getHistoryIndex() {
+
+  return (
+    window.history.state
+      ?.dashboardIndex ?? 0
+  );
+
+}
+
+
+function isSameNavigation(a, b) {
+
+  return (
+    a?.userId === b?.userId &&
+    a?.section === b?.section &&
+    a?.rubro === b?.rubro &&
+    a?.executive === b?.executive
+  );
+
+}
+
+
+/* =========================================================
+   BOTONES ATRÁS E INICIO
+   =========================================================
+   - Siempre en el mismo lugar (arriba a la izquierda),
+     donde la gente espera encontrarlos.
+   - Ícono + texto, con área de clic de 36 px.
+   - Se deshabilitan cuando no hay a dónde ir, para que
+     quede claro en qué punto está el usuario.
+   ========================================================= */
+
+function NavigationButtons({
+  canGoBack,
+  isHome,
+  onGoBack,
+  onGoHome,
+}) {
+
+  return (
+    <nav
+      className="topbar-navigation"
+      aria-label="Navegación"
+    >
+
+      <button
+        type="button"
+        className="topbar-nav-button"
+        onClick={onGoBack}
+        disabled={!canGoBack}
+        title={
+          canGoBack
+            ? "Volver a la pantalla anterior (Alt + ←)"
+            : "No hay una pantalla anterior"
+        }
+      >
+
+        <ChevronLeft
+          size={16}
+        />
+
+        <span>
+          Atrás
+        </span>
+
+      </button>
+
+
+      <button
+        type="button"
+        className="topbar-nav-button"
+        onClick={onGoHome}
+        disabled={isHome}
+        aria-current={
+          isHome
+            ? "page"
+            : undefined
+        }
+        title={
+          isHome
+            ? "Ya estás en el inicio"
+            : "Ir al inicio (Resumen sin filtros)"
+        }
+      >
+
+        <HomeIcon
+          size={15}
+        />
+
+        <span>
+          Inicio
+        </span>
+
+      </button>
+
+    </nav>
+  );
+
+}
+
+
+/* =========================================================
    APP PRINCIPAL
    ========================================================= */
 
@@ -8254,6 +8527,169 @@ const [changePasswordError, setChangePasswordError] = useState("");
     mobileSidebarOpen,
     setMobileSidebarOpen,
   ] = useState(false);
+
+
+  /* =======================================================
+     HISTORIAL DE NAVEGACIÓN
+     ======================================================= */
+
+  const historyIndex =
+    useSyncExternalStore(
+      subscribeToHistory,
+      getHistoryIndex
+    );
+
+  const canGoBack =
+    historyIndex > 0;
+
+  const isHome =
+    !selectedExecutive &&
+    activeSection !== "franquicias" &&
+    selectedRubro === "Todos";
+
+
+  /*
+   * Cada vez que cambia la pantalla se agrega
+   * una entrada al historial. Al entrar con un
+   * usuario nuevo el historial arranca de cero.
+   */
+
+  useEffect(() => {
+
+    if (!selectedUser) {
+      return;
+    }
+
+    const navigation = {
+      userId: selectedUser.id,
+      section: activeSection,
+      rubro: selectedRubro,
+      executive: selectedExecutive,
+    };
+
+    const current =
+      window.history.state;
+
+    if (
+      isSameNavigation(
+        current?.dashboardNav,
+        navigation
+      )
+    ) {
+      return;
+    }
+
+    if (
+      current?.dashboardNav?.userId ===
+      selectedUser.id
+    ) {
+
+      window.history.pushState(
+        {
+          dashboardNav: navigation,
+          dashboardIndex:
+            getHistoryIndex() + 1,
+        },
+        ""
+      );
+
+    } else {
+
+      window.history.replaceState(
+        {
+          dashboardNav: navigation,
+          dashboardIndex: 0,
+        },
+        ""
+      );
+
+    }
+
+    window.dispatchEvent(
+      new Event(HISTORY_EVENT)
+    );
+
+  }, [
+    selectedUser,
+    activeSection,
+    selectedRubro,
+    selectedExecutive,
+  ]);
+
+
+  /*
+   * Atrás / Adelante del navegador:
+   * se restaura la pantalla guardada.
+   */
+
+  useEffect(() => {
+
+    function handlePopState(event) {
+
+      const navigation =
+        event.state?.dashboardNav;
+
+      setSelectedProposal(null);
+
+      if (!navigation) {
+        return;
+      }
+
+      setActiveSection(
+        navigation.section
+      );
+
+      setSelectedRubro(
+        navigation.rubro
+      );
+
+      setSelectedExecutive(
+        navigation.executive
+      );
+
+    }
+
+    window.addEventListener(
+      "popstate",
+      handlePopState
+    );
+
+    return () =>
+      window.removeEventListener(
+        "popstate",
+        handlePopState
+      );
+
+  }, []);
+
+
+  function handleGoBack() {
+
+    if (canGoBack) {
+      window.history.back();
+    }
+
+  }
+
+
+  function handleGoHome() {
+
+    clearFilters();
+
+    setActiveSection(
+      "resumen"
+    );
+
+    setSelectedExecutive(null);
+    setSelectedProposal(null);
+    setMobileSidebarOpen(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+  }
 
 
   /* =======================================================
@@ -8681,10 +9117,15 @@ async function handleLogin() {
      ======================================================= */
 
   const pageTitle =
-    selectedRubro !==
-      "Todos"
+    selectedExecutive
+      ? selectedExecutive
+      : activeSection ===
+        "franquicias"
+      ? "Franquicias"
+      : selectedRubro !==
+        "Todos"
       ? selectedRubro
-      : "Dashboard Comercial";
+      : "Resumen";
 
 
   /* =======================================================
@@ -9278,8 +9719,16 @@ async function handleLogin() {
           </button>
 
 
+          <NavigationButtons
+            canGoBack={canGoBack}
+            isHome={isHome}
+            onGoBack={handleGoBack}
+            onGoHome={handleGoHome}
+          />
+
+
           <strong>
-            Dashboard Comercial
+            {pageTitle}
           </strong>
 
 
@@ -9319,6 +9768,19 @@ async function handleLogin() {
 
           onLogout={
             handleLogout
+          }
+
+          locationLabel={
+            pageTitle
+          }
+
+          navigation={
+            <NavigationButtons
+              canGoBack={canGoBack}
+              isHome={isHome}
+              onGoBack={handleGoBack}
+              onGoHome={handleGoHome}
+            />
           }
 
         />
