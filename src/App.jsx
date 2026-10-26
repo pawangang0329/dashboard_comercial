@@ -114,6 +114,9 @@ const USERS = [
   filterTeam: "",
   canViewAll: true,
 
+  // Entra directo al dashboard, sin pedir contraseña
+  noPassword: true,
+
   image:
     `${IMAGE_PATH}TatianaGarciaHD.png`,
 },
