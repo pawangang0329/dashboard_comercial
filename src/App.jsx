@@ -9,8 +9,11 @@
    ========================================================= */
 
 import React, {
+  createContext,
+  useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
 } from "react";
@@ -19,7 +22,6 @@ import * as XLSX from "xlsx";
 
 import {
   Search,
-  Bell,
   HelpCircle,
   ChevronDown,
   ChevronRight,
@@ -52,6 +54,10 @@ import {
   TrendingUp,
   LogOut,
   ExternalLink,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+  ChevronsDown,
 } from "lucide-react";
 
 import {
@@ -784,6 +790,60 @@ function normalizeExecutiveName(value) {
       normalizeText(name)
     ] ||
     name
+  );
+
+}
+
+
+/* =========================================================
+   TEXTO LEGIBLE
+   =========================================================
+   Los textos que vienen del Excel TODO EN MAYÚSCULAS
+   se muestran en tipo oración, que se lee más rápido.
+   Los textos cortos (siglas) y los que ya traen
+   minúsculas se dejan como están.
+   ========================================================= */
+
+function toReadableCase(value) {
+
+  const text =
+    String(value ?? "").trim();
+
+  const letters =
+    text.replace(
+      /[^A-Za-zÁÉÍÓÚÑÜáéíóúñü]/g,
+      ""
+    );
+
+  if (
+    letters.length < 5 ||
+    letters !== letters.toUpperCase()
+  ) {
+    return text;
+  }
+
+  const lower =
+    text.toLocaleLowerCase("es");
+
+  return (
+    lower.charAt(0).toLocaleUpperCase("es") +
+    lower.slice(1)
+  );
+
+}
+
+
+/*
+ * Nacional de la propuesta. Alianzas y Productos
+ * generales no tienen Nacional; se muestra su equipo.
+ */
+
+function getTeamLabel(row) {
+
+  return (
+    row?.nacional ||
+    toReadableCase(row?.equipoExcel) ||
+    ""
   );
 
 }
@@ -2293,6 +2353,18 @@ function normalizeExcelRow(
             )
             .trim()
         : "",
+
+
+    // Valor original de EQUIPO (Alianzas, Productos generales...)
+    equipoExcel:
+      clean(
+        getRowValue(
+          row,
+          [
+            "EQUIPO",
+          ]
+        )
+      ),
 
 
     ejecutivo,
@@ -4461,7 +4533,19 @@ function DashboardSidebar({
 
         <div className="sector-list">
 
-          {sectors.map(
+          {/* Los sectores sin propuestas van al final y desactivados */}
+
+          {[...sectors]
+            .sort(
+              (a, b) =>
+                Number(
+                  (brandCountsByRubro?.[b] ?? 0) > 0
+                ) -
+                Number(
+                  (brandCountsByRubro?.[a] ?? 0) > 0
+                )
+            )
+            .map(
             (rubro) => {
 
               const Icon =
@@ -4482,6 +4566,10 @@ function DashboardSidebar({
                 selectedRubro ===
                 rubro;
 
+              const isEmpty =
+                count === 0 &&
+                !isActive;
+
 
               return (
                 <button
@@ -4493,6 +4581,22 @@ function DashboardSidebar({
                         ? "active"
                         : ""
                     }`
+                  }
+
+                  disabled={isEmpty}
+
+                  aria-current={
+                    isActive
+                      ? "page"
+                      : undefined
+                  }
+
+                  title={
+                    isEmpty
+                      ? `${rubro}: sin propuestas con los filtros actuales`
+                      : isActive
+                      ? `Quitar el filtro ${rubro}`
+                      : `Ver el sector ${rubro}`
                   }
 
                   onClick={() =>
@@ -4548,6 +4652,7 @@ function DashboardTopbar({
   searchTerm,
   onSearchChange,
   onLogout,
+  onOpenHelp,
   navigation,
   locationLabel,
 }) {
@@ -4609,24 +4714,13 @@ function DashboardTopbar({
         <button
           type="button"
           className="topbar-icon-button"
-          title="Ayuda"
+          title="Ayuda: cómo usar el dashboard"
+          aria-label="Ayuda"
+          onClick={onOpenHelp}
         >
 
           <HelpCircle
-            size={15}
-          />
-
-        </button>
-
-
-        <button
-          type="button"
-          className="topbar-icon-button"
-          title="Notificaciones"
-        >
-
-          <Bell
-            size={15}
+            size={16}
           />
 
         </button>
@@ -5267,29 +5361,30 @@ function ExecutiveDetail({
                         onOpenProposal(row)
                       )}
                     >
-                      <div>
+                      <div data-label="Marca">
                         <strong>
                           {row.cuenta || "—"}
                         </strong>
                       </div>
 
-                      <div>
+                      <div data-label="Sector">
                         {row.rubro || "—"}
                       </div>
 
-                      <div className="executive-proposal-text">
-                        {row.necesidad ||
-                          row.oportunidad ||
-                          "—"}
+                      <div data-label="Propuesta" className="executive-proposal-text">
+                        {toReadableCase(
+                          row.necesidad ||
+                            row.oportunidad
+                        ) || "—"}
                       </div>
 
-                      <div>
+                      <div data-label="Estado">
                         <StatusBadge
                           estado={row.estado}
                         />
                       </div>
 
-                      <div>
+                      <div data-label="Valor">
                         <strong>
                           {formatMoneyShort(
                             row.valorPropuesta
@@ -5297,7 +5392,7 @@ function ExecutiveDetail({
                         </strong>
                       </div>
 
-                      <div>
+                      <div data-label="Asesor">
                         <div className="proposal-table-advisor">
                           <Avatar
                             name={advisor.name}
@@ -5311,7 +5406,7 @@ function ExecutiveDetail({
                         </div>
                       </div>
 
-                      <div>
+                      <div data-label="Presentación">
                         <ProposalLink row={row} />
                       </div>
                     </div>
@@ -5352,9 +5447,10 @@ function ExecutiveDetail({
           <div className="executive-account-item">
             <span>Necesidad principal</span>
             <strong>
-              {selectedAccount?.necesidad ||
-                selectedAccount?.oportunidad ||
-                "Sin información"}
+              {toReadableCase(
+                selectedAccount?.necesidad ||
+                  selectedAccount?.oportunidad
+              ) || "Sin información"}
             </strong>
           </div>
 
@@ -5598,16 +5694,120 @@ const TABLE_STATUS_FILTERS = [
   {
     id: "todas",
     label: "Todas",
+    value: "Todos",
   },
   {
     id: "cerrada",
     label: "Cerradas",
+    value: "Cerrada",
   },
   {
     id: "seguimiento",
     label: "En seguimiento",
+    value: "En seguimiento",
   },
 ];
+
+
+/*
+ * Filtro de estado compartido: los botones de la tabla
+ * y el selector Estado de la barra izquierda son el
+ * mismo filtro, así nunca muestran cosas distintas.
+ */
+
+const StatusFilterContext =
+  createContext(null);
+
+
+const TABLE_COLUMNS = [
+  {
+    id: "ejecutivo",
+    label: "EJECUTIVO",
+    sortValue: (row) =>
+      normalizeText(row.ejecutivo),
+  },
+  {
+    id: "nacional",
+    label: "NACIONAL",
+    sortValue: (row) =>
+      normalizeText(getTeamLabel(row)),
+  },
+  {
+    id: "cuenta",
+    label: "MARCA",
+    sortValue: (row) =>
+      normalizeText(row.cuenta),
+  },
+  {
+    id: "necesidad",
+    label: "NECESIDAD / PROPUESTA",
+  },
+  {
+    id: "estado",
+    label: "ESTADO",
+    sortValue: (row) =>
+      row.estado,
+  },
+  {
+    id: "valor",
+    label: "VALOR DE LA PROPUESTA",
+    sortValue: (row) =>
+      toNumber(row.valorPropuesta),
+  },
+  {
+    id: "asesor",
+    label: "ASESOR",
+    sortValue: (row) =>
+      normalizeText(
+        getAdvisorData(row.asesor).name
+      ),
+  },
+  {
+    id: "link",
+    label: "LINK PRESENTACIÓN",
+  },
+];
+
+
+const TABLE_PAGE_SIZE = 25;
+
+
+function sortRows(
+  rows,
+  sort
+) {
+
+  const column =
+    TABLE_COLUMNS.find(
+      (item) => item.id === sort.column
+    );
+
+  if (!column?.sortValue) {
+    return rows;
+  }
+
+  const direction =
+    sort.direction === "asc" ? 1 : -1;
+
+  return [...rows].sort((a, b) => {
+
+    const valueA = column.sortValue(a);
+    const valueB = column.sortValue(b);
+
+    if (typeof valueA === "number") {
+      return (valueA - valueB) * direction;
+    }
+
+    return (
+      String(valueA).localeCompare(
+        String(valueB),
+        "es"
+      ) * direction
+    );
+
+  });
+
+}
 
 
 function ProposalTable({
@@ -5615,51 +5815,69 @@ function ProposalTable({
   onOpenProposal,
 }) {
 
+  const statusFilter =
+    useContext(StatusFilterContext);
+
+
+  /* Orden: clic en el título de la columna */
+
   const [
-    statusFilter,
-    setStatusFilter,
-  ] = useState("todas");
+    sort,
+    setSort,
+  ] = useState({
+    column: null,
+    direction: "asc",
+  });
 
 
-  const visibleRows =
-    statusFilter === "todas"
-      ? rows
-      : rows.filter(
-          (row) =>
-            row.estado ===
-            statusFilter
-        );
+  function handleSort(columnId) {
 
-
-  if (
-    rows.length === 0
-  ) {
-
-    return (
-      <div className="dashboard-panel">
-
-        <div className="empty-state">
-
-          <FileText
-            size={25}
-          />
-
-          <strong>
-            No hay propuestas
-          </strong>
-
-          <span>
-            No encontramos propuestas
-            que coincidan con los
-            filtros seleccionados.
-          </span>
-
-        </div>
-
-      </div>
-    );
+    setSort((current) => ({
+      column: columnId,
+      direction:
+        current.column === columnId &&
+        current.direction === "asc"
+          ? "desc"
+          : "asc",
+    }));
 
   }
+
+
+  /*
+   * Paginación: se muestran de a 25.
+   * Si cambian los filtros, vuelve a 25.
+   */
+
+  const [
+    limit,
+    setLimit,
+  ] = useState({
+    source: rows,
+    count: TABLE_PAGE_SIZE,
+  });
+
+  const visibleLimit =
+    limit.source === rows
+      ? limit.count
+      : TABLE_PAGE_SIZE;
+
+
+  const sortedRows =
+    useMemo(
+      () => sortRows(rows, sort),
+      [rows, sort]
+    );
+
+  const visibleRows =
+    sortedRows.slice(
+      0,
+      visibleLimit
+    );
+
+  const remaining =
+    sortedRows.length -
+    visibleRows.length;
 
 
   return (
@@ -5681,7 +5899,7 @@ function ProposalTable({
 
 
         <span>
-          {visibleRows.length} propuestas
+          {rows.length} propuestas
         </span>
 
       </div>
@@ -5689,244 +5907,58 @@ function ProposalTable({
 
       {/* FILTROS POR ESTADO */}
 
-      <div className="proposal-status-filters">
+      {statusFilter && (
 
-        {TABLE_STATUS_FILTERS.map(
-          (filter) => {
+        <div
+          className="proposal-status-filters"
+          role="group"
+          aria-label="Filtrar por estado"
+        >
 
-            const meta =
-              ESTADO_META[
-                filter.id
-              ];
+          {TABLE_STATUS_FILTERS.map(
+            (filter) => {
 
-            const count =
-              filter.id === "todas"
-                ? rows.length
-                : rows.filter(
-                    (row) =>
-                      row.estado ===
-                      filter.id
-                  ).length;
-
-
-            return (
-              <button
-                key={filter.id}
-                type="button"
-                className={`proposal-status-filter ${
-                  statusFilter ===
+              const meta =
+                ESTADO_META[
                   filter.id
-                    ? "active"
-                    : ""
-                }`}
-                style={{
-                  "--filter-color":
-                    meta?.color ||
-                    COLORS.text,
-                }}
-                onClick={() =>
-                  setStatusFilter(
-                    filter.id
-                  )
-                }
-              >
+                ];
 
-                {filter.label}
-
-                <b>
-                  {count}
-                </b>
-
-              </button>
-            );
-
-          }
-        )}
-
-      </div>
-
-
-      <div className="proposal-table">
-
-        <div className="proposal-table-header">
-
-          <div>
-            EJECUTIVO
-          </div>
-
-          <div>
-            NACIONAL
-          </div>
-
-          <div>
-            MARCA
-          </div>
-
-          <div>
-            NECESIDAD / PROPUESTA
-          </div>
-
-          <div>
-            ESTADO
-          </div>
-
-          <div>
-            VALOR DE LA PROPUESTA
-          </div>
-
-          <div>
-            ASESOR
-          </div>
-
-          <div>
-            LINK PRESENTACIÓN
-          </div>
-
-        </div>
-
-
-        <div className="proposal-table-body">
-
-          {visibleRows.length === 0 && (
-
-            <div className="proposal-status-empty">
-              No hay propuestas con este estado.
-            </div>
-
-          )}
-
-          {visibleRows.map(
-            (row) => {
-
-              const advisor =
-                getAdvisorData(
-                  row.asesor
-                );
+              const isActive =
+                statusFilter.selectedStatus ===
+                filter.value;
 
 
               return (
-                <div
-                  className="proposal-table-row"
-                  key={
-                    row.id
+                <button
+                  key={filter.id}
+                  type="button"
+                  className={`proposal-status-filter ${
+                    isActive
+                      ? "active"
+                      : ""
+                  }`}
+                  aria-pressed={isActive}
+                  style={{
+                    "--filter-color":
+                      meta?.color ||
+                      COLORS.text,
+                  }}
+                  onClick={() =>
+                    statusFilter.onStatusChange(
+                      filter.value
+                    )
                   }
                 >
 
-                  {/* EJECUTIVO */}
+                  {filter.label}
 
-                  <div>
+                  <b>
+                    {statusFilter.counts[
+                      filter.id
+                    ] ?? 0}
+                  </b>
 
-                    <strong>
-                      {row.ejecutivo ||
-                        "—"}
-                    </strong>
-
-                  </div>
-
-
-                  {/* NACIONAL */}
-
-                  <div>
-
-                    {row.nacional ||
-                      "—"}
-
-                  </div>
-
-
-                  {/* MARCA */}
-
-                  <div>
-
-                    <strong>
-                      {row.cuenta ||
-                        "—"}
-                    </strong>
-
-                  </div>
-
-
-                  {/* PROPUESTA */}
-
-                  <div>
-
-                    <div className="proposal-table-need">
-
-                      {row.necesidad ||
-                        row.oportunidad ||
-                        "—"}
-
-                    </div>
-
-                  </div>
-
-
-                  {/* ESTADO */}
-
-                  <div>
-
-                    <StatusBadge
-                      estado={
-                        row.estado
-                      }
-                    />
-
-                  </div>
-
-
-                  {/* VALOR */}
-
-                  <div>
-
-                    <strong>
-                      {formatMoneyShort(
-                        row.valorPropuesta
-                      )}
-                    </strong>
-
-                  </div>
-
-
-                  {/* ASESOR */}
-
-                  <div>
-
-                    <div className="proposal-table-advisor">
-
-                      <Avatar
-                        name={
-                          advisor.name
-                        }
-                        initials={
-                          advisor.initials
-                        }
-                        image={
-                          advisor.image
-                        }
-                        size="small"
-                      />
-
-
-                      <span>
-                        {advisor.name}
-                      </span>
-
-                    </div>
-
-                  </div>
-
-
-                  {/* LINK PRESENTACIÓN */}
-
-                  <div>
-
-                    <ProposalLink
-                      row={row}
-                    />
-
-                  </div>
-
-                </div>
+                </button>
               );
 
             }
@@ -5934,7 +5966,303 @@ function ProposalTable({
 
         </div>
 
-      </div>
+      )}
+
+
+      {rows.length === 0 ? (
+
+        <div className="empty-state">
+
+          <FileText
+            size={25}
+          />
+
+          <strong>
+            No hay propuestas
+          </strong>
+
+          <span>
+            No encontramos propuestas
+            que coincidan con los
+            filtros seleccionados.
+          </span>
+
+        </div>
+
+      ) : (
+
+        <div className="proposal-table">
+
+          <div className="proposal-table-header">
+
+            {TABLE_COLUMNS.map(
+              (column) => {
+
+                if (!column.sortValue) {
+
+                  return (
+                    <div key={column.id}>
+                      {column.label}
+                    </div>
+                  );
+
+                }
+
+                const isSorted =
+                  sort.column === column.id;
+
+                const SortIcon =
+                  !isSorted
+                    ? ArrowUpDown
+                    : sort.direction === "asc"
+                    ? ArrowUp
+                    : ArrowDown;
+
+
+                return (
+                  <div
+                    key={column.id}
+                    aria-sort={
+                      isSorted
+                        ? sort.direction === "asc"
+                          ? "ascending"
+                          : "descending"
+                        : "none"
+                    }
+                  >
+
+                    <button
+                      type="button"
+                      className={`table-sort-button ${
+                        isSorted
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        handleSort(column.id)
+                      }
+                      title={`Ordenar por ${column.label.toLowerCase()}`}
+                    >
+
+                      {column.label}
+
+                      <SortIcon
+                        size={12}
+                      />
+
+                    </button>
+
+                  </div>
+                );
+
+              }
+            )}
+
+          </div>
+
+
+          <div className="proposal-table-body">
+
+            {visibleRows.map(
+              (row) => {
+
+                const advisor =
+                  getAdvisorData(
+                    row.asesor
+                  );
+
+
+                return (
+                  <div
+                    className="proposal-table-row"
+                    key={
+                      row.id
+                    }
+                    title="Ver el detalle de la propuesta"
+                    {...getRowOpenProps(() =>
+                      onOpenProposal(row)
+                    )}
+                  >
+
+                    {/* EJECUTIVO */}
+
+                    <div data-label="Ejecutivo">
+
+                      <strong>
+                        {row.ejecutivo ||
+                          "—"}
+                      </strong>
+
+                    </div>
+
+
+                    {/* NACIONAL */}
+
+                    <div data-label="Nacional">
+
+                      {getTeamLabel(row) ||
+                        "—"}
+
+                    </div>
+
+
+                    {/* MARCA */}
+
+                    <div data-label="Marca">
+
+                      <strong>
+                        {row.cuenta ||
+                          "—"}
+                      </strong>
+
+                    </div>
+
+
+                    {/* PROPUESTA */}
+
+                    <div data-label="Propuesta">
+
+                      <div className="proposal-table-need">
+
+                        {toReadableCase(
+                          row.necesidad ||
+                            row.oportunidad
+                        ) || "—"}
+
+                      </div>
+
+                    </div>
+
+
+                    {/* ESTADO */}
+
+                    <div data-label="Estado">
+
+                      <StatusBadge
+                        estado={
+                          row.estado
+                        }
+                      />
+
+                    </div>
+
+
+                    {/* VALOR */}
+
+                    <div data-label="Valor">
+
+                      <strong>
+                        {formatMoneyShort(
+                          row.valorPropuesta
+                        )}
+                      </strong>
+
+                    </div>
+
+
+                    {/* ASESOR */}
+
+                    <div data-label="Asesor">
+
+                      <div
+                        className="proposal-table-advisor"
+                        title={advisor.name}
+                      >
+
+                        <Avatar
+                          name={
+                            advisor.name
+                          }
+                          initials={
+                            advisor.initials
+                          }
+                          image={
+                            advisor.image
+                          }
+                          size="small"
+                        />
+
+
+                        <span>
+                          {advisor.name}
+                        </span>
+
+                      </div>
+
+                    </div>
+
+
+                    {/* LINK PRESENTACIÓN */}
+
+                    <div data-label="Presentación">
+
+                      <ProposalLink
+                        row={row}
+                      />
+
+                    </div>
+
+                  </div>
+                );
+
+              }
+            )}
+
+          </div>
+
+
+          {/* PAGINACIÓN */}
+
+          <div className="proposal-table-footer">
+
+            <span>
+              Mostrando {visibleRows.length} de {sortedRows.length}
+            </span>
+
+            {remaining > 0 && (
+
+              <div className="proposal-table-more">
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setLimit({
+                      source: rows,
+                      count:
+                        visibleLimit +
+                        TABLE_PAGE_SIZE,
+                    })
+                  }
+                >
+                  <ChevronsDown
+                    size={14}
+                  />
+                  Ver {Math.min(TABLE_PAGE_SIZE, remaining)} más
+                </button>
+
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() =>
+                    setLimit({
+                      source: rows,
+                      count:
+                        sortedRows.length,
+                    })
+                  }
+                >
+                  Ver todas
+                </button>
+
+              </div>
+
+            )}
+
+          </div>
+
+        </div>
+
+      )}
 
     </div>
   );
@@ -5950,10 +6278,22 @@ function ActiveFilters({
   selectedTeam,
   selectedStatus,
   selectedRubro,
+  searchTerm = "",
   onClear,
 }) {
 
   const filters = [];
+
+
+  if (
+    searchTerm.trim()
+  ) {
+
+    filters.push(
+      `Búsqueda: "${searchTerm.trim()}"`
+    );
+
+  }
 
 
   if (
@@ -6736,9 +7076,6 @@ function FranchiseView({
 
 function SummaryView({
   rows,
-  selectedTeam,
-  selectedStatus,
-  selectedRubro,
   onOpenProposal,
 }) {
 
@@ -6809,27 +7146,6 @@ function SummaryView({
         </div>
 
       </div>
-
-
-      {/* =================================================
-         FILTROS
-         ================================================= */}
-
-      <ActiveFilters
-        selectedTeam={
-          selectedTeam
-        }
-
-        selectedStatus={
-          selectedStatus
-        }
-
-        selectedRubro={
-          selectedRubro
-        }
-
-        onClear={() => {}}
-      />
 
 
       {/* =================================================
@@ -7843,6 +8159,145 @@ function RubroView({
    MODAL DE PROPUESTA
    ========================================================= */
 
+/* =========================================================
+   AYUDA
+   ========================================================= */
+
+const HELP_TOPICS = [
+  {
+    title: "Moverse por el dashboard",
+    text:
+      "Usa Atrás para volver a la pantalla anterior e Inicio para regresar al Resumen sin filtros. También funcionan el botón Atrás del navegador y Alt + ←.",
+  },
+  {
+    title: "Filtrar la información",
+    text:
+      "En la barra izquierda elige Equipo, Estado o un Sector. Los filtros aplicados aparecen arriba en Filtros activos; con Limpiar filtros vuelves a ver todo.",
+  },
+  {
+    title: "Buscar",
+    text:
+      "Escribe en el buscador una marca, un ejecutivo o un asesor. La búsqueda se suma a los demás filtros.",
+  },
+  {
+    title: "Ver una propuesta",
+    text:
+      "Haz clic en cualquier fila para ver el detalle completo. El enlace azul abre la presentación en otra pestaña. Cierra el detalle con Esc o con la X.",
+  },
+  {
+    title: "Tabla Detalle",
+    text:
+      "Haz clic en el título de una columna para ordenar. Los botones de estado filtran la tabla y el resto del dashboard.",
+  },
+  {
+    title: "Compartir una vista",
+    text:
+      "La dirección de la página guarda la vista actual (sector, ejecutivo o Franquicias). Cópiala para volver a ella después.",
+  },
+];
+
+
+function HelpModal({
+  onClose,
+}) {
+
+  useEffect(() => {
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    return () =>
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+
+  }, [onClose]);
+
+
+  return (
+    <div
+      className="proposal-modal-overlay"
+      onMouseDown={(event) => {
+        if (
+          event.target ===
+          event.currentTarget
+        ) {
+          onClose();
+        }
+      }}
+    >
+
+      <div
+        className="proposal-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="help-title"
+      >
+
+        <div className="proposal-modal-header">
+
+          <div>
+            <span>
+              AYUDA
+            </span>
+
+            <h2 id="help-title">
+              Cómo usar el dashboard
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar ayuda"
+            autoFocus
+          >
+            <X
+              size={17}
+            />
+          </button>
+
+        </div>
+
+
+        <div className="proposal-modal-body">
+
+          {HELP_TOPICS.map((topic) => (
+
+            <div
+              className="proposal-detail-section"
+              key={topic.title}
+            >
+              <span>
+                {topic.title.toUpperCase()}
+              </span>
+
+              <p>
+                {topic.text}
+              </p>
+            </div>
+
+          ))}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+
+}
+
+
 function ProposalModal({
   row,
   onClose,
@@ -7899,7 +8354,12 @@ function ProposalModal({
       }}
     >
 
-      <div className="proposal-modal">
+      <div
+        className="proposal-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="proposal-modal-title"
+      >
 
         {/* HEADER */}
 
@@ -7911,7 +8371,7 @@ function ProposalModal({
               DETALLE DE PROPUESTA
             </span>
 
-            <h2>
+            <h2 id="proposal-modal-title">
               {row.cuenta ||
                 "Propuesta"}
             </h2>
@@ -7925,6 +8385,8 @@ function ProposalModal({
               onClose
             }
             aria-label="Cerrar"
+            title="Cerrar (Esc)"
+            autoFocus
           >
 
             <X
@@ -7965,7 +8427,7 @@ function ProposalModal({
               </span>
 
               <strong>
-                {row.nacional ||
+                {getTeamLabel(row) ||
                   "—"}
               </strong>
 
@@ -8100,9 +8562,10 @@ function ProposalModal({
             </span>
 
             <p>
-              {row.necesidad ||
-                row.oportunidad ||
-                "Sin información"}
+              {toReadableCase(
+                row.necesidad ||
+                  row.oportunidad
+              ) || "Sin información"}
             </p>
 
           </div>
@@ -8294,6 +8757,70 @@ function getHistoryIndex() {
     window.history.state
       ?.dashboardIndex ?? 0
   );
+
+}
+
+
+/*
+ * La vista también queda en la dirección de la página
+ * (?sector=Banca, ?vista=franquicias, ?ejecutivo=...)
+ * para poder copiarla y volver a ella.
+ */
+
+function buildViewUrl(navigation) {
+
+  const params =
+    new URLSearchParams();
+
+  if (navigation.section === "franquicias") {
+    params.set("vista", "franquicias");
+  }
+
+  if (navigation.rubro && navigation.rubro !== "Todos") {
+    params.set("sector", navigation.rubro);
+  }
+
+  if (navigation.executive) {
+    params.set("ejecutivo", navigation.executive);
+  }
+
+  const query =
+    params.toString();
+
+  return `${window.location.pathname}${query ? `?${query}` : ""}`;
+
+}
+
+
+function readViewFromUrl() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const rubro =
+    params.get("sector");
+
+  const executive =
+    params.get("ejecutivo");
+
+  const isFranchise =
+    params.get("vista") === "franquicias";
+
+  if (!rubro && !executive && !isFranchise) {
+    return null;
+  }
+
+  return {
+    section: isFranchise
+      ? "franquicias"
+      : rubro
+      ? "sector"
+      : "resumen",
+    rubro: rubro || "Todos",
+    executive: executive || null,
+  };
 
 }
 
@@ -8530,6 +9057,16 @@ const [changePasswordError, setChangePasswordError] = useState("");
 
 
   /* =======================================================
+     AYUDA
+     ======================================================= */
+
+  const [
+    showHelp,
+    setShowHelp,
+  ] = useState(false);
+
+
+  /* =======================================================
      HISTORIAL DE NAVEGACIÓN
      ======================================================= */
 
@@ -8541,6 +9078,12 @@ const [changePasswordError, setChangePasswordError] = useState("");
 
   const canGoBack =
     historyIndex > 0;
+
+
+  /* Vista pedida en la dirección al abrir la página (se usa una vez) */
+
+  const pendingUrlViewRef =
+    useRef(readViewFromUrl());
 
   const isHome =
     !selectedExecutive &&
@@ -8590,7 +9133,8 @@ const [changePasswordError, setChangePasswordError] = useState("");
           dashboardIndex:
             getHistoryIndex() + 1,
         },
-        ""
+        "",
+        buildViewUrl(navigation)
       );
 
     } else {
@@ -8600,7 +9144,8 @@ const [changePasswordError, setChangePasswordError] = useState("");
           dashboardNav: navigation,
           dashboardIndex: 0,
         },
-        ""
+        "",
+        buildViewUrl(navigation)
       );
 
     }
@@ -8684,12 +9229,69 @@ const [changePasswordError, setChangePasswordError] = useState("");
     setSelectedProposal(null);
     setMobileSidebarOpen(false);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
+  }
+
+
+  /*
+   * Al cambiar de pantalla, el contenido nuevo
+   * aparece debajo de los equipos. Se lleva la
+   * vista hasta él para que el cambio se vea;
+   * al volver al inicio se sube al principio.
+   */
+
+  const viewRef =
+    useRef(null);
+
+  const lastViewRef =
+    useRef(null);
+
+  useEffect(() => {
+
+    const viewKey =
+      `${activeSection}|${selectedRubro}|${selectedExecutive ?? ""}`;
+
+    const previousKey =
+      lastViewRef.current;
+
+    lastViewRef.current =
+      viewKey;
+
+    if (
+      previousKey === null ||
+      previousKey === viewKey
+    ) {
+      return;
+    }
+
+    const behavior =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches
+        ? "auto"
+        : "smooth";
+
+    if (isHome) {
+
+      window.scrollTo({
+        top: 0,
+        behavior,
+      });
+
+      return;
+
+    }
+
+    viewRef.current?.scrollIntoView({
+      behavior,
+      block: "start",
     });
 
-  }
+  }, [
+    activeSection,
+    selectedRubro,
+    selectedExecutive,
+    isHome,
+  ]);
 
 
   /* =======================================================
@@ -8828,6 +9430,34 @@ const [changePasswordError, setChangePasswordError] = useState("");
 
     setSearchTerm("");
     setSelectedExecutive(null);
+
+
+    /*
+     * Si la página se abrió con una vista en la
+     * dirección (enlace compartido), se muestra
+     * esa vista al entrar.
+     */
+
+    const urlView =
+      pendingUrlViewRef.current;
+
+    if (selectedUser && urlView) {
+
+      pendingUrlViewRef.current = null;
+
+      setActiveSection(
+        urlView.section
+      );
+
+      setSelectedRubro(
+        urlView.rubro
+      );
+
+      setSelectedExecutive(
+        urlView.executive
+      );
+
+    }
 
   }, [
     selectedUser,
@@ -9110,6 +9740,62 @@ async function handleLogin() {
 
   const currentRows =
     filteredRows;
+
+
+  /* =======================================================
+     FILTRO DE ESTADO COMPARTIDO
+     =======================================================
+     Los botones de estado de la tabla Detalle y el selector
+     Estado de la barra izquierda usan este mismo valor.
+     Los contadores ignoran el estado para que cada botón
+     diga cuántas propuestas va a mostrar.
+     ======================================================= */
+
+  const statusFilterValue =
+    useMemo(() => {
+
+      const rowsAnyStatus =
+        filterRows({
+          rows,
+          user:
+            selectedUser,
+          selectedTeam,
+          selectedStatus:
+            "Todos",
+          selectedRubro,
+          searchTerm,
+        });
+
+      return {
+        selectedStatus,
+        onStatusChange:
+          setSelectedStatus,
+        counts: {
+          todas:
+            rowsAnyStatus.length,
+          seguimiento:
+            rowsAnyStatus.filter(
+              (row) =>
+                row.estado ===
+                "seguimiento"
+            ).length,
+          cerrada:
+            rowsAnyStatus.filter(
+              (row) =>
+                row.estado ===
+                "cerrada"
+            ).length,
+        },
+      };
+
+    }, [
+      rows,
+      selectedUser,
+      selectedTeam,
+      selectedStatus,
+      selectedRubro,
+      searchTerm,
+    ]);
 
 
   /* =======================================================
@@ -9506,17 +10192,57 @@ async function handleLogin() {
 
     return (
 
-      <div className="dashboard-loading">
+      /*
+       * Esqueleto con la forma del dashboard: la espera
+       * se percibe más corta que con una pantalla vacía.
+       */
 
-        <div className="loading-spinner" />
+      <div
+        className="dashboard-skeleton"
+        role="status"
+        aria-busy="true"
+      >
 
-        <strong>
-          Cargando dashboard...
-        </strong>
+        <div className="skeleton-sidebar">
+          <div className="skeleton-block skeleton-logo" />
+          {Array.from({ length: 8 }, (_, index) => (
+            <div
+              key={index}
+              className="skeleton-block skeleton-line"
+            />
+          ))}
+        </div>
 
-        <span>
-          Leyendo información de Tablero_Comercial_PRISA_Libro_con_RUBRO.xlsx
-        </span>
+        <div className="skeleton-main">
+
+          <div className="skeleton-topbar">
+            <div className="skeleton-block skeleton-search" />
+          </div>
+
+          <div className="skeleton-content">
+
+            <p className="skeleton-message">
+              <strong>Cargando dashboard…</strong>
+              <span>
+                Leyendo {EXCEL_FILE.replace("/", "")}
+              </span>
+            </p>
+
+            <div className="skeleton-kpis">
+              {Array.from({ length: 3 }, (_, index) => (
+                <div
+                  key={index}
+                  className="skeleton-block skeleton-kpi"
+                />
+              ))}
+            </div>
+
+            <div className="skeleton-block skeleton-panel" />
+            <div className="skeleton-block skeleton-panel" />
+
+          </div>
+
+        </div>
 
       </div>
 
@@ -9563,7 +10289,7 @@ async function handleLogin() {
             Verifica que
             <strong>
               {" "}
-              Tablero_Comercial_PRISA_Libro_con_RUBRO.xlsx
+              {EXCEL_FILE.replace("/", "")}
             </strong>
             {" "}
             esté dentro de la carpeta
@@ -9774,6 +10500,10 @@ async function handleLogin() {
             pageTitle
           }
 
+          onOpenHelp={() =>
+            setShowHelp(true)
+          }
+
           navigation={
             <NavigationButtons
               canGoBack={canGoBack}
@@ -9796,7 +10526,10 @@ async function handleLogin() {
 
           <ActiveFilters
             selectedTeam={
-              selectedTeam
+              /* La Nacional fija de un líder no es un filtro que se pueda quitar */
+              selectedUser?.filterTeam
+                ? "Todos"
+                : selectedTeam
             }
 
             selectedStatus={
@@ -9805,6 +10538,10 @@ async function handleLogin() {
 
             selectedRubro={
               selectedRubro
+            }
+
+            searchTerm={
+              searchTerm
             }
 
             onClear={
@@ -9848,6 +10585,15 @@ async function handleLogin() {
           {/* =================================================
              VISTA
              ================================================= */}
+
+          <StatusFilterContext.Provider
+            value={statusFilterValue}
+          >
+
+          <div
+            ref={viewRef}
+            className="dashboard-view"
+          >
 
           {selectedExecutive ? (
 
@@ -9921,18 +10667,6 @@ async function handleLogin() {
                 currentRows
               }
 
-              selectedTeam={
-                selectedTeam
-              }
-
-              selectedStatus={
-                selectedStatus
-              }
-
-              selectedRubro={
-                selectedRubro
-              }
-
               onOpenProposal={
                 setSelectedProposal
               }
@@ -9940,6 +10674,10 @@ async function handleLogin() {
             />
 
           )}
+
+          </div>
+
+          </StatusFilterContext.Provider>
 
         </div>
 
@@ -10108,6 +10846,17 @@ async function handleLogin() {
       {/* ===================================================
          MODAL
          =================================================== */}
+
+      {showHelp && (
+
+        <HelpModal
+          onClose={() =>
+            setShowHelp(false)
+          }
+        />
+
+      )}
+
 
       {selectedProposal && (
 
