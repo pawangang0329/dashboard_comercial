@@ -741,6 +741,68 @@ function normalizeText(value) {
 }
 
 /* =========================================================
+   NOMBRES DE EJECUTIVOS
+   =========================================================
+   En el Excel algunos ejecutivos aparecen escritos de
+   varias formas. Aquí se unifican en un solo nombre.
+   La clave va normalizada (minúsculas y sin tildes).
+   ========================================================= */
+
+const EXECUTIVE_ALIASES = {
+
+  "diana andrea rodiguez":
+    "Diana Andrea Rodríguez",
+
+  "diana andrea rodriguez":
+    "Diana Andrea Rodríguez",
+
+  "diana rodriguez":
+    "Diana Andrea Rodríguez",
+
+  "carol beltan":
+    "Carol Beltrán",
+
+  "carol beltran":
+    "Carol Beltrán",
+
+  "rosa diaz":
+    "Rosa Jeymy Díaz",
+
+  "rosa jeymy diaz":
+    "Rosa Jeymy Díaz",
+
+  "laura calvera":
+    "Laura Sofía Calvera",
+
+  "laura sofia calvera":
+    "Laura Sofía Calvera",
+
+  "karen perez":
+    "Karen Pérez",
+
+  "luis lopez":
+    "Luis López",
+
+};
+
+
+function normalizeExecutiveName(value) {
+
+  const name =
+    String(value ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  return (
+    EXECUTIVE_ALIASES[
+      normalizeText(name)
+    ] ||
+    name
+  );
+
+}
+
+/* =========================================================
    DETECTAR RUBRO POR CONTENIDO
    ========================================================= */
 
@@ -1518,15 +1580,15 @@ function getUserImage(name) {
   }
 
   if (
-  normalized.includes("carol")
-) {
-  return `${IMAGE_PATH}CarolBeltran.png`;
-}
-
-  if (
     normalized.includes("carolina diaz")
   ) {
     return `${IMAGE_PATH}CarolinaDiaz.png`;
+  }
+
+  if (
+    normalized.includes("carol")
+  ) {
+    return `${IMAGE_PATH}CarolBeltran.png`;
   }
 
   if (
@@ -1920,7 +1982,7 @@ function normalizeExcelRow(
      ===================================================== */
 
   const ejecutivo =
-    clean(
+    normalizeExecutiveName(
       getRowValue(
         row,
         [
