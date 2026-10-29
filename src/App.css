@@ -2628,6 +2628,14 @@ img {
     12px;
 }
 
+.period-list-info .period-list-advisor {
+  color:
+    #a9adb9;
+
+  font-size:
+    11px;
+}
+
 .period-list-dates {
   display:
     flex;
@@ -8026,6 +8034,74 @@ img {
   .proposal-table-more button {
     flex: 1;
     justify-content: center;
+  }
+
+}
+
+
+/* =========================================================
+   EQUIPO INNOVACIÓN DIGITAL: TARJETAS CLICABLES
+   ========================================================= */
+
+.innovation-card-button {
+  width: 100%;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.innovation-member-card.innovation-card-button {
+  border-style: solid;
+}
+
+.innovation-card-button:hover {
+  border-color: rgba(230, 25, 122, 0.45);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.innovation-card-button[aria-pressed="true"] {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 1px var(--pink) inset;
+}
+
+.innovation-card-button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.innovation-card-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
+  color: #c9ccd5;
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.innovation-card-button:hover .innovation-card-count,
+.innovation-card-button[aria-pressed="true"] .innovation-card-count {
+  color: #ffffff;
+}
+
+.innovation-director-card .innovation-director-badge {
+  margin-left: auto;
+}
+
+.innovation-director-card .innovation-director-badge + .innovation-card-count {
+  margin-left: 12px;
+}
+
+@media (max-width: 700px) {
+
+  .innovation-director-card .innovation-director-badge {
+    display: none;
   }
 
 }

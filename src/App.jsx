@@ -3012,6 +3012,40 @@ function findUserByName(name) {
    OBTENER ASESOR
    ========================================================= */
 
+/*
+ * Propuestas de cada persona de Innovación Digital
+ * según la columna ASESOR INNOVACION DIGITAL.
+ * Las de "Equipo Innovación Digital" son del director.
+ */
+
+const ADVISOR_ALIASES = {
+  "glen orillo starke": [
+    "equipo innovacion digital",
+    "glen orillo starke",
+    "glen orillo",
+  ],
+};
+
+
+function advisorMatches(
+  row,
+  advisorName
+) {
+
+  const asesor =
+    normalizeText(row?.asesor);
+
+  const key =
+    normalizeText(advisorName);
+
+  const aliases =
+    ADVISOR_ALIASES[key] || [key];
+
+  return aliases.includes(asesor);
+
+}
+
+
 function getAdvisorData(
   advisorName
 ) {
@@ -4783,8 +4817,38 @@ function DashboardTopbar({
    ========================================================= */
 
 function InnovationTeamSection({
-  selectedTeam,
+  rows = [],
+  selectedAdvisor,
+  onOpenAdvisor,
 }) {
+
+  /*
+   * Cada persona es un botón que abre sus propuestas.
+   */
+
+  const getCount = (name) =>
+    rows.filter((row) =>
+      advisorMatches(row, name)
+    ).length;
+
+  const getCardProps = (name) => {
+
+    const isActive =
+      normalizeText(selectedAdvisor) ===
+      normalizeText(name);
+
+    return {
+      type: "button",
+      "aria-pressed": isActive,
+      title: isActive
+        ? `Estás viendo las propuestas de ${name}`
+        : `Ver las propuestas de ${name}`,
+      onClick: () =>
+        onOpenAdvisor(name),
+    };
+
+  };
+
 
   /*
    * El director siempre aparece.
@@ -4830,7 +4894,10 @@ function InnovationTeamSection({
 
       {/* DIRECTOR */}
 
-      <div className="innovation-director-card">
+      <button
+        className="innovation-director-card innovation-card-button"
+        {...getCardProps(director.name)}
+      >
 
         <UserAvatar
           user={
@@ -4863,7 +4930,15 @@ function InnovationTeamSection({
           INNOVACIÓN DIGITAL
         </span>
 
-      </div>
+
+        <span className="innovation-card-count">
+          {getCount(director.name)} propuestas
+          <ChevronRight
+            size={14}
+          />
+        </span>
+
+      </button>
 
 
       {/* MIEMBROS */}
@@ -4880,11 +4955,12 @@ function InnovationTeamSection({
 
 
             return (
-              <div
-                className="innovation-member-card"
+              <button
+                className="innovation-member-card innovation-card-button"
                 key={
                   member.name
                 }
+                {...getCardProps(member.name)}
               >
 
                 <UserAvatar
@@ -4907,7 +4983,15 @@ function InnovationTeamSection({
 
                 </div>
 
-              </div>
+
+                <span className="innovation-card-count">
+                  {getCount(member.name)} propuestas
+                  <ChevronRight
+                    size={14}
+                  />
+                </span>
+
+              </button>
             );
 
           }
@@ -5501,6 +5585,126 @@ function ExecutiveDetail({
 
 
 /* =========================================================
+   PROPUESTAS DE UN ASESOR DE INNOVACIÓN DIGITAL
+   ========================================================= */
+
+function AdvisorDetail({
+  advisorName,
+  rows = [],
+  onBack,
+  onOpenProposal,
+}) {
+
+  const member =
+    INNOVATION_TEAM.find(
+      (item) =>
+        normalizeText(item.name) ===
+        normalizeText(advisorName)
+    );
+
+  const advisorRows =
+    rows.filter((row) =>
+      advisorMatches(row, advisorName)
+    );
+
+  const closedRows =
+    advisorRows.filter(
+      (row) => row.estado === "cerrada"
+    );
+
+  const totalValue =
+    advisorRows.reduce(
+      (sum, row) =>
+        sum +
+        toNumber(
+          row.valorPropuesta
+        ),
+      0
+    );
+
+  const isDirector =
+    member === INNOVATION_TEAM[0];
+
+
+  return (
+    <section className="executive-detail-section">
+
+      <button
+        type="button"
+        className="executive-detail-back"
+        onClick={onBack}
+      >
+        <ChevronLeft size={15} />
+        Volver al resumen
+      </button>
+
+
+      <div className="executive-detail-header">
+
+        <div className="executive-detail-user">
+
+          <UserAvatar
+            user={findUserByName(advisorName)}
+            size="large"
+          />
+
+          <div>
+            <strong>
+              {member?.name || advisorName}
+            </strong>
+            <span>
+              {member?.role || "Innovación Digital"}
+            </span>
+            <small>
+              {isDirector
+                ? "Propuestas del Equipo Innovación Digital"
+                : "Propuestas en las que es asesor(a)"}
+            </small>
+          </div>
+
+        </div>
+
+
+        <div className="executive-detail-metrics">
+          <div>
+            <span>Propuestas</span>
+            <strong>{advisorRows.length}</strong>
+          </div>
+
+          <div>
+            <span>En seguimiento</span>
+            <strong>{advisorRows.length - closedRows.length}</strong>
+          </div>
+
+          <div>
+            <span>Cerradas</span>
+            <strong>{closedRows.length}</strong>
+          </div>
+
+          <div>
+            <span>Valor de las propuestas</span>
+            <strong>{formatMoneyShort(totalValue)}</strong>
+          </div>
+        </div>
+
+      </div>
+
+
+      <ProposalTable
+        rows={advisorRows}
+        onOpenProposal={onOpenProposal}
+        scope={(row) =>
+          advisorMatches(row, advisorName)
+        }
+      />
+
+    </section>
+  );
+
+}
+
+
+/* =========================================================
    FIN APP.JSX — PARTE 4/6
    ========================================================= */
 
@@ -5813,10 +6017,38 @@ function sortRows(
 function ProposalTable({
   rows = [],
   onOpenProposal,
+  scope,
 }) {
 
   const statusFilter =
     useContext(StatusFilterContext);
+
+
+  /*
+   * Cuántas propuestas mostraría cada botón de estado.
+   * `scope` limita el conteo a la vista (por ejemplo,
+   * solo las de un asesor).
+   */
+
+  const scopedRows =
+    (statusFilter?.rowsAnyStatus ?? []).filter(
+      scope || (() => true)
+    );
+
+  const counts = {
+    todas:
+      scopedRows.length,
+    seguimiento:
+      scopedRows.filter(
+        (row) =>
+          row.estado === "seguimiento"
+      ).length,
+    cerrada:
+      scopedRows.filter(
+        (row) =>
+          row.estado === "cerrada"
+      ).length,
+  };
 
 
   /* Orden: clic en el título de la columna */
@@ -5953,7 +6185,7 @@ function ProposalTable({
                   {filter.label}
 
                   <b>
-                    {statusFilter.counts[
+                    {counts[
                       filter.id
                     ] ?? 0}
                   </b>
@@ -6423,6 +6655,13 @@ function countByStatus(items) {
 }
 
 
+/* Genéricas: las que en el Excel tienen "Equipo Innovación Digital" como asesor */
+
+function isGenericProposal(row) {
+  return normalizeText(row?.asesor) === "equipo innovacion digital";
+}
+
+
 function PeriodSection({
   rows,
   onOpenProposal,
@@ -6456,6 +6695,11 @@ function PeriodSection({
     [items]
   );
 
+  const genericRows = useMemo(
+    () => items.filter((item) => isGenericProposal(item.row)),
+    [items]
+  );
+
 
   /* Meses con propuestas, en orden cronológico */
 
@@ -6475,16 +6719,53 @@ function PeriodSection({
   const activeMonth =
     selectedMonth === "Todos" ||
     (selectedMonth === "SinFecha" && undatedRows.length > 0) ||
+    (selectedMonth === "Genericas" && genericRows.length > 0) ||
     months.includes(selectedMonth)
       ? selectedMonth
       : months[months.length - 1] || "Todos";
 
   const showingUndated = activeMonth === "SinFecha";
+  const showingGeneric = activeMonth === "Genericas";
 
 
-  /* Filas del gráfico: meses ("Todos"), semanas del mes o "Sin fecha" */
+  /* Filas del gráfico: meses ("Todos"), semanas del mes, "Sin fecha" o genéricas por mes */
 
   const periods = useMemo(() => {
+
+    if (activeMonth === "Genericas") {
+
+      const genericMonths = [
+        ...new Set(
+          genericRows
+            .filter((item) => item.fecha)
+            .map((item) => getMonthKey(item.fecha))
+        ),
+      ].sort();
+
+      const byMonth = genericMonths.map((monthKey) => ({
+        key: monthKey,
+        label: getMonthLabel(monthKey),
+        range: "",
+        items: genericRows
+          .filter((item) => item.fecha && getMonthKey(item.fecha) === monthKey)
+          .sort((a, b) => a.fecha.getTime() - b.fecha.getTime()),
+      }));
+
+      const undatedGeneric = genericRows.filter((item) => !item.fecha);
+
+      return undatedGeneric.length > 0
+        ? [
+            ...byMonth,
+            {
+              key: "SinFecha",
+              label: "Sin fecha",
+              range: "",
+              items: undatedGeneric,
+            },
+          ]
+        : byMonth;
+
+    }
 
     if (activeMonth === "SinFecha") {
 
@@ -6523,7 +6804,7 @@ function PeriodSection({
         .sort((a, b) => a.fecha.getTime() - b.fecha.getTime()),
     }));
 
-  }, [activeMonth, months, datedRows, undatedRows]);
+  }, [activeMonth, months, datedRows, undatedRows, genericRows]);
 
 
   const periodCounts = periods.map((period) => countByStatus(period.items));
@@ -6590,7 +6871,9 @@ function PeriodSection({
   const periodName =
     showingUndated
       ? "sin fecha"
-      : activeMonth === "Todos"
+      : showingGeneric
+        ? "genéricas"
+        : activeMonth === "Todos"
         ? ""
         : `en ${getMonthLabel(activeMonth)}`;
 
@@ -6646,6 +6929,16 @@ function PeriodSection({
                 onClick={() => handleMonthChange("SinFecha")}
               >
                 Sin fecha
+              </button>
+            )}
+
+            {genericRows.length > 0 && (
+              <button
+                type="button"
+                className={`period-month-chip ${showingGeneric ? "active" : ""}`}
+                onClick={() => handleMonthChange("Genericas")}
+              >
+                Genéricas
               </button>
             )}
 
@@ -6732,6 +7025,10 @@ function PeriodSection({
           <p className="period-hint">
             {showingUndated
               ? "Propuestas que no tienen fecha de solicitud ni de entrega."
+              : showingGeneric
+                ? activeWeek
+                  ? `Propuestas genéricas de ${activeWeek.label}. Toca otra vez para verlas todas.`
+                  : "Propuestas genéricas (Equipo Innovación Digital). Toca un mes para ver solo ese mes."
               : activeMonth === "Todos"
                 ? "Cada propuesta se cuenta en el mes de su fecha de solicitud. Toca un mes para verlo semana a semana."
                 : activeWeek
@@ -6759,6 +7056,9 @@ function PeriodSection({
                   <div className="period-list-info">
                     <strong>{item.row.cuenta || "Sin cuenta"}</strong>
                     <span>{item.row.ejecutivo || "—"}</span>
+                    <span className="period-list-advisor">
+                      Asesor: {getAdvisorData(item.row.asesor).name}
+                    </span>
                   </div>
 
                   <div className="period-list-dates">
@@ -8784,6 +9084,10 @@ function buildViewUrl(navigation) {
     params.set("ejecutivo", navigation.executive);
   }
 
+  if (navigation.advisor) {
+    params.set("asesor", navigation.advisor);
+  }
+
   const query =
     params.toString();
 
@@ -8805,10 +9109,13 @@ function readViewFromUrl() {
   const executive =
     params.get("ejecutivo");
 
+  const advisor =
+    params.get("asesor");
+
   const isFranchise =
     params.get("vista") === "franquicias";
 
-  if (!rubro && !executive && !isFranchise) {
+  if (!rubro && !executive && !advisor && !isFranchise) {
     return null;
   }
 
@@ -8820,6 +9127,7 @@ function readViewFromUrl() {
       : "resumen",
     rubro: rubro || "Todos",
     executive: executive || null,
+    advisor: executive ? null : advisor || null,
   };
 
 }
@@ -8831,7 +9139,8 @@ function isSameNavigation(a, b) {
     a?.userId === b?.userId &&
     a?.section === b?.section &&
     a?.rubro === b?.rubro &&
-    a?.executive === b?.executive
+    a?.executive === b?.executive &&
+    (a?.advisor ?? null) === (b?.advisor ?? null)
   );
 
 }
@@ -9047,6 +9356,32 @@ const [changePasswordError, setChangePasswordError] = useState("");
 
 
   /* =======================================================
+     ASESOR DE INNOVACIÓN SELECCIONADO
+     ======================================================= */
+
+  const [
+    selectedAdvisor,
+    setSelectedAdvisor,
+  ] = useState(null);
+
+
+  /*
+   * Ejecutivo y asesor son vistas distintas:
+   * abrir una cierra la otra.
+   */
+
+  function openExecutive(name) {
+    setSelectedAdvisor(null);
+    setSelectedExecutive(name);
+  }
+
+  function openAdvisor(name) {
+    setSelectedExecutive(null);
+    setSelectedAdvisor(name);
+  }
+
+
+  /* =======================================================
      SIDEBAR MOBILE
      ======================================================= */
 
@@ -9087,6 +9422,7 @@ const [changePasswordError, setChangePasswordError] = useState("");
 
   const isHome =
     !selectedExecutive &&
+    !selectedAdvisor &&
     activeSection !== "franquicias" &&
     selectedRubro === "Todos";
 
@@ -9108,6 +9444,7 @@ const [changePasswordError, setChangePasswordError] = useState("");
       section: activeSection,
       rubro: selectedRubro,
       executive: selectedExecutive,
+      advisor: selectedAdvisor,
     };
 
     const current =
@@ -9159,6 +9496,7 @@ const [changePasswordError, setChangePasswordError] = useState("");
     activeSection,
     selectedRubro,
     selectedExecutive,
+    selectedAdvisor,
   ]);
 
 
@@ -9190,6 +9528,10 @@ const [changePasswordError, setChangePasswordError] = useState("");
 
       setSelectedExecutive(
         navigation.executive
+      );
+
+      setSelectedAdvisor(
+        navigation.advisor ?? null
       );
 
     }
@@ -9226,6 +9568,7 @@ const [changePasswordError, setChangePasswordError] = useState("");
     );
 
     setSelectedExecutive(null);
+    setSelectedAdvisor(null);
     setSelectedProposal(null);
     setMobileSidebarOpen(false);
 
@@ -9248,7 +9591,7 @@ const [changePasswordError, setChangePasswordError] = useState("");
   useEffect(() => {
 
     const viewKey =
-      `${activeSection}|${selectedRubro}|${selectedExecutive ?? ""}`;
+      `${activeSection}|${selectedRubro}|${selectedExecutive ?? ""}|${selectedAdvisor ?? ""}`;
 
     const previousKey =
       lastViewRef.current;
@@ -9290,6 +9633,7 @@ const [changePasswordError, setChangePasswordError] = useState("");
     activeSection,
     selectedRubro,
     selectedExecutive,
+    selectedAdvisor,
     isHome,
   ]);
 
@@ -9430,6 +9774,7 @@ const [changePasswordError, setChangePasswordError] = useState("");
 
     setSearchTerm("");
     setSelectedExecutive(null);
+    setSelectedAdvisor(null);
 
 
     /*
@@ -9455,6 +9800,10 @@ const [changePasswordError, setChangePasswordError] = useState("");
 
       setSelectedExecutive(
         urlView.executive
+      );
+
+      setSelectedAdvisor(
+        urlView.advisor
       );
 
     }
@@ -9770,22 +10119,7 @@ async function handleLogin() {
         selectedStatus,
         onStatusChange:
           setSelectedStatus,
-        counts: {
-          todas:
-            rowsAnyStatus.length,
-          seguimiento:
-            rowsAnyStatus.filter(
-              (row) =>
-                row.estado ===
-                "seguimiento"
-            ).length,
-          cerrada:
-            rowsAnyStatus.filter(
-              (row) =>
-                row.estado ===
-                "cerrada"
-            ).length,
-        },
+        rowsAnyStatus,
       };
 
     }, [
@@ -9803,7 +10137,9 @@ async function handleLogin() {
      ======================================================= */
 
   const pageTitle =
-    selectedExecutive
+    selectedAdvisor
+      ? selectedAdvisor
+      : selectedExecutive
       ? selectedExecutive
       : activeSection ===
         "franquicias"
@@ -9925,6 +10261,7 @@ async function handleLogin() {
     );
 
     setSelectedExecutive(null);
+    setSelectedAdvisor(null);
 
 
     /*
@@ -9948,6 +10285,10 @@ async function handleLogin() {
     setSelectedRubro(
       rubro
     );
+
+    // Elegir un sector muestra el sector, no la vista abierta antes
+    setSelectedExecutive(null);
+    setSelectedAdvisor(null);
 
 
     /*
@@ -9988,15 +10329,15 @@ async function handleLogin() {
       section
     );
 
+    // Resumen y Franquicias reemplazan la vista de ejecutivo o asesor
+    setSelectedExecutive(null);
+    setSelectedAdvisor(null);
+
 
     if (
       section ===
       "franquicias"
     ) {
-
-      setSelectedExecutive(
-        null
-      );
 
       setMobileSidebarOpen(
         false
@@ -10555,8 +10896,16 @@ async function handleLogin() {
              ================================================= */}
 
           <InnovationTeamSection
-            selectedTeam={
-              selectedTeam
+            rows={
+              currentRows
+            }
+
+            selectedAdvisor={
+              selectedAdvisor
+            }
+
+            onOpenAdvisor={
+              openAdvisor
             }
           />
 
@@ -10576,7 +10925,7 @@ async function handleLogin() {
             }
 
             onOpenExecutive={
-              setSelectedExecutive
+              openExecutive
             }
 
           />
@@ -10595,7 +10944,29 @@ async function handleLogin() {
             className="dashboard-view"
           >
 
-          {selectedExecutive ? (
+          {selectedAdvisor ? (
+
+            <AdvisorDetail
+              advisorName={
+                selectedAdvisor
+              }
+
+              rows={
+                currentRows
+              }
+
+              onBack={() =>
+                setSelectedAdvisor(
+                  null
+                )
+              }
+
+              onOpenProposal={
+                setSelectedProposal
+              }
+            />
+
+          ) : selectedExecutive ? (
 
             <ExecutiveDetail
               executiveName={
